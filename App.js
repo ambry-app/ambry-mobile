@@ -1,21 +1,30 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react'
+import { NavigationContainer } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import tw, { useDeviceContext } from 'twrnc'
 
-export default function App() {
+import RecentBooksScreen from './screens/RecentBooksScreen'
+import BookDetailsScreen from './screens/BookDetailsScreen'
+import PersonDetailsScreen from './screens/PersonDetailsScreen'
+import SeriesScreen from './screens/SeriesScreen'
+
+const Stack = createNativeStackNavigator()
+
+export default function App () {
+  useDeviceContext(tw)
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName='Recent'>
+        <Stack.Screen
+          name='Recent'
+          options={{ title: 'Newest books' }}
+          component={RecentBooksScreen}
+        />
+        <Stack.Screen name='Book' component={BookDetailsScreen} />
+        <Stack.Screen name='Person' component={PersonDetailsScreen} />
+        <Stack.Screen name='Series' component={SeriesScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
