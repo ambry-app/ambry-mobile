@@ -1,13 +1,33 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
-import { Image, ScrollView, Text, View } from 'react-native'
+import { Image, SectionList, Text, View } from 'react-native'
 import tw from '../lib/tailwind'
 
+import BookGrid from '../components/BookGrid'
 import Description from '../components/Description'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 
 import { formatImageUri, getPerson } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/person'
+
+function PersonHeader ({ person }) {
+  return (
+    <>
+      <Text style={tw`text-4xl text-gray-700 text-center`}>{person.name}</Text>
+      <View
+        style={tw`mx-12 my-8 rounded-full border-gray-200 bg-gray-200 shadow-lg`}
+      >
+        <Image
+          source={{ uri: formatImageUri(person.imagePath) }}
+          style={tw.style('rounded-full w-full', {
+            aspectRatio: 1 / 1
+          })}
+        />
+      </View>
+      <Description description={person.description} />
+    </>
+  )
+}
 
 export default function PersonDetailsScreen ({ route }) {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -46,26 +66,40 @@ export default function PersonDetailsScreen ({ route }) {
       )
     }
   } else {
+    const authorSections = person.authors.map(author => {
+      return {
+        title:
+          author.name == person.name
+            ? `Written by ${author.name}`
+            : `Written by ${person.name} as ${author.name}`,
+        data: [{ id: author.id, books: author.books }]
+      }
+    })
+
+    const narratorSections = person.narrators.map(narrator => {
+      return {
+        title:
+          narrator.name == person.name
+            ? `Narrated by ${narrator.name}`
+            : `Narrated by ${person.name} as ${narrator.name}`,
+        data: [{ id: narrator.id, books: narrator.books }]
+      }
+    })
     return (
-      <ScrollView>
-        <View style={tw`p-4`}>
-          <Text style={tw`text-4xl text-gray-700 text-center`}>
-            {person.name}
-          </Text>
-          <View
-            style={tw`mx-12 my-8 rounded-full border-gray-200 bg-gray-200 shadow-lg`}
-          >
-            <Image
-              source={{ uri: formatImageUri(person.imagePath) }}
-              style={tw.style('rounded-full w-full', {
-                aspectRatio: 1 / 1
-              })}
-            />
+      <SectionList
+        style={tw`p-4`}
+        sections={[...authorSections, ...narratorSections]}
+        keyExtractor={({ id }) => id}
+        renderItem={({ item: { books } }) => (
+          <View style={tw`pb-8`}>
+            <BookGrid books={books} />
           </View>
-          <Description description={person.description} />
-          {/* TODO: books authored and/or narrated go here */}
-        </View>
-      </ScrollView>
+        )}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text style={tw`mt-8 text-3xl text-gray-700`}>{title}</Text>
+        )}
+        ListHeaderComponent={<PersonHeader person={person} />}
+      />
     )
   }
 
