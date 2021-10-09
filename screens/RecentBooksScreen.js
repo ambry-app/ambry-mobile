@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
 import { ActivityIndicator, Text, View } from 'react-native'
-import tw from 'twrnc'
+import tw from '../lib/tailwind'
 
 import { getRecentBooks } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/books'

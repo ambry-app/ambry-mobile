@@ -1,7 +1,8 @@
 import React from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import tw, { useDeviceContext } from 'twrnc'
+import tw from './lib/tailwind'
+import { useDeviceContext } from 'twrnc'
 
 import RecentBooksScreen from './screens/RecentBooksScreen'
 import BookDetailsScreen from './screens/BookDetailsScreen'
@@ -21,8 +22,16 @@ export default function App () {
           options={{ title: 'Newest books' }}
           component={RecentBooksScreen}
         />
-        <Stack.Screen name='Book' component={BookDetailsScreen} />
-        <Stack.Screen name='Person' component={PersonDetailsScreen} />
+        <Stack.Screen
+          name='Book'
+          options={{ title: 'Book details' }}
+          component={BookDetailsScreen}
+        />
+        <Stack.Screen
+          name='Person'
+          options={{ title: 'Person details' }}
+          component={PersonDetailsScreen}
+        />
         <Stack.Screen name='Series' component={SeriesScreen} />
       </Stack.Navigator>
     </NavigationContainer>
