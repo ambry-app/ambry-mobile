@@ -1,14 +1,10 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
-import {
-  ActivityIndicator,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native'
-import Markdown from 'react-native-markdown-display'
+import { Image, ScrollView, Text, View } from 'react-native'
 import tw from '../lib/tailwind'
+
+import Description from '../components/Description'
+import LargeActivityIndicator from '../components/LargeActivityIndicator'
+import ScreenCentered from '../components/ScreenCentered'
 
 import { formatImageUri, getPerson } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/person'
@@ -36,25 +32,20 @@ export default function PersonDetailsScreen ({ route }) {
   if (!person) {
     if (loading) {
       return (
-        <View style={tw.style('items-center justify-center', { flex: 1 })}>
-          <ActivityIndicator animating={true} />
-        </View>
+        <ScreenCentered>
+          <LargeActivityIndicator />
+        </ScreenCentered>
       )
     }
 
     if (error) {
       return (
-        <View style={tw.style('items-center justify-center', { flex: 1 })}>
+        <ScreenCentered>
           <Text>Failed to load person!</Text>
-        </View>
+        </ScreenCentered>
       )
     }
   } else {
-    const markdownStyles = StyleSheet.create({
-      // Tailwind `text-gray-700` when gray = colors.gray in tailwind.config.js
-      body: { color: '#3F3F46', fontSize: 18 }
-    })
-
     return (
       <ScrollView>
         <View style={tw`p-4`}>
@@ -65,15 +56,15 @@ export default function PersonDetailsScreen ({ route }) {
             style={tw`mx-12 my-8 rounded-full border-gray-200 bg-gray-200 shadow-lg`}
           >
             <Image
-              source={{ uri: formatImageUri(person.image_path) }}
+              source={{ uri: formatImageUri(person.imagePath) }}
               style={tw.style('rounded-full w-full', {
                 aspectRatio: 1 / 1
               })}
             />
           </View>
-          <Markdown style={markdownStyles}>{person.description}</Markdown>
+          <Description description={person.description} />
+          {/* TODO: books authored and/or narrated go here */}
         </View>
-        {/* TODO: books authored and/or narrated go here */}
       </ScrollView>
     )
   }

@@ -1,10 +1,12 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
-import { ActivityIndicator, Text, View } from 'react-native'
-import tw from '../lib/tailwind'
+import { Text, View } from 'react-native'
+
+import BookGrid from '../components/BookGrid'
+import LargeActivityIndicator from '../components/LargeActivityIndicator'
+import ScreenCentered from '../components/ScreenCentered'
 
 import { getRecentBooks } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/books'
-import BookGrid from '../components/BookGrid'
 
 export default function RecentBooksScreen () {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -30,20 +32,20 @@ export default function RecentBooksScreen () {
   if (books.length === 0) {
     if (loading) {
       return (
-        <View style={tw.style('items-center justify-center', { flex: 1 })}>
-          <ActivityIndicator animating={true} />
-        </View>
+        <ScreenCentered>
+          <LargeActivityIndicator />
+        </ScreenCentered>
       )
     }
 
     if (error) {
       return (
-        <View style={tw.style('items-center justify-center', { flex: 1 })}>
+        <ScreenCentered>
           <Text>Failed to load books!</Text>
-        </View>
+        </ScreenCentered>
       )
     }
   }
 
-  return <BookGrid numColumns={2} books={books} onEndReached={fetchBooks} />
+  return <BookGrid books={books} onEndReached={fetchBooks} />
 }

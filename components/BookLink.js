@@ -11,7 +11,7 @@ export default function BookLink ({ book }) {
   const authors = book.authors.map(author => (
     <TouchableOpacity
       key={author.id}
-      onPress={() => navigation.push('Person', { personId: author.id })}
+      onPress={() => navigation.push('Person', { personId: author.personId })}
     >
       <Text style={tw`text-lg text-gray-500 text-center`}>{author.name}</Text>
     </TouchableOpacity>
@@ -23,7 +23,7 @@ export default function BookLink ({ book }) {
       onPress={() => navigation.push('Series', { seriesId: series.id })}
     >
       <Text style={tw`text-gray-400 text-center`}>
-        {series.name} #{series.book_number}
+        {series.name} #{series.bookNumber}
       </Text>
     </TouchableOpacity>
   ))
@@ -40,7 +40,7 @@ export default function BookLink ({ book }) {
         onPress={() => navigation.push('Book', { bookId: book.id })}
       >
         <Image
-          source={{ uri: formatImageUri(book.image_path) }}
+          source={{ uri: formatImageUri(book.imagePath) }}
           style={tw.style('rounded-lg', 'w-full', {
             aspectRatio: 10 / 15
           })}

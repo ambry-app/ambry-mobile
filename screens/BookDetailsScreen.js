@@ -1,18 +1,15 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
-import {
-  ActivityIndicator,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native'
-import Markdown from 'react-native-markdown-display'
-import tw from '../lib/tailwind'
+import { Image, ScrollView, Text, View } from 'react-native'
 import Moment from 'moment'
 
-import { formatImageUri, getBook } from '../api/ambry'
+import tw from '../lib/tailwind'
+
+import Description from '../components/Description'
+import LargeActivityIndicator from '../components/LargeActivityIndicator'
+import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
+
+import { formatImageUri, getBook } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/book'
 
 export default function BookDetailsScreen ({ route }) {
@@ -38,25 +35,20 @@ export default function BookDetailsScreen ({ route }) {
   if (!book) {
     if (loading) {
       return (
-        <View style={tw.style('items-center justify-center', { flex: 1 })}>
-          <ActivityIndicator animating={true} />
-        </View>
+        <ScreenCentered>
+          <LargeActivityIndicator />
+        </ScreenCentered>
       )
     }
 
     if (error) {
       return (
-        <View style={tw.style('items-center justify-center', { flex: 1 })}>
+        <ScreenCentered>
           <Text>Failed to load book!</Text>
-        </View>
+        </ScreenCentered>
       )
     }
   } else {
-    const markdownStyles = StyleSheet.create({
-      // Tailwind `text-gray-700` when gray = colors.gray in tailwind.config.js
-      body: { color: '#3F3F46', fontSize: 18 }
-    })
-
     return (
       <ScrollView>
         <View style={tw`p-4`}>
@@ -66,7 +58,7 @@ export default function BookDetailsScreen ({ route }) {
             items={book.authors}
             navigationArgsExtractor={author => [
               'Person',
-              { personId: author.id }
+              { personId: author.personId }
             ]}
             style={tw`text-xl text-gray-500`}
             linkStyle={tw`text-xl text-lime-500`}
@@ -77,7 +69,7 @@ export default function BookDetailsScreen ({ route }) {
               'Series',
               { seriesId: series.id }
             ]}
-            nameExtractor={series => `${series.name} #${series.book_number}`}
+            nameExtractor={series => `${series.name} #${series.bookNumber}`}
             style={tw`text-lg text-gray-400`}
             linkStyle={tw`text-lg text-gray-400`}
           />
@@ -85,7 +77,7 @@ export default function BookDetailsScreen ({ route }) {
             style={tw`m-8 mb-0 rounded-2xl border-gray-200 bg-gray-200 shadow-lg`}
           >
             <Image
-              source={{ uri: formatImageUri(book.image_path) }}
+              source={{ uri: formatImageUri(book.imagePath) }}
               style={tw.style('rounded-2xl', 'w-full', {
                 aspectRatio: 10 / 15
               })}
@@ -95,7 +87,7 @@ export default function BookDetailsScreen ({ route }) {
             Published {Moment(book.published).format('MMMM Do, YYYY')}
           </Text>
           {/* TODO: recordings go here */}
-          <Markdown style={markdownStyles}>{book.description}</Markdown>
+          <Description description={book.description} />
         </View>
       </ScrollView>
     )
