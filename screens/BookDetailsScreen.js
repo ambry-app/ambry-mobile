@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
-import { Image, ScrollView, Text, View } from 'react-native'
+import { Button, Image, ScrollView, Text, View } from 'react-native'
 import Moment from 'moment'
 
 import tw from '../lib/tailwind'
@@ -12,6 +12,8 @@ import WrappingListOfLinks from '../components/WrappingListOfLinks'
 
 import { formatImageUri, getBook } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/book'
+
+import Play from '../assets/play.svg'
 
 function MediaList ({ book, media }) {
   if (media.length == 0) {
@@ -28,21 +30,27 @@ function MediaList ({ book, media }) {
         {media.map((media, i) => (
           <View
             key={media.id}
-            style={tw.style('py-3 border-gray-200', { 'border-t': i > 0 })}
+            style={tw.style(
+              'flex-row justify-between items-center py-3 border-gray-200',
+              {
+                'border-t': i > 0
+              }
+            )}
           >
-            <Text style={tw`text-lg text-gray-700`}>
-              {book.title} ({media.abridged ? 'Anridged' : 'Unabridged'})
-            </Text>
-            <WrappingListOfLinks
-              prefix='Narrated by'
-              items={media.narrators}
-              navigationArgsExtractor={narrator => [
-                'Person',
-                { personId: narrator.personId }
-              ]}
-              style={tw`text-lg text-gray-500`}
-              linkStyle={tw`text-lg text-lime-500`}
-            />
+            <View style={tw`flex-shrink`}>
+              <Text style={tw`text-lg text-gray-700`}>{book.title}</Text>
+              <WrappingListOfLinks
+                prefix='Narrated by'
+                items={media.narrators}
+                navigationArgsExtractor={narrator => [
+                  'Person',
+                  { personId: narrator.personId }
+                ]}
+                style={tw`text-lg text-gray-500`}
+                linkStyle={tw`text-lg text-lime-500`}
+              />
+            </View>
+            <Play width={50} height={50} />
           </View>
         ))}
       </View>
