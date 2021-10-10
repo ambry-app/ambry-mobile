@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
-import { Text, View } from 'react-native'
+import { Text } from 'react-native'
 
 import BookGrid from '../components/BookGrid'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'

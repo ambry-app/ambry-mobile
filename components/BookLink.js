@@ -30,6 +30,11 @@ export default function BookLink ({ book }) {
 
   return (
     <View style={tw`p-2 w-1/2`}>
+      {book.bookNumber && (
+        <Text style={tw`text-center text-lg text-gray-700`}>
+          Book {book.bookNumber}
+        </Text>
+      )}
       <Pressable
         style={({ pressed }) => [
           tw.style(['rounded-lg', 'border-gray-200', 'bg-gray-200']),

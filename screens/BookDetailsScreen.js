@@ -5,6 +5,7 @@ import Moment from 'moment'
 import tw from '../lib/tailwind'
 
 import Description from '../components/Description'
+import { Header1 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
@@ -52,7 +53,7 @@ export default function BookDetailsScreen ({ route }) {
     return (
       <ScrollView>
         <View style={tw`p-4`}>
-          <Text style={tw`text-4xl text-gray-700`}>{book.title}</Text>
+          <Header1>{book.title}</Header1>
           <WrappingListOfLinks
             prefix='by'
             items={book.authors}
@@ -74,7 +75,7 @@ export default function BookDetailsScreen ({ route }) {
             linkStyle={tw`text-lg text-gray-400`}
           />
           <View
-            style={tw`m-8 mb-0 rounded-2xl border-gray-200 bg-gray-200 shadow-lg`}
+            style={tw`mt-8 rounded-2xl border-gray-200 bg-gray-200 shadow-lg`}
           >
             <Image
               source={{ uri: formatImageUri(book.imagePath) }}
@@ -83,7 +84,7 @@ export default function BookDetailsScreen ({ route }) {
               })}
             />
           </View>
-          <Text style={tw`text-gray-400 text-sm ml-8 mt-2 mb-4`}>
+          <Text style={tw`text-gray-400 text-sm mt-1 mb-4`}>
             Published {Moment(book.published).format('MMMM Do, YYYY')}
           </Text>
           {/* TODO: recordings go here */}

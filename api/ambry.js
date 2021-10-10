@@ -19,6 +19,12 @@ export async function getPerson (personId) {
   return result.data
 }
 
+export async function getSeries (seriesId) {
+  const response = await fetch(`${API_URL}/series/${seriesId}`)
+  const result = await response.json()
+  return result.data
+}
+
 export function formatImageUri (path) {
   return `${BASE_URL}/${path}`
 }

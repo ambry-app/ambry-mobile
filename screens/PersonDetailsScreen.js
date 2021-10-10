@@ -4,6 +4,7 @@ import tw from '../lib/tailwind'
 
 import BookGrid from '../components/BookGrid'
 import Description from '../components/Description'
+import { Header1, Header2 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 
@@ -12,8 +13,8 @@ import { actionCreators, initialState, reducer } from '../reducers/person'
 
 function PersonHeader ({ person }) {
   return (
-    <>
-      <Text style={tw`text-4xl text-gray-700 text-center`}>{person.name}</Text>
+    <View style={tw`p-4`}>
+      <Header1 style={tw`text-center`}>{person.name}</Header1>
       <View
         style={tw`mx-12 my-8 rounded-full border-gray-200 bg-gray-200 shadow-lg`}
       >
@@ -25,7 +26,7 @@ function PersonHeader ({ person }) {
         />
       </View>
       <Description description={person.description} />
-    </>
+    </View>
   )
 }
 
@@ -87,16 +88,11 @@ export default function PersonDetailsScreen ({ route }) {
     })
     return (
       <SectionList
-        style={tw`p-4`}
         sections={[...authorSections, ...narratorSections]}
         keyExtractor={({ id }) => id}
-        renderItem={({ item: { books } }) => (
-          <View style={tw`pb-8`}>
-            <BookGrid books={books} />
-          </View>
-        )}
+        renderItem={({ item: { books } }) => <BookGrid books={books} />}
         renderSectionHeader={({ section: { title } }) => (
-          <Text style={tw`mt-8 text-3xl text-gray-700`}>{title}</Text>
+          <Header2 style={tw`px-4 pt-8 pb-0`}>{title}</Header2>
         )}
         ListHeaderComponent={<PersonHeader person={person} />}
       />
