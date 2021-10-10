@@ -17,7 +17,8 @@ export const initialState = {
   loading: false,
   error: false,
   books: [],
-  nextPage: 1
+  nextPage: 1,
+  hasMore: true
 }
 
 export function reducer (state, action) {
@@ -30,8 +31,8 @@ export function reducer (state, action) {
         loading: false,
         error: false,
         books: [...state.books, ...action.payload.books],
-        nextPage:
-          action.payload.books == [] ? state.nextPage : state.nextPage + 1
+        nextPage: state.nextPage + 1,
+        hasMore: action.payload.books.length > 0
       }
     case types.FAILURE:
       return { ...state, loading: false, error: true }

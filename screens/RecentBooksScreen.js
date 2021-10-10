@@ -11,9 +11,13 @@ import { actionCreators, initialState, reducer } from '../reducers/books'
 export default function RecentBooksScreen () {
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  const { books, nextPage, loading, error } = state
+  const { books, nextPage, hasMore, loading, error } = state
 
   const fetchBooks = useCallback(async () => {
+    if (!hasMore) {
+      return
+    }
+
     dispatch(actionCreators.loading())
 
     try {
