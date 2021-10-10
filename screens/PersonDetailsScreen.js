@@ -62,7 +62,7 @@ export default function PersonDetailsScreen ({ route }) {
     if (error) {
       return (
         <ScreenCentered>
-          <Text>Failed to load person!</Text>
+          <Text style={tw`text-gray-700`}>Failed to load person!</Text>
         </ScreenCentered>
       )
     }

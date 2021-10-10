@@ -44,7 +44,7 @@ export default function SeriesScreen ({ navigation, route }) {
     if (error) {
       return (
         <ScreenCentered>
-          <Text>Failed to load series!</Text>
+          <Text style={tw`text-gray-700`}>Failed to load series!</Text>
         </ScreenCentered>
       )
     }

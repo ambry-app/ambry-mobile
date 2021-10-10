@@ -5,6 +5,8 @@ import BookGrid from '../components/BookGrid'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 
+import tw from '../lib/tailwind'
+
 import { getRecentBooks } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/books'
 
@@ -45,7 +47,7 @@ export default function RecentBooksScreen () {
     if (error) {
       return (
         <ScreenCentered>
-          <Text>Failed to load books!</Text>
+          <Text style={tw`text-gray-700`}>Failed to load books!</Text>
         </ScreenCentered>
       )
     }

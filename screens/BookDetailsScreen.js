@@ -90,7 +90,7 @@ export default function BookDetailsScreen ({ route }) {
     if (error) {
       return (
         <ScreenCentered>
-          <Text>Failed to load book!</Text>
+          <Text style={tw`text-gray-700`}>Failed to load book!</Text>
         </ScreenCentered>
       )
     }
