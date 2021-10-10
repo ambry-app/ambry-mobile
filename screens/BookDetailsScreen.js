@@ -13,6 +13,43 @@ import WrappingListOfLinks from '../components/WrappingListOfLinks'
 import { formatImageUri, getBook } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/book'
 
+function MediaList ({ book, media }) {
+  if (media.length == 0) {
+    return (
+      <Text style={tw`my-4 font-bold`}>
+        Sorry, there are no recordings uploaded for this book.
+      </Text>
+    )
+  } else {
+    return (
+      <View
+        style={tw`rounded-lg border border-gray-200 bg-white shadow-lg px-3 mb-4`}
+      >
+        {media.map((media, i) => (
+          <View
+            key={media.id}
+            style={tw.style('py-3 border-gray-200', { 'border-t': i > 0 })}
+          >
+            <Text style={tw`text-lg text-gray-700`}>
+              {book.title} ({media.abridged ? 'Anridged' : 'Unabridged'})
+            </Text>
+            <WrappingListOfLinks
+              prefix='Narrated by'
+              items={media.narrators}
+              navigationArgsExtractor={narrator => [
+                'Person',
+                { personId: narrator.personId }
+              ]}
+              style={tw`text-lg text-gray-500`}
+              linkStyle={tw`text-lg text-lime-500`}
+            />
+          </View>
+        ))}
+      </View>
+    )
+  }
+}
+
 export default function BookDetailsScreen ({ route }) {
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -87,7 +124,7 @@ export default function BookDetailsScreen ({ route }) {
           <Text style={tw`text-gray-400 text-sm mt-1 mb-4`}>
             Published {Moment(book.published).format('MMMM Do, YYYY')}
           </Text>
-          {/* TODO: recordings go here */}
+          <MediaList book={book} media={book.media} />
           <Description description={book.description} />
         </View>
       </ScrollView>

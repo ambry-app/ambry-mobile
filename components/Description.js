@@ -8,5 +8,5 @@ export default function Description ({ description }) {
     body: { color: tw.color('gray-700'), fontSize: 18 }
   })
 
-  return <Markdown style={markdownStyles}>{description}</Markdown>
+  return <Markdown style={markdownStyles}>{description || ''}</Markdown>
 }
