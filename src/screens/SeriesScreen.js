@@ -1,6 +1,8 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
 import { Text, View } from 'react-native'
 
+import { useAuth } from '../contexts/Auth'
+
 import tw from '../lib/tailwind'
 
 import BookGrid from '../components/BookGrid'
@@ -13,6 +15,9 @@ import { actionCreators, initialState, reducer } from '../reducers/series'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
 
 export default function SeriesScreen ({ navigation, route }) {
+  const {
+    authData: { token }
+  } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { series, loading, error } = state
@@ -21,7 +26,7 @@ export default function SeriesScreen ({ navigation, route }) {
     dispatch(actionCreators.loading())
 
     try {
-      const series = await getSeries(route.params.seriesId)
+      const series = await getSeries(route.params.seriesId, token)
       dispatch(actionCreators.success(series))
     } catch (e) {
       dispatch(actionCreators.failure())

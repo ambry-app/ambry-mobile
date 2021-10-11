@@ -1,5 +1,8 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
 import { Image, SectionList, Text, View } from 'react-native'
+
+import { useAuth } from '../contexts/Auth'
+
 import tw from '../lib/tailwind'
 
 import BookGrid from '../components/BookGrid'
@@ -8,10 +11,14 @@ import { Header1, Header2 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 
-import { formatImageUri, getPerson } from '../api/ambry'
+import { imageSource, getPerson } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/person'
 
 function PersonHeader ({ person }) {
+  const {
+    authData: { token }
+  } = useAuth()
+
   return (
     <View style={tw`p-4`}>
       <Header1 style={tw`text-center`}>{person.name}</Header1>
@@ -19,7 +26,7 @@ function PersonHeader ({ person }) {
         style={tw`mx-12 my-8 rounded-full border-gray-200 bg-gray-200 shadow-lg`}
       >
         <Image
-          source={{ uri: formatImageUri(person.imagePath) }}
+          source={imageSource(person.imagePath, token)}
           style={tw.style('rounded-full w-full', {
             aspectRatio: 1 / 1
           })}
@@ -31,6 +38,9 @@ function PersonHeader ({ person }) {
 }
 
 export default function PersonDetailsScreen ({ route }) {
+  const {
+    authData: { token }
+  } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { person, loading, error } = state
@@ -39,7 +49,7 @@ export default function PersonDetailsScreen ({ route }) {
     dispatch(actionCreators.loading())
 
     try {
-      const person = await getPerson(route.params.personId)
+      const person = await getPerson(route.params.personId, token)
       dispatch(actionCreators.success(person))
     } catch (e) {
       dispatch(actionCreators.failure())

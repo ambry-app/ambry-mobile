@@ -10,26 +10,56 @@ async function handleResponse (response) {
   }
 }
 
-export async function getRecentBooks (page = 1) {
-  const response = await fetch(`${API_URL}/books?page=${page}`)
+export async function getRecentBooks (page = 1, token) {
+  const response = await fetch(`${API_URL}/books?page=${page}`, {
+    headers: { Authorization: 'Bearer ' + token }
+  })
   return handleResponse(response)
 }
 
-export async function getBook (bookId) {
-  const response = await fetch(`${API_URL}/books/${bookId}`)
+export async function getBook (bookId, token) {
+  const response = await fetch(`${API_URL}/books/${bookId}`, {
+    headers: { Authorization: 'Bearer ' + token }
+  })
   return handleResponse(response)
 }
 
-export async function getPerson (personId) {
-  const response = await fetch(`${API_URL}/people/${personId}`)
+export async function getPerson (personId, token) {
+  const response = await fetch(`${API_URL}/people/${personId}`, {
+    headers: { Authorization: 'Bearer ' + token }
+  })
   return handleResponse(response)
 }
 
-export async function getSeries (seriesId) {
-  const response = await fetch(`${API_URL}/series/${seriesId}`)
+export async function getSeries (seriesId, token) {
+  const response = await fetch(`${API_URL}/series/${seriesId}`, {
+    headers: { Authorization: 'Bearer ' + token }
+  })
   return handleResponse(response)
 }
 
-export function formatImageUri (path) {
-  return `${BASE_URL}/${path}`
+export async function createToken (email, password) {
+  const response = await fetch(`${API_URL}/log_in`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      user: {
+        email: email,
+        password: password
+      }
+    })
+  })
+
+  return handleResponse(response)
+}
+
+export function imageSource (path, token) {
+  return {
+    uri: `${BASE_URL}/${path}`,
+    headers: {
+      Authorization: 'Bearer ' + token
+    }
+  }
 }

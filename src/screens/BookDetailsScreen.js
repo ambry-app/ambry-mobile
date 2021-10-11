@@ -2,6 +2,8 @@ import React, { useEffect, useReducer, useCallback } from 'react'
 import { Button, Image, ScrollView, Text, View } from 'react-native'
 import Moment from 'moment'
 
+import { useAuth } from '../contexts/Auth'
+
 import tw from '../lib/tailwind'
 
 import Description from '../components/Description'
@@ -10,7 +12,7 @@ import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
 
-import { formatImageUri, getBook } from '../api/ambry'
+import { imageSource, getBook } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/book'
 
 import Play from '../assets/play.svg'
@@ -59,6 +61,9 @@ function MediaList ({ book, media }) {
 }
 
 export default function BookDetailsScreen ({ route }) {
+  const {
+    authData: { token }
+  } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { book, loading, error } = state
@@ -67,7 +72,7 @@ export default function BookDetailsScreen ({ route }) {
     dispatch(actionCreators.loading())
 
     try {
-      const book = await getBook(route.params.bookId)
+      const book = await getBook(route.params.bookId, token)
       dispatch(actionCreators.success(book))
     } catch (e) {
       dispatch(actionCreators.failure())
@@ -123,7 +128,7 @@ export default function BookDetailsScreen ({ route }) {
             style={tw`mt-8 rounded-2xl border-gray-200 bg-gray-200 shadow-lg`}
           >
             <Image
-              source={{ uri: formatImageUri(book.imagePath) }}
+              source={imageSource(book.imagePath, token)}
               style={tw.style('rounded-2xl', 'w-full', {
                 aspectRatio: 10 / 15
               })}

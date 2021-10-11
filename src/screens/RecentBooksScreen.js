@@ -1,6 +1,8 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
 import { Text } from 'react-native'
 
+import { useAuth } from '../contexts/Auth'
+
 import BookGrid from '../components/BookGrid'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
@@ -11,6 +13,9 @@ import { getRecentBooks } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/books'
 
 export default function RecentBooksScreen () {
+  const {
+    authData: { token }
+  } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { books, nextPage, hasMore, loading, error } = state
@@ -23,7 +28,7 @@ export default function RecentBooksScreen () {
     dispatch(actionCreators.loading())
 
     try {
-      const nextBooks = await getRecentBooks(nextPage)
+      const nextBooks = await getRecentBooks(nextPage, token)
       dispatch(actionCreators.success(nextBooks, nextPage))
     } catch (e) {
       dispatch(actionCreators.failure())
