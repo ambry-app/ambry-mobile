@@ -15,9 +15,7 @@ import { imageSource, getPerson } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/person'
 
 function PersonHeader ({ person }) {
-  const {
-    authData: { token }
-  } = useAuth()
+  const { authData } = useAuth()
 
   return (
     <View style={tw`p-4`}>
@@ -26,7 +24,7 @@ function PersonHeader ({ person }) {
         style={tw`mx-12 my-8 rounded-full border-gray-200 bg-gray-200 shadow-lg`}
       >
         <Image
-          source={imageSource(person.imagePath, token)}
+          source={imageSource(authData, person.imagePath)}
           style={tw.style('rounded-full w-full', {
             aspectRatio: 1 / 1
           })}
@@ -38,9 +36,7 @@ function PersonHeader ({ person }) {
 }
 
 export default function PersonDetailsScreen ({ route }) {
-  const {
-    authData: { token }
-  } = useAuth()
+  const { authData } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { person, loading, error } = state
@@ -49,10 +45,14 @@ export default function PersonDetailsScreen ({ route }) {
     dispatch(actionCreators.loading())
 
     try {
-      const person = await getPerson(route.params.personId, token)
+      const person = await getPerson(authData, route.params.personId)
       dispatch(actionCreators.success(person))
-    } catch (e) {
-      dispatch(actionCreators.failure())
+    } catch (status) {
+      if (status == 401) {
+        await signOut()
+      } else {
+        dispatch(actionCreators.failure())
+      }
     }
   }, [route.params.personId])
 

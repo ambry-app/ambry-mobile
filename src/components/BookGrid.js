@@ -8,7 +8,8 @@ import BookLink from './BookLink'
 export default function BookGrid ({
   books,
   onEndReached,
-  ListHeaderComponent
+  ListHeaderComponent,
+  ListFooterComponent
 }) {
   return (
     <FlatList
@@ -19,6 +20,7 @@ export default function BookGrid ({
       onEndReached={onEndReached}
       renderItem={({ item }) => <BookLink book={item} />}
       ListHeaderComponent={ListHeaderComponent}
+      ListFooterComponent={ListFooterComponent}
     />
   )
 }

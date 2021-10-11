@@ -9,9 +9,7 @@ import tw from '../lib/tailwind'
 import { imageSource } from '../api/ambry'
 
 export default function BookLink ({ book }) {
-  const {
-    authData: { token }
-  } = useAuth()
+  const { authData } = useAuth()
   const navigation = useNavigation()
 
   const authors = book.authors.map(author => (
@@ -51,7 +49,7 @@ export default function BookLink ({ book }) {
         onPress={() => navigation.push('Book', { bookId: book.id })}
       >
         <Image
-          source={imageSource(book.imagePath, token)}
+          source={imageSource(authData, book.imagePath)}
           style={tw.style('rounded-lg', 'w-full', {
             aspectRatio: 10 / 15
           })}

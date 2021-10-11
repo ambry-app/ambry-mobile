@@ -15,9 +15,7 @@ import { actionCreators, initialState, reducer } from '../reducers/series'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
 
 export default function SeriesScreen ({ navigation, route }) {
-  const {
-    authData: { token }
-  } = useAuth()
+  const { signOut, authData } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { series, loading, error } = state
@@ -26,10 +24,14 @@ export default function SeriesScreen ({ navigation, route }) {
     dispatch(actionCreators.loading())
 
     try {
-      const series = await getSeries(route.params.seriesId, token)
+      const series = await getSeries(authData, route.params.seriesId)
       dispatch(actionCreators.success(series))
-    } catch (e) {
-      dispatch(actionCreators.failure())
+    } catch (status) {
+      if (status == 401) {
+        await signOut()
+      } else {
+        dispatch(actionCreators.failure())
+      }
     }
   }, [route.params.seriesId])
 

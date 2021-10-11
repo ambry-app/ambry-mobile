@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
-import { Text } from 'react-native'
+import { Text, View } from 'react-native'
 
 import { useAuth } from '../contexts/Auth'
 
@@ -13,25 +13,27 @@ import { getRecentBooks } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/books'
 
 export default function RecentBooksScreen () {
-  const {
-    authData: { token }
-  } = useAuth()
+  const { signOut, authData } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { books, nextPage, hasMore, loading, error } = state
 
   const fetchBooks = useCallback(async () => {
-    if (!hasMore) {
+    if (loading || !hasMore) {
       return
     }
 
     dispatch(actionCreators.loading())
 
     try {
-      const nextBooks = await getRecentBooks(nextPage, token)
+      const nextBooks = await getRecentBooks(authData, nextPage)
       dispatch(actionCreators.success(nextBooks, nextPage))
-    } catch (e) {
-      dispatch(actionCreators.failure())
+    } catch (status) {
+      if (status == 401) {
+        await signOut()
+      } else {
+        dispatch(actionCreators.failure())
+      }
     }
   }, [nextPage])
 
@@ -58,5 +60,13 @@ export default function RecentBooksScreen () {
     }
   }
 
-  return <BookGrid books={books} onEndReached={fetchBooks} />
+  return (
+    <BookGrid
+      books={books}
+      onEndReached={fetchBooks}
+      ListFooterComponent={
+        <View style={tw`h-14`}>{loading && <LargeActivityIndicator />}</View>
+      }
+    />
+  )
 }

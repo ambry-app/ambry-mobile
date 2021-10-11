@@ -20,7 +20,7 @@ import Play from '../assets/play.svg'
 function MediaList ({ book, media }) {
   if (media.length == 0) {
     return (
-      <Text style={tw`my-4 font-bold`}>
+      <Text style={tw`text-gray-700 my-4 font-bold`}>
         Sorry, there are no recordings uploaded for this book.
       </Text>
     )
@@ -61,9 +61,7 @@ function MediaList ({ book, media }) {
 }
 
 export default function BookDetailsScreen ({ route }) {
-  const {
-    authData: { token }
-  } = useAuth()
+  const { signOut, authData } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { book, loading, error } = state
@@ -72,10 +70,14 @@ export default function BookDetailsScreen ({ route }) {
     dispatch(actionCreators.loading())
 
     try {
-      const book = await getBook(route.params.bookId, token)
+      const book = await getBook(authData, route.params.bookId)
       dispatch(actionCreators.success(book))
-    } catch (e) {
-      dispatch(actionCreators.failure())
+    } catch (status) {
+      if (status == 401) {
+        await signOut()
+      } else {
+        dispatch(actionCreators.failure())
+      }
     }
   }, [route.params.bookId])
 
@@ -128,7 +130,7 @@ export default function BookDetailsScreen ({ route }) {
             style={tw`mt-8 rounded-2xl border-gray-200 bg-gray-200 shadow-lg`}
           >
             <Image
-              source={imageSource(book.imagePath, token)}
+              source={imageSource(authData, book.imagePath)}
               style={tw.style('rounded-2xl', 'w-full', {
                 aspectRatio: 10 / 15
               })}
