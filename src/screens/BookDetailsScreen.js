@@ -44,6 +44,7 @@ function MediaList ({ book, media }) {
               <WrappingListOfLinks
                 prefix='Narrated by'
                 items={media.narrators}
+                keyExtractor={narrator => narrator.personId}
                 navigationArgsExtractor={narrator => [
                   'Person',
                   { personId: narrator.personId }
