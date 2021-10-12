@@ -35,7 +35,7 @@ function PersonHeader ({ person }) {
   )
 }
 
-export default function PersonDetailsScreen ({ route }) {
+export default function PersonDetailsScreen ({ route, navigation }) {
   const { authData } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -59,6 +59,12 @@ export default function PersonDetailsScreen ({ route }) {
   useEffect(() => {
     fetchPerson()
   }, [])
+
+  useEffect(() => {
+    if (person) {
+      navigation.setOptions({ title: person.name })
+    }
+  }, [person])
 
   if (!person) {
     if (loading) {

@@ -1,7 +1,7 @@
-import { useNavigation } from '@react-navigation/core'
 import React from 'react'
 import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native'
 
+import { useNavigation } from '@react-navigation/core'
 import { useAuth } from '../contexts/Auth'
 
 import tw from '../lib/tailwind'

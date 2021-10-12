@@ -39,6 +39,12 @@ export default function SeriesScreen ({ navigation, route }) {
     fetchSeries()
   }, [])
 
+  useEffect(() => {
+    if (series) {
+      navigation.setOptions({ title: series.name })
+    }
+  }, [series])
+
   if (!series) {
     if (loading) {
       return (

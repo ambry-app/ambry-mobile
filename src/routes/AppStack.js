@@ -5,6 +5,7 @@ import RecentBooksScreen from '../screens/RecentBooksScreen'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
 import PersonDetailsScreen from '../screens/PersonDetailsScreen'
 import SeriesScreen from '../screens/SeriesScreen'
+import PlayerScreen from '../screens/PlayerScreen'
 
 const Stack = createNativeStackNavigator()
 
@@ -27,6 +28,7 @@ export const AppStack = () => {
         component={PersonDetailsScreen}
       />
       <Stack.Screen name='Series' component={SeriesScreen} />
+      <Stack.Screen name='Player' component={PlayerScreen} />
     </Stack.Navigator>
   )
 }

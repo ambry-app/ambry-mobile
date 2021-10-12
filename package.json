@@ -21,6 +21,7 @@
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.8.0",
     "react-native-svg": "^12.1.1",
+    "react-native-track-player": "^2.1.1",
     "tailwindcss": "^2.2.16",
     "twrnc": "^2.0.0-rc.3"
   },

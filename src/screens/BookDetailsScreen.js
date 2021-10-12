@@ -1,7 +1,8 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
-import { Button, Image, ScrollView, Text, View } from 'react-native'
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import Moment from 'moment'
 
+import { useNavigation } from '@react-navigation/core'
 import { useAuth } from '../contexts/Auth'
 
 import tw from '../lib/tailwind'
@@ -18,6 +19,8 @@ import { actionCreators, initialState, reducer } from '../reducers/book'
 import Play from '../assets/play.svg'
 
 function MediaList ({ book, media }) {
+  const navigation = useNavigation()
+
   if (media.length == 0) {
     return (
       <Text style={tw`text-gray-700 my-4 font-bold`}>
@@ -53,7 +56,11 @@ function MediaList ({ book, media }) {
                 linkStyle={tw`text-lg text-lime-500`}
               />
             </View>
-            <Play width={50} height={50} />
+            <TouchableOpacity
+              onPress={() => navigation.push('Player', { mediaId: media.id })}
+            >
+              <Play width={50} height={50} />
+            </TouchableOpacity>
           </View>
         ))}
       </View>
@@ -61,7 +68,7 @@ function MediaList ({ book, media }) {
   }
 }
 
-export default function BookDetailsScreen ({ route }) {
+export default function BookDetailsScreen ({ route, navigation }) {
   const { signOut, authData } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -85,6 +92,12 @@ export default function BookDetailsScreen ({ route }) {
   useEffect(() => {
     fetchBook()
   }, [])
+
+  useEffect(() => {
+    if (book) {
+      navigation.setOptions({ title: book.title })
+    }
+  }, [book])
 
   if (!book) {
     if (loading) {
