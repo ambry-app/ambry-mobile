@@ -50,18 +50,19 @@ export async function reportPlayerState (
   { host, token },
   { id, position, playbackRate }
 ) {
+  const body = {
+    playerState: {
+      position,
+      playbackRate
+    }
+  }
   const response = await fetch(apiUrl(host, `player_states/${id}`), {
     method: 'PUT',
     headers: {
       Authorization: 'Bearer ' + token,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      playerState: {
-        position,
-        playbackRate
-      }
-    })
+    body: JSON.stringify(body)
   })
   return handleResponse(response)
 }

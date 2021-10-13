@@ -9,9 +9,14 @@ let wasPausedByDuck = false
 async function sendState () {
   const userSession = await EncryptedStorage.getItem('userSession')
   const authData = JSON.parse(userSession)
-  const currentPlayerStateString = await AsyncStorage.getItem(
-    'currentPlayerState'
-  )
+
+  const track = await TrackPlayer.getTrack(0)
+
+  if (!track) {
+    return
+  }
+
+  const currentPlayerStateString = await AsyncStorage.getItem(track.url)
   if (!currentPlayerStateString) {
     return
   }
@@ -26,22 +31,23 @@ async function sendState () {
     playbackRate: playbackRate.toFixed(2)
   }
 
-  await reportPlayerState(authData, playerStateReport)
+  // only report to server non-zero positions; mitigates race conditions when
+  // player not yet fully set-up
+  if (playerStateReport.position != '0.000') {
+    await reportPlayerState(authData, playerStateReport)
 
-  const updatedPlayerState = {
-    position: position,
-    playbackRate: playbackRate,
-    ...currentPlayerState
+    const updatedPlayerState = {
+      position: position,
+      playbackRate: playbackRate,
+      ...currentPlayerState
+    }
+
+    await AsyncStorage.setItem(track.url, JSON.stringify(updatedPlayerState))
   }
-
-  await AsyncStorage.setItem(
-    'currentPlayerState',
-    JSON.stringify(updatedPlayerState)
-  )
 }
 
 export default async function setup () {
-  TrackPlayer.addEventListener(Event.PlaybackState, x => {
+  TrackPlayer.addEventListener(Event.PlaybackState, _playbackState => {
     sendState()
   })
 

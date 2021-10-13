@@ -18,7 +18,7 @@ import ScreenCentered from '../components/ScreenCentered'
 import Play from '../assets/play.svg'
 import Pause from '../assets/pause.svg'
 
-import { getPlayerState, imageSource } from '../api/ambry'
+import { getPlayerState, imageSource, reportPlayerState } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/playerState'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
 
@@ -35,6 +35,19 @@ const togglePlayback = async playbackState => {
   }
 }
 
+const reportPreviousTrackState = async (authData, trackUrl) => {
+  const previousPlayerStateString = await AsyncStorage.getItem(trackUrl)
+  const { id } = JSON.parse(previousPlayerStateString)
+  const position = await TrackPlayer.getPosition()
+  const playbackRate = await TrackPlayer.getRate()
+
+  await reportPlayerState(authData, {
+    id,
+    position,
+    playbackRate
+  })
+}
+
 export default function PlayerScreen ({ navigation, route }) {
   const { signOut, authData } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -49,11 +62,6 @@ export default function PlayerScreen ({ navigation, route }) {
     try {
       const playerState = await getPlayerState(authData, route.params.mediaId)
 
-      await AsyncStorage.setItem(
-        'currentPlayerState',
-        JSON.stringify(playerState)
-      )
-
       const { uri: mpdUrl, headers } = imageSource(
         authData,
         playerState.media.mpdPath
@@ -63,11 +71,15 @@ export default function PlayerScreen ({ navigation, route }) {
         playerState.media.book.imagePath
       )
 
+      await AsyncStorage.setItem(mpdUrl, JSON.stringify(playerState))
+
       const track = await TrackPlayer.getTrack(0)
 
       if (track && track.url === mpdUrl) {
         dispatch(actionCreators.success(playerState))
       } else {
+        await reportPreviousTrackState(authData, track.url)
+
         await TrackPlayer.reset()
         await TrackPlayer.add({
           url: mpdUrl,
