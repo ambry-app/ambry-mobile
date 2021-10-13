@@ -39,6 +39,33 @@ export async function getSeries ({ host, token }, seriesId) {
   return handleResponse(response)
 }
 
+export async function getPlayerState ({ host, token }, mediaId) {
+  const response = await fetch(apiUrl(host, `player_states/${mediaId}`), {
+    headers: { Authorization: 'Bearer ' + token }
+  })
+  return handleResponse(response)
+}
+
+export async function reportPlayerState (
+  { host, token },
+  { id, position, playbackRate }
+) {
+  const response = await fetch(apiUrl(host, `player_states/${id}`), {
+    method: 'PUT',
+    headers: {
+      Authorization: 'Bearer ' + token,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      playerState: {
+        position,
+        playbackRate
+      }
+    })
+  })
+  return handleResponse(response)
+}
+
 export async function createToken (host, email, password) {
   const response = await fetch(apiUrl(host, 'log_in'), {
     method: 'POST',

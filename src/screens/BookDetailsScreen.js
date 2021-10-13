@@ -57,7 +57,9 @@ function MediaList ({ book, media }) {
               />
             </View>
             <TouchableOpacity
-              onPress={() => navigation.push('Player', { mediaId: media.id })}
+              onPress={() =>
+                navigation.navigate('Player', { mediaId: media.id })
+              }
             >
               <Play width={50} height={50} />
             </TouchableOpacity>
