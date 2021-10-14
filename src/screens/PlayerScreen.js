@@ -78,7 +78,9 @@ export default function PlayerScreen ({ navigation, route }) {
       if (track && track.url === mpdUrl) {
         dispatch(actionCreators.success(playerState))
       } else {
-        await reportPreviousTrackState(authData, track.url)
+        if (track) {
+          await reportPreviousTrackState(authData, track.url)
+        }
 
         await TrackPlayer.reset()
         await TrackPlayer.add({
@@ -159,7 +161,7 @@ export default function PlayerScreen ({ navigation, route }) {
               })}
             />
           </View>
-          <View style={tw`pl-4`}>
+          <View style={tw`pl-4 w-3/4`}>
             <TouchableOpacity
               onPress={() =>
                 navigation.push('Book', { bookId: playerState.media.book.id })
