@@ -57,25 +57,18 @@ async function seekRelative (interval) {
 }
 
 export default async function setup () {
-  TrackPlayer.addEventListener(Event.PlaybackState, _playbackState => {
-    sendState()
-  })
-
-  TrackPlayer.addEventListener(Event.RemoteStop, () => {
-    sendState()
-
+  TrackPlayer.addEventListener(Event.RemoteStop, async () => {
+    await TrackPlayer.pause()
+    await seekRelative(-1)
     TrackPlayer.destroy()
   })
 
-  TrackPlayer.addEventListener(Event.RemotePause, () => {
-    sendState()
-
-    TrackPlayer.pause()
+  TrackPlayer.addEventListener(Event.RemotePause, async () => {
+    await TrackPlayer.pause()
+    seekRelative(-1)
   })
 
   TrackPlayer.addEventListener(Event.RemotePlay, () => {
-    sendState()
-
     TrackPlayer.play()
   })
 
@@ -88,15 +81,15 @@ export default async function setup () {
   })
 
   TrackPlayer.addEventListener(Event.RemoteDuck, async e => {
-    sendState()
-
     if (e.permanent === true) {
       TrackPlayer.stop()
     } else {
       if (e.paused === true) {
         const playerState = await TrackPlayer.getState()
         wasPausedByDuck = playerState !== State.Paused
-        TrackPlayer.pause()
+        await TrackPlayer.pause()
+        await seekRelative(-1)
+        sendState()
       } else {
         if (wasPausedByDuck === true) {
           TrackPlayer.play()

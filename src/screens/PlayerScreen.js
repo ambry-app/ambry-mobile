@@ -26,7 +26,7 @@ import { getPlayerState, imageSource, reportPlayerState } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/playerState'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
 
-const togglePlayback = async playbackState => {
+const togglePlayback = async (playbackState, playerState, authData) => {
   const currentTrack = await TrackPlayer.getCurrentTrack()
 
   if (currentTrack == null) {
@@ -35,6 +35,7 @@ const togglePlayback = async playbackState => {
       await TrackPlayer.play()
     } else {
       await TrackPlayer.pause()
+      seekRelative(-1, playerState, authData)
     }
   }
 }
@@ -47,8 +48,8 @@ const reportPreviousTrackState = async (authData, trackUrl) => {
 
   await reportPlayerState(authData, {
     id,
-    position,
-    playbackRate
+    position: position.toFixed(3),
+    playbackRate: playbackRate.toFixed(2)
   })
 }
 
@@ -272,7 +273,9 @@ export default function PlayerScreen ({ navigation, route }) {
           >
             <Back10 width={34} height={39} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => togglePlayback(playbackState)}>
+          <TouchableOpacity
+            onPress={() => togglePlayback(playbackState, playerState, authData)}
+          >
             {playbackState === State.Playing ? (
               <Pause width={75} height={75} />
             ) : (
