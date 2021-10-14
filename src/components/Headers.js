@@ -10,3 +10,7 @@ export function Header1 ({ children, style }) {
 export function Header2 ({ children, style }) {
   return <Text style={[tw`text-3xl text-gray-700`, style]}>{children}</Text>
 }
+
+export function Header4 ({ children, style }) {
+  return <Text style={[tw`text-xl text-gray-700`, style]}>{children}</Text>
+}

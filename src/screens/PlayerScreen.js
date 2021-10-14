@@ -1,18 +1,26 @@
 import React, { useEffect, useReducer, useCallback, useState } from 'react'
-import { Image, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Button,
+  Image,
+  Modal,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import TrackPlayer, {
   usePlaybackState,
   useProgress,
   State,
   TrackType
 } from 'react-native-track-player'
+import Slider from '@react-native-community/slider'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { useAuth } from '../contexts/Auth'
 
 import tw from '../lib/tailwind'
 
-import { Header2 } from '../components/Headers'
+import { Header2, Header4 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 import Play from '../assets/play.svg'
@@ -86,6 +94,17 @@ async function seekRelative (interval, playerState, authData) {
   await sendState(playerState, authData)
 }
 
+function formatPlaybackRate (rate) {
+  if (!rate) {
+    return
+  }
+  if (Number.isInteger(rate)) {
+    return rate + '.0'
+  } else {
+    return rate.toString()
+  }
+}
+
 export default function PlayerScreen ({ navigation, route }) {
   const { signOut, authData } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -93,6 +112,8 @@ export default function PlayerScreen ({ navigation, route }) {
   const playbackState = usePlaybackState()
   const progress = useProgress()
   const [progressDisplay, setProgressDisplay] = useState()
+  const [rateModalVisible, setRateModalVisible] = useState(false)
+  const [playbackRate, setPlaybackRate] = useState()
 
   // report progress every 1 minute, at least while this screen is active
   useEffect(() => {
@@ -142,7 +163,6 @@ export default function PlayerScreen ({ navigation, route }) {
           artwork: artworkUrl,
           headers
         })
-        await TrackPlayer.setRate(playerState.playbackRate)
         await TrackPlayer.seekTo(playerState.position)
 
         dispatch(actionCreators.success(playerState))
@@ -179,6 +199,14 @@ export default function PlayerScreen ({ navigation, route }) {
     setProgressDisplay({ percent, position, duration, remaining })
   }, [progress])
 
+  useEffect(() => {
+    playerState && setPlaybackRate(playerState.playbackRate)
+  }, [playerState])
+
+  useEffect(() => {
+    playbackRate && TrackPlayer.setRate(playbackRate)
+  }, [playbackRate])
+
   if (!playerState) {
     if (loading) {
       return (
@@ -198,6 +226,83 @@ export default function PlayerScreen ({ navigation, route }) {
   } else {
     return (
       <>
+        <Modal
+          animationType='fade'
+          transparent={true}
+          visible={rateModalVisible}
+          onRequestClose={() => {
+            setRateModalVisible(!rateModalVisible)
+          }}
+        >
+          <ScreenCentered>
+            <View style={tw`shadow-lg bg-white rounded-lg w-11/12`}>
+              <View style={tw`p-4`}>
+                <Header4>Playback Speed</Header4>
+                <Text style={tw`m-4 text-gray-700 text-lg text-center`}>
+                  {formatPlaybackRate(playbackRate)}x
+                </Text>
+                <Slider
+                  style={tw`my-4`}
+                  value={playbackRate}
+                  minimumValue={0.5}
+                  maximumValue={3.0}
+                  step={0.05}
+                  thumbTintColor={tw.color('lime-500')}
+                  minimumTrackTintColor={tw.color('gray-200')}
+                  maximumTrackTintColor={tw.color('gray-200')}
+                  onValueChange={async value => {
+                    setPlaybackRate(parseFloat(value.toFixed(2)))
+                  }}
+                />
+                <View style={tw`flex-row justify-between my-4`}>
+                  <TouchableOpacity onPress={() => setPlaybackRate(1.0)}>
+                    <Text
+                      style={tw`text-gray-700 text-center py-1 px-2 w-14 border border-gray-200 rounded-md`}
+                    >
+                      1.0x
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setPlaybackRate(1.25)}>
+                    <Text
+                      style={tw`text-gray-700 text-center py-1 px-2 w-14 border border-gray-200 rounded-md`}
+                    >
+                      1.25x
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setPlaybackRate(1.5)}>
+                    <Text
+                      style={tw`text-gray-700 text-center py-1 px-2 w-14 border border-gray-200 rounded-md`}
+                    >
+                      1.5x
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setPlaybackRate(1.75)}>
+                    <Text
+                      style={tw`text-gray-700 text-center py-1 px-2 w-14 border border-gray-200 rounded-md`}
+                    >
+                      1.75x
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setPlaybackRate(2.0)}>
+                    <Text
+                      style={tw`text-gray-700 text-center py-1 px-2 w-14 border border-gray-200 rounded-md`}
+                    >
+                      2.0x
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={tw`flex-row-reverse bg-gray-50 rounded-lg p-4`}>
+                <Button
+                  title='Ok'
+                  color={tw.color('lime-500')}
+                  onPress={() => setRateModalVisible(!rateModalVisible)}
+                />
+              </View>
+            </View>
+          </ScreenCentered>
+        </Modal>
+
         <View style={tw`p-4 flex-row`}>
           <View
             style={tw`w-1/4 rounded-xl border-gray-200 bg-gray-200 shadow-md`}
@@ -271,11 +376,13 @@ export default function PlayerScreen ({ navigation, route }) {
           </View>
         </View>
         <View style={tw`px-4 my-2 flex-row-reverse`}>
-          <Text
-            style={tw`py-1 px-2 text-gray-500 text-sm tabular-nums border border-gray-200 rounded-lg`}
-          >
-            {parseFloat(playerState.playbackRate)}x
-          </Text>
+          <TouchableOpacity onPress={() => setRateModalVisible(true)}>
+            <Text
+              style={tw`py-1 px-2 text-gray-500 text-sm tabular-nums border border-gray-200 rounded-lg`}
+            >
+              {formatPlaybackRate(playbackRate)}x
+            </Text>
+          </TouchableOpacity>
         </View>
         <ScreenCentered style={tw`flex-row justify-around px-12`}>
           <TouchableOpacity
