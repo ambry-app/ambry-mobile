@@ -18,9 +18,21 @@ async function setupIfNecessary () {
   await TrackPlayer.updateOptions({
     stopWithApp: false,
     alwaysPauseOnInterruption: true,
-    capabilities: [Capability.Play, Capability.Pause, Capability.Stop],
-    compactCapabilities: [Capability.Play, Capability.Pause],
-    backBuffer: 120
+    capabilities: [
+      Capability.Play,
+      Capability.Pause,
+      Capability.JumpForward,
+      Capability.JumpBackward,
+      Capability.Stop
+    ],
+    compactCapabilities: [
+      Capability.Play,
+      Capability.Pause,
+      Capability.JumpBackward
+    ],
+    backBuffer: 120,
+    forwardJumpInterval: 10,
+    backwardJumpInterval: 10
   })
 }
 

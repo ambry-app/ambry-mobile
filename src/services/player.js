@@ -37,13 +37,23 @@ async function sendState () {
     await reportPlayerState(authData, playerStateReport)
 
     const updatedPlayerState = {
-      position: position,
-      playbackRate: playbackRate,
+      position,
+      playbackRate,
       ...currentPlayerState
     }
 
     await AsyncStorage.setItem(track.url, JSON.stringify(updatedPlayerState))
   }
+}
+
+async function seekRelative (interval) {
+  const position = await TrackPlayer.getPosition()
+  const playbackRate = await TrackPlayer.getRate()
+  const actualInterval = interval * playbackRate
+
+  await TrackPlayer.seekTo(position + actualInterval)
+
+  await sendState()
 }
 
 export default async function setup () {
@@ -67,6 +77,14 @@ export default async function setup () {
     sendState()
 
     TrackPlayer.play()
+  })
+
+  TrackPlayer.addEventListener(Event.RemoteJumpBackward, ({ interval }) => {
+    seekRelative(interval * -1)
+  })
+
+  TrackPlayer.addEventListener(Event.RemoteJumpForward, ({ interval }) => {
+    seekRelative(interval)
   })
 
   TrackPlayer.addEventListener(Event.RemoteDuck, async e => {

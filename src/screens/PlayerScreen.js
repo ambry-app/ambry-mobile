@@ -17,6 +17,10 @@ import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 import Play from '../assets/play.svg'
 import Pause from '../assets/pause.svg'
+import Forward10 from '../assets/forward_10.svg'
+import Back10 from '../assets/back_10.svg'
+import Forward from '../assets/forward.svg'
+import Back from '../assets/back.svg'
 
 import { getPlayerState, imageSource, reportPlayerState } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/playerState'
@@ -46,6 +50,39 @@ const reportPreviousTrackState = async (authData, trackUrl) => {
     position,
     playbackRate
   })
+}
+
+async function sendState (playerState, authData) {
+  const { uri: mpdUrl } = imageSource(authData, playerState.media.mpdPath)
+
+  const position = await TrackPlayer.getPosition()
+  const playbackRate = await TrackPlayer.getRate()
+
+  const playerStateReport = {
+    id: playerState.id,
+    position: position.toFixed(3),
+    playbackRate: playbackRate.toFixed(2)
+  }
+
+  await reportPlayerState(authData, playerStateReport)
+
+  const updatedPlayerState = {
+    position,
+    playbackRate,
+    ...playerState
+  }
+
+  await AsyncStorage.setItem(mpdUrl, JSON.stringify(updatedPlayerState))
+}
+
+async function seekRelative (interval, playerState, authData) {
+  const position = await TrackPlayer.getPosition()
+  const playbackRate = await TrackPlayer.getRate()
+  const actualInterval = interval * playbackRate
+
+  await TrackPlayer.seekTo(position + actualInterval)
+
+  await sendState(playerState, authData)
 }
 
 export default function PlayerScreen ({ navigation, route }) {
@@ -202,7 +239,7 @@ export default function PlayerScreen ({ navigation, route }) {
             />
           </View>
         </View>
-        <View style={tw`p-4`}>
+        <View style={tw`px-4 my-2`}>
           <View style={tw`h-2 bg-gray-200 rounded-full overflow-hidden`}>
             <View
               style={tw.style('h-2 bg-lime-500', {
@@ -222,13 +259,44 @@ export default function PlayerScreen ({ navigation, route }) {
             </Text>
           </View>
         </View>
-        <ScreenCentered>
+        <View style={tw`px-4 my-2 flex-row-reverse`}>
+          <Text
+            style={tw`py-1 px-2 text-gray-500 text-sm tabular-nums border border-gray-200 rounded-lg`}
+          >
+            {parseFloat(playerState.playbackRate)}x
+          </Text>
+        </View>
+        <ScreenCentered style={tw`flex-row justify-around px-12`}>
+          <TouchableOpacity
+            onPress={() => seekRelative(-10, playerState, authData)}
+          >
+            <Back10 width={34} height={39} />
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => togglePlayback(playbackState)}>
             {playbackState === State.Playing ? (
               <Pause width={75} height={75} />
             ) : (
               <Play width={75} height={75} />
             )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => seekRelative(10, playerState, authData)}
+          >
+            <Forward10 width={34} height={39} />
+          </TouchableOpacity>
+        </ScreenCentered>
+        <ScreenCentered style={tw`items-start flex-row justify-around px-12`}>
+          <TouchableOpacity
+            onPress={() => seekRelative(-60, playerState, authData)}
+          >
+            <Back width={42} height={27} />
+            <Text style={tw`text-gray-700 text-center`}>1 min</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => seekRelative(60, playerState, authData)}
+          >
+            <Forward width={42} height={27} />
+            <Text style={tw`text-gray-700 text-center`}>1 min</Text>
           </TouchableOpacity>
         </ScreenCentered>
       </>
