@@ -94,6 +94,16 @@ export default function PlayerScreen ({ navigation, route }) {
   const progress = useProgress()
   const [progressDisplay, setProgressDisplay] = useState()
 
+  // report progress every 1 minute, at least while this screen is active
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (playbackState === State.Playing) {
+        sendState(playerState, authData)
+      }
+    }, 60 * 1000)
+    return () => clearInterval(interval)
+  }, [playbackState])
+
   const fetchPlayerState = useCallback(async () => {
     dispatch(actionCreators.loading())
 
