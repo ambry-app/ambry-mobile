@@ -87,17 +87,20 @@ async function sendState (playerState, authData) {
 
 async function seekRelative (interval, playerState, authData) {
   const position = await TrackPlayer.getPosition()
+  const duration = await TrackPlayer.getDuration()
   const playbackRate = await TrackPlayer.getRate()
   const actualInterval = interval * playbackRate
+  const targetDestination = position + actualInterval
+  const actualDestination = Math.min(targetDestination, duration)
 
-  await TrackPlayer.seekTo(position + actualInterval)
+  await TrackPlayer.seekTo(actualDestination)
 
   await sendState(playerState, authData)
 }
 
 function formatPlaybackRate (rate) {
   if (!rate) {
-    return
+    return '1.0'
   }
   if (Number.isInteger(rate)) {
     return rate + '.0'
@@ -184,22 +187,25 @@ export default function PlayerScreen ({ navigation, route }) {
 
   useEffect(() => {
     const { duration: durationSeconds, position: positionSeconds } = progress
-    const percent = ((positionSeconds / durationSeconds) * 100).toFixed(1) + '%'
+    const percent =
+      durationSeconds && durationSeconds > 0
+        ? ((positionSeconds / durationSeconds) * 100).toFixed(1) + '%'
+        : '0.0%'
     const position =
       positionSeconds < 3600
         ? new Date(positionSeconds * 1000).toISOString().substr(14, 5)
         : new Date(positionSeconds * 1000).toISOString().substr(11, 8)
-
     const duration = new Date(durationSeconds * 1000)
       .toISOString()
       .substr(11, 8)
-    const remainingSeconds = durationSeconds - positionSeconds
-    const remaining = new Date(remainingSeconds * 1000)
+    const remainingSeconds = Math.max(durationSeconds - positionSeconds, 0)
+    const rate = playbackRate || 1
+    const remaining = new Date((remainingSeconds * 1000) / rate)
       .toISOString()
       .substr(11, 8)
 
     setProgressDisplay({ percent, position, duration, remaining })
-  }, [progress])
+  }, [progress, playbackRate])
 
   useEffect(() => {
     playerState && setPlaybackRate(playerState.playbackRate)

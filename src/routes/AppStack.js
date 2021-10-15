@@ -28,7 +28,11 @@ export const AppStack = () => {
         component={PersonDetailsScreen}
       />
       <Stack.Screen name='Series' component={SeriesScreen} />
-      <Stack.Screen name='Player' component={PlayerScreen} />
+      <Stack.Screen
+        name='Player'
+        options={{ title: 'Ambry Player' }}
+        component={PlayerScreen}
+      />
     </Stack.Navigator>
   )
 }

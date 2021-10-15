@@ -37,6 +37,8 @@ const AuthProvider = ({ children }) => {
 
   const signOut = async () => {
     // TODO: call signOut in API so it also invalidates the session server-side.
+    // TODO: keep email and host and restore them in the sign-in form for
+    // convenience.
     setAuthData(undefined)
 
     await EncryptedStorage.removeItem('userSession')

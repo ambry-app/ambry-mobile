@@ -82,7 +82,7 @@ export default async function setup () {
 
   TrackPlayer.addEventListener(Event.RemoteDuck, async e => {
     if (e.permanent === true) {
-      TrackPlayer.stop()
+      TrackPlayer.pause()
     } else {
       if (e.paused === true) {
         const playerState = await TrackPlayer.getState()
