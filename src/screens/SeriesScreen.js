@@ -57,7 +57,9 @@ export default function SeriesScreen ({ navigation, route }) {
     if (error) {
       return (
         <ScreenCentered>
-          <Text style={tw`text-gray-700`}>Failed to load series!</Text>
+          <Text style={tw`text-gray-700 dark:text-gray-200`}>
+            Failed to load series!
+          </Text>
         </ScreenCentered>
       )
     }
@@ -80,8 +82,8 @@ export default function SeriesScreen ({ navigation, route }) {
                 'Person',
                 { personId: author.personId }
               ]}
-              style={tw`text-xl text-gray-500`}
-              linkStyle={tw`text-xl text-lime-500`}
+              style={tw`text-xl text-gray-500 dark:text-gray-400`}
+              linkStyle={tw`text-xl text-lime-500 dark:text-lime-400`}
             />
           </View>
         }

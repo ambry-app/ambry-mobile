@@ -1,0 +1,6 @@
+{
+  "replaceAttrValues": {
+    "iconColor": "{props.iconColor}",
+    "ringColor": "{props.ringColor}"
+  }
+}

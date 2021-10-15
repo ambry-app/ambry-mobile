@@ -54,7 +54,9 @@ export default function RecentBooksScreen () {
     if (error) {
       return (
         <ScreenCentered>
-          <Text style={tw`text-gray-700`}>Failed to load books!</Text>
+          <Text style={tw`text-gray-700 dark:text-gray-200`}>
+            Failed to load books!
+          </Text>
         </ScreenCentered>
       )
     }

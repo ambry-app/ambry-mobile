@@ -17,7 +17,9 @@ export default function BookLink ({ book }) {
       key={author.id}
       onPress={() => navigation.push('Person', { personId: author.personId })}
     >
-      <Text style={tw`text-lg text-gray-500 text-center`}>{author.name}</Text>
+      <Text style={tw`text-lg text-gray-500 dark:text-gray-400 text-center`}>
+        {author.name}
+      </Text>
     </TouchableOpacity>
   ))
 
@@ -26,7 +28,7 @@ export default function BookLink ({ book }) {
       key={series.id}
       onPress={() => navigation.push('Series', { seriesId: series.id })}
     >
-      <Text style={tw`text-gray-400 text-center`}>
+      <Text style={tw`text-gray-400 dark:text-gray-500 text-center`}>
         {series.name} #{series.bookNumber}
       </Text>
     </TouchableOpacity>
@@ -35,7 +37,7 @@ export default function BookLink ({ book }) {
   return (
     <View style={tw`p-2 w-1/2`}>
       {book.bookNumber && (
-        <Text style={tw`text-center text-lg text-gray-700`}>
+        <Text style={tw`text-center text-lg text-gray-700 dark:text-gray-200`}>
           Book {book.bookNumber}
         </Text>
       )}
@@ -58,7 +60,9 @@ export default function BookLink ({ book }) {
       <TouchableOpacity
         onPress={() => navigation.push('Book', { bookId: book.id })}
       >
-        <Text style={tw`text-xl text-gray-700 text-center`}>{book.title}</Text>
+        <Text style={tw`text-xl text-gray-700 dark:text-gray-200 text-center`}>
+          {book.title}
+        </Text>
       </TouchableOpacity>
       {authors}
       {series}

@@ -1,5 +1,12 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  useColorScheme
+} from 'react-native'
 import Moment from 'moment'
 
 import { useNavigation } from '@react-navigation/core'
@@ -12,6 +19,7 @@ import { Header1 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
+import PlayButton from '../components/PlayButton'
 
 import { imageSource, getBook } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/book'
@@ -20,30 +28,33 @@ import Play from '../assets/play.svg'
 
 function MediaList ({ book, media }) {
   const navigation = useNavigation()
+  const scheme = useColorScheme()
 
   if (media.length == 0) {
     return (
-      <Text style={tw`text-gray-700 my-4 font-bold`}>
+      <Text style={tw`text-gray-700 dark:text-gray-200 my-4 font-bold`}>
         Sorry, there are no recordings uploaded for this book.
       </Text>
     )
   } else {
     return (
       <View
-        style={tw`rounded-lg border border-gray-200 bg-white shadow-lg px-3 mb-4`}
+        style={tw`rounded-lg border border-gray-200 bg-gray-50 dark:border-0 dark:bg-gray-800 shadow-lg px-3 mb-4`}
       >
         {media.map((media, i) => (
           <View
             key={media.id}
             style={tw.style(
-              'flex-row justify-between items-center py-3 border-gray-200',
+              'flex-row justify-between items-center py-3 border-gray-200 dark:border-gray-700',
               {
                 'border-t': i > 0
               }
             )}
           >
             <View style={tw`flex-shrink`}>
-              <Text style={tw`text-lg text-gray-700`}>{book.title}</Text>
+              <Text style={tw`text-lg text-gray-700 dark:text-gray-200`}>
+                {book.title}
+              </Text>
               <WrappingListOfLinks
                 prefix='Narrated by'
                 items={media.narrators}
@@ -52,8 +63,8 @@ function MediaList ({ book, media }) {
                   'Person',
                   { personId: narrator.personId }
                 ]}
-                style={tw`text-lg text-gray-500`}
-                linkStyle={tw`text-lg text-lime-500`}
+                style={tw`text-lg text-gray-500 dark:text-gray-400`}
+                linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
               />
             </View>
             <TouchableOpacity
@@ -61,7 +72,7 @@ function MediaList ({ book, media }) {
                 navigation.navigate('Player', { mediaId: media.id })
               }
             >
-              <Play width={50} height={50} />
+              <PlayButton width={50} height={50} />
             </TouchableOpacity>
           </View>
         ))}
@@ -113,7 +124,9 @@ export default function BookDetailsScreen ({ route, navigation }) {
     if (error) {
       return (
         <ScreenCentered>
-          <Text style={tw`text-gray-700`}>Failed to load book!</Text>
+          <Text style={tw`text-gray-700 dark:text-gray-200`}>
+            Failed to load book!
+          </Text>
         </ScreenCentered>
       )
     }
@@ -129,8 +142,8 @@ export default function BookDetailsScreen ({ route, navigation }) {
               'Person',
               { personId: author.personId }
             ]}
-            style={tw`text-xl text-gray-500`}
-            linkStyle={tw`text-xl text-lime-500`}
+            style={tw`text-xl text-gray-500 dark:text-gray-400`}
+            linkStyle={tw`text-xl text-lime-500 dark:text-lime-400`}
           />
           <WrappingListOfLinks
             items={book.series}
@@ -139,8 +152,8 @@ export default function BookDetailsScreen ({ route, navigation }) {
               { seriesId: series.id }
             ]}
             nameExtractor={series => `${series.name} #${series.bookNumber}`}
-            style={tw`text-lg text-gray-400`}
-            linkStyle={tw`text-lg text-gray-400`}
+            style={tw`text-lg text-gray-400 dark:text-gray-500`}
+            linkStyle={tw`text-lg text-gray-400 dark:text-gray-500`}
           />
           <View
             style={tw`mt-8 rounded-2xl border-gray-200 bg-gray-200 shadow-lg`}
@@ -152,7 +165,7 @@ export default function BookDetailsScreen ({ route, navigation }) {
               })}
             />
           </View>
-          <Text style={tw`text-gray-400 text-sm mt-1 mb-4`}>
+          <Text style={tw`text-gray-400 dark:text-gray-500 text-sm mt-1 mb-4`}>
             Published {Moment(book.published).format('MMMM Do, YYYY')}
           </Text>
           <MediaList book={book} media={book.media} />

@@ -1,5 +1,12 @@
 import React, { useState } from 'react'
-import { Button, Text, TextInput, ScrollView, View } from 'react-native'
+import {
+  Button,
+  Text,
+  TextInput,
+  ScrollView,
+  View,
+  useColorScheme
+} from 'react-native'
 
 import tw from '../lib/tailwind'
 
@@ -7,6 +14,7 @@ import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import { useAuth } from '../contexts/Auth'
 
 import Logo from '../assets/logo_256x1056.svg'
+import LogoDark from '../assets/logo_256x1056_darkmode.svg'
 
 export default function SignInScreen () {
   const auth = useAuth()
@@ -15,6 +23,7 @@ export default function SignInScreen () {
   const [email, setEmail] = useState('')
   const [host, setHost] = useState('')
   const [password, setPassword] = useState('')
+  const scheme = useColorScheme()
 
   const signIn = async (host, email, password) => {
     isError(false)
@@ -31,8 +40,14 @@ export default function SignInScreen () {
   return (
     <ScrollView style={tw`p-4`}>
       <View style={tw`py-8 items-center`}>
-        <Logo height='86' width='352' />
-        <Text style={tw`text-lg font-semibold text-gray-500`}>
+        {scheme == 'dark' ? (
+          <LogoDark height='86' width='352' />
+        ) : (
+          <Logo height='86' width='352' />
+        )}
+        <Text
+          style={tw`text-lg font-semibold text-gray-500 dark:text-gray-400`}
+        >
           Personal Audiobook Streaming
         </Text>
       </View>
@@ -41,8 +56,10 @@ export default function SignInScreen () {
         value={host}
         autoCapitalize='none'
         onChangeText={setHost}
-        style={tw`my-2 text-gray-700 border-2 border-gray-200 bg-white rounded px-3 py-2`}
-        placeholderTextColor={tw.color('gray-300')}
+        style={tw`my-2 text-gray-700 dark:text-gray-200 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded px-3 py-2`}
+        placeholderTextColor={
+          scheme == 'dark' ? tw.color('gray-500') : tw.color('gray-300')
+        }
       />
       <TextInput
         placeholder='Email'
@@ -52,20 +69,24 @@ export default function SignInScreen () {
         textContentType='emailAddress'
         autoCompleteType='email'
         keyboardType='email-address'
-        style={tw`my-2 text-gray-700 border-2 border-gray-200 bg-white rounded px-3 py-2`}
-        placeholderTextColor={tw.color('gray-300')}
+        style={tw`my-2 text-gray-700 dark:text-gray-200 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded px-3 py-2`}
+        placeholderTextColor={
+          scheme == 'dark' ? tw.color('gray-500') : tw.color('gray-300')
+        }
       />
       <TextInput
         placeholder='Password'
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        style={tw`my-2 mb-4 text-gray-700 border-2 border-gray-200 bg-white rounded px-3 py-2`}
-        placeholderTextColor={tw.color('gray-300')}
+        style={tw`my-2 mb-4 text-gray-700 dark:text-gray-200 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded px-3 py-2`}
+        placeholderTextColor={
+          scheme == 'dark' ? tw.color('gray-500') : tw.color('gray-300')
+        }
       />
       <Button
         title='Sign in'
-        color={tw.color('lime-500')}
+        color={scheme == 'dark' ? tw.color('lime-400') : tw.color('lime-500')}
         onPress={() => signIn(host, email, password)}
         disabled={loading}
       />
