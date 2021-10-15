@@ -13,6 +13,7 @@ export default function Back10Button ({ width, height }) {
       width={width}
       height={height}
       iconColor={scheme == 'dark' ? tw.color('gray-200') : tw.color('gray-700')}
+      accentColor={tw.color('gray-400')}
     />
   )
 }

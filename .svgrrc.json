@@ -1,0 +1,11 @@
+{
+  "replaceAttrValues": {
+    "iconColor": "{props.iconColor}",
+    "ringColor": "{props.ringColor}",
+    "textColor": "{props.textColor}",
+    "brandColor": "{props.brandColor}",
+    "accentColor": "{props.accentColor}",
+    "primaryColor": "{props.primaryColor}",
+    "secondaryColor": "{props.secondaryColor}"
+  }
+}

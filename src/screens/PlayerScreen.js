@@ -450,17 +450,13 @@ export default function PlayerScreen ({ navigation, route }) {
             onPress={() => seekRelative(-60, playerState, authData)}
           >
             <BackButton width={42} height={27} />
-            <Text style={tw`text-gray-700 dark:text-gray-200 text-center`}>
-              1 min
-            </Text>
+            <Text style={tw`text-gray-400 text-center`}>1 min</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => seekRelative(60, playerState, authData)}
           >
             <ForwardButton width={42} height={27} />
-            <Text style={tw`text-gray-700 dark:text-gray-200 text-center`}>
-              1 min
-            </Text>
+            <Text style={tw`text-gray-400 text-center`}>1 min</Text>
           </TouchableOpacity>
         </ScreenCentered>
       </>
