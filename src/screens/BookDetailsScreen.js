@@ -59,10 +59,12 @@ function MediaList ({ book, media }) {
                 prefix='Narrated by'
                 items={media.narrators}
                 keyExtractor={narrator => narrator.personId}
-                navigationArgsExtractor={narrator => [
-                  'Person',
-                  { personId: narrator.personId }
-                ]}
+                onPressLink={narrator =>
+                  navigation.navigate('Library', {
+                    screen: 'Person',
+                    params: { personId: narrator.personId }
+                  })
+                }
                 style={tw`text-lg text-gray-500 dark:text-gray-400`}
                 linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
               />
@@ -104,7 +106,7 @@ export default function BookDetailsScreen ({ route, navigation }) {
 
   useEffect(() => {
     fetchBook()
-  }, [])
+  }, [route.params.bookId])
 
   useEffect(() => {
     if (book) {
@@ -138,19 +140,17 @@ export default function BookDetailsScreen ({ route, navigation }) {
           <WrappingListOfLinks
             prefix='by'
             items={book.authors}
-            navigationArgsExtractor={author => [
-              'Person',
-              { personId: author.personId }
-            ]}
+            onPressLink={author =>
+              navigation.push('Person', { personId: author.personId })
+            }
             style={tw`text-xl text-gray-500 dark:text-gray-400`}
             linkStyle={tw`text-xl text-lime-500 dark:text-lime-400`}
           />
           <WrappingListOfLinks
             items={book.series}
-            navigationArgsExtractor={series => [
-              'Series',
-              { seriesId: series.id }
-            ]}
+            onPressLink={series =>
+              navigation.push('Series', { seriesId: series.id })
+            }
             nameExtractor={series => `${series.name} #${series.bookNumber}`}
             style={tw`text-lg text-gray-400 dark:text-gray-500`}
             linkStyle={tw`text-lg text-gray-400 dark:text-gray-500`}

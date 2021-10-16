@@ -58,7 +58,7 @@ export default function PersonDetailsScreen ({ route, navigation }) {
 
   useEffect(() => {
     fetchPerson()
-  }, [])
+  }, [route.params.personId])
 
   useEffect(() => {
     if (person) {

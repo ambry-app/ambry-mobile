@@ -37,7 +37,7 @@ export default function SeriesScreen ({ navigation, route }) {
 
   useEffect(() => {
     fetchSeries()
-  }, [])
+  }, [route.params.seriesId])
 
   useEffect(() => {
     if (series) {
@@ -78,10 +78,9 @@ export default function SeriesScreen ({ navigation, route }) {
             <WrappingListOfLinks
               prefix='by'
               items={uniqueAuthors}
-              navigationArgsExtractor={author => [
-                'Person',
-                { personId: author.personId }
-              ]}
+              onPressLink={author =>
+                navigation.push('Person', { personId: author.personId })
+              }
               style={tw`text-xl text-gray-500 dark:text-gray-400`}
               linkStyle={tw`text-xl text-lime-500 dark:text-lime-400`}
             />

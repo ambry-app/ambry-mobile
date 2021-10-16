@@ -355,7 +355,10 @@ export default function PlayerScreen ({ navigation, route }) {
         <View style={tw`pl-4 w-3/4`}>
           <TouchableOpacity
             onPress={() =>
-              navigation.push('Book', { bookId: playerState.media.book.id })
+              navigation.navigate('Library', {
+                screen: 'Book',
+                params: { bookId: playerState.media.book.id }
+              })
             }
           >
             <Header2>{playerState.media.book.title}</Header2>
@@ -363,10 +366,12 @@ export default function PlayerScreen ({ navigation, route }) {
           <WrappingListOfLinks
             prefix='by'
             items={playerState.media.book.authors}
-            navigationArgsExtractor={author => [
-              'Person',
-              { personId: author.personId }
-            ]}
+            onPressLink={author =>
+              navigation.navigate('Library', {
+                screen: 'Person',
+                params: { personId: author.personId }
+              })
+            }
             style={tw`text-lg text-gray-500 dark:text-gray-400`}
             linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
           />
@@ -374,19 +379,23 @@ export default function PlayerScreen ({ navigation, route }) {
             prefix='Narrated by'
             items={playerState.media.narrators}
             keyExtractor={narrator => narrator.personId}
-            navigationArgsExtractor={narrator => [
-              'Person',
-              { personId: narrator.personId }
-            ]}
+            onPressLink={narrator =>
+              navigation.navigate('Library', {
+                screen: 'Person',
+                params: { personId: narrator.personId }
+              })
+            }
             style={tw`text-gray-500 dark:text-gray-400`}
             linkStyle={tw`text-lime-500 dark:text-lime-400`}
           />
           <WrappingListOfLinks
             items={playerState.media.book.series}
-            navigationArgsExtractor={series => [
-              'Series',
-              { seriesId: series.id }
-            ]}
+            onPressLink={series =>
+              navigation.navigate('Library', {
+                screen: 'Series',
+                params: { seriesId: series.id }
+              })
+            }
             nameExtractor={series => `${series.name} #${series.bookNumber}`}
             style={tw`text-gray-400 dark:text-gray-500`}
             linkStyle={tw`text-gray-400 dark:text-gray-500`}

@@ -1,4 +1,3 @@
-import { useNavigation } from '@react-navigation/core'
 import React from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 import tw from '../lib/tailwind'
@@ -8,17 +7,15 @@ export default function WrappingListOfLinks ({
   items,
   keyExtractor = item => item.id,
   nameExtractor = item => item.name,
-  navigationArgsExtractor,
+  onPressLink,
   style,
   linkStyle
 }) {
-  const navigation = useNavigation()
-
   const links = items
     .map(item => (
       <TouchableOpacity
         key={keyExtractor(item)}
-        onPress={() => navigation.push(...navigationArgsExtractor(item))}
+        onPress={() => onPressLink(item)}
       >
         <Text style={linkStyle}>{nameExtractor(item)}</Text>
       </TouchableOpacity>
