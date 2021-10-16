@@ -90,7 +90,7 @@ export default function SignInScreen () {
       />
       <Button
         title='Sign in'
-        color={scheme == 'dark' ? tw.color('lime-400') : tw.color('lime-500')}
+        color={tw.color('lime-500')}
         onPress={() => signIn(host, email, password)}
         disabled={loading}
       />

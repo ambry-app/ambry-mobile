@@ -16,6 +16,7 @@ import TrackPlayer, {
 } from 'react-native-track-player'
 import Slider from '@react-native-community/slider'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { StackActions } from '@react-navigation/native'
 
 import { useAuth } from '../contexts/Auth'
 
@@ -143,6 +144,9 @@ export default function PlayerScreen ({ navigation, route }) {
       // In this case, we should try restoring the state from whatever was last
       // loaded.
       const trackUrl = await AsyncStorage.getItem('lastLoadedUrl')
+      if (!trackUrl) {
+        return
+      }
       const playerStateString = await AsyncStorage.getItem(trackUrl)
       const playerState = JSON.parse(playerStateString)
 
@@ -240,11 +244,21 @@ export default function PlayerScreen ({ navigation, route }) {
     )
   }
 
-  if (error || !playerState) {
+  if (error) {
     return (
       <ScreenCentered>
         <Text style={tw`text-gray-700 dark:text-gray-200`}>
           Failed to load player!
+        </Text>
+      </ScreenCentered>
+    )
+  }
+
+  if (!playerState) {
+    return (
+      <ScreenCentered>
+        <Text style={tw`text-gray-700 dark:text-gray-200`}>
+          No audiobook selected. Visit the Library to choose a book.
         </Text>
       </ScreenCentered>
     )
@@ -331,9 +345,7 @@ export default function PlayerScreen ({ navigation, route }) {
             <View style={tw`flex-row-reverse bg-gray-50 dark:bg-gray-700 p-4`}>
               <Button
                 title='Ok'
-                color={
-                  scheme == 'dark' ? tw.color('lime-400') : tw.color('lime-500')
-                }
+                color={tw.color('lime-500')}
                 onPress={() => setRateModalVisible(!rateModalVisible)}
               />
             </View>
@@ -354,24 +366,28 @@ export default function PlayerScreen ({ navigation, route }) {
         </View>
         <View style={tw`pl-4 w-3/4`}>
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('Library', {
-                screen: 'Book',
-                params: { bookId: playerState.media.book.id }
-              })
-            }
+            onPress={() => {
+              navigation.dispatch(
+                StackActions.push('Book', {
+                  bookId: playerState.media.book.id
+                })
+              )
+              navigation.navigate('Library')
+            }}
           >
             <Header2>{playerState.media.book.title}</Header2>
           </TouchableOpacity>
           <WrappingListOfLinks
             prefix='by'
             items={playerState.media.book.authors}
-            onPressLink={author =>
-              navigation.navigate('Library', {
-                screen: 'Person',
-                params: { personId: author.personId }
-              })
-            }
+            onPressLink={author => {
+              navigation.dispatch(
+                StackActions.push('Person', {
+                  personId: author.personId
+                })
+              )
+              navigation.navigate('Library')
+            }}
             style={tw`text-lg text-gray-500 dark:text-gray-400`}
             linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
           />
@@ -379,23 +395,27 @@ export default function PlayerScreen ({ navigation, route }) {
             prefix='Narrated by'
             items={playerState.media.narrators}
             keyExtractor={narrator => narrator.personId}
-            onPressLink={narrator =>
-              navigation.navigate('Library', {
-                screen: 'Person',
-                params: { personId: narrator.personId }
-              })
-            }
+            onPressLink={narrator => {
+              navigation.dispatch(
+                StackActions.push('Person', {
+                  personId: narrator.personId
+                })
+              )
+              navigation.navigate('Library')
+            }}
             style={tw`text-gray-500 dark:text-gray-400`}
             linkStyle={tw`text-lime-500 dark:text-lime-400`}
           />
           <WrappingListOfLinks
             items={playerState.media.book.series}
-            onPressLink={series =>
-              navigation.navigate('Library', {
-                screen: 'Series',
-                params: { seriesId: series.id }
-              })
-            }
+            onPressLink={series => {
+              navigation.dispatch(
+                StackActions.push('Series', {
+                  seriesId: series.seriesId
+                })
+              )
+              navigation.navigate('Library')
+            }}
             nameExtractor={series => `${series.name} #${series.bookNumber}`}
             style={tw`text-gray-400 dark:text-gray-500`}
             linkStyle={tw`text-gray-400 dark:text-gray-500`}

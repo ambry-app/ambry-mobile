@@ -46,7 +46,8 @@ export const AppStack = () => {
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Library width={size} height={size} iconColor={color} />
-          )
+          ),
+          tabBarLabelPosition: 'beside-icon'
         }}
         component={LibraryStack}
       />
@@ -56,7 +57,8 @@ export const AppStack = () => {
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <PlayButton width={size} height={size} iconColor={color} />
-          )
+          ),
+          tabBarLabelPosition: 'beside-icon'
         }}
         component={PlayerScreen}
       />
