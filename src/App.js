@@ -28,7 +28,8 @@ async function setupIfNecessary () {
     compactCapabilities: [
       Capability.Play,
       Capability.Pause,
-      Capability.JumpBackward
+      Capability.JumpBackward,
+      Capability.JumpForward
     ],
     backBuffer: 120,
     forwardJumpInterval: 10,

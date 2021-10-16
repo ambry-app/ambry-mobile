@@ -119,6 +119,7 @@ export default function PlayerScreen ({ navigation, route }) {
   const [rateModalVisible, setRateModalVisible] = useState(false)
   const [playbackRate, setPlaybackRate] = useState()
   const scheme = useColorScheme()
+  const mediaIdParam = route?.params?.mediaId
 
   // report progress every 1 minute, at least while this screen is active
   useEffect(() => {
@@ -135,13 +136,14 @@ export default function PlayerScreen ({ navigation, route }) {
 
     let mediaId
 
-    if (route.params.mediaId) {
+    if (route.params && route.params.mediaId) {
       mediaId = route.params.mediaId
     } else {
-      // we're probably coming from the notification deep link, so let's just
-      // restore the state of the current track being played
-      const track = await TrackPlayer.getTrack(0)
-      const playerStateString = await AsyncStorage.getItem(track.url)
+      // We're coming from the notification deep link or the tab navigator.
+      // In this case, we should try restoring the state from whatever was last
+      // loaded.
+      const trackUrl = await AsyncStorage.getItem('lastLoadedUrl')
+      const playerStateString = await AsyncStorage.getItem(trackUrl)
       const playerState = JSON.parse(playerStateString)
 
       mediaId = playerState.media.id
@@ -160,6 +162,7 @@ export default function PlayerScreen ({ navigation, route }) {
       )
 
       await AsyncStorage.setItem(mpdUrl, JSON.stringify(playerState))
+      await AsyncStorage.setItem('lastLoadedUrl', mpdUrl)
 
       const track = await TrackPlayer.getTrack(0)
 
@@ -193,11 +196,11 @@ export default function PlayerScreen ({ navigation, route }) {
         dispatch(actionCreators.failure())
       }
     }
-  }, [route.params])
+  }, [mediaIdParam])
 
   useEffect(() => {
     fetchPlayerState()
-  }, [])
+  }, [mediaIdParam])
 
   useEffect(() => {
     const { duration: durationSeconds, position: positionSeconds } = progress
@@ -229,253 +232,239 @@ export default function PlayerScreen ({ navigation, route }) {
     playbackRate && TrackPlayer.setRate(playbackRate)
   }, [playbackRate])
 
-  if (!playerState) {
-    if (loading) {
-      return (
-        <ScreenCentered>
-          <LargeActivityIndicator />
-        </ScreenCentered>
-      )
-    }
-
-    if (error) {
-      return (
-        <ScreenCentered>
-          <Text style={tw`text-gray-700 dark:text-gray-200`}>
-            Failed to load player!
-          </Text>
-        </ScreenCentered>
-      )
-    }
-  } else {
+  if (loading) {
     return (
-      <>
-        <Modal
-          animationType='fade'
-          transparent={true}
-          visible={rateModalVisible}
-          onRequestClose={() => {
-            setRateModalVisible(!rateModalVisible)
-          }}
-        >
-          <ScreenCentered>
-            <View
-              style={tw`shadow-lg bg-white dark:bg-gray-800 rounded-lg w-11/12 overflow-hidden`}
-            >
-              <View style={tw`p-4`}>
-                <Header4>Playback Speed</Header4>
-                <Text
-                  style={tw`m-4 text-gray-700 dark:text-gray-200 text-lg text-center`}
-                >
-                  {formatPlaybackRate(playbackRate)}x
-                </Text>
-                <Slider
-                  style={tw`my-4`}
-                  value={playbackRate}
-                  minimumValue={0.5}
-                  maximumValue={3.0}
-                  step={0.05}
-                  thumbTintColor={
-                    scheme == 'dark'
-                      ? tw.color('lime-400')
-                      : tw.color('lime-500')
-                  }
-                  minimumTrackTintColor={
-                    scheme == 'dark'
-                      ? tw.color('gray-400')
-                      : tw.color('gray-200')
-                  }
-                  maximumTrackTintColor={
-                    scheme == 'dark'
-                      ? tw.color('gray-400')
-                      : tw.color('gray-200')
-                  }
-                  onValueChange={async value => {
-                    setPlaybackRate(parseFloat(value.toFixed(2)))
-                  }}
-                />
-                <View style={tw`flex-row justify-between my-4`}>
-                  <TouchableOpacity onPress={() => setPlaybackRate(1.0)}>
-                    <Text
-                      style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-200 dark:border-gray-400 rounded-md`}
-                    >
-                      1.0x
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setPlaybackRate(1.25)}>
-                    <Text
-                      style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-200 dark:border-gray-400 rounded-md`}
-                    >
-                      1.25x
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setPlaybackRate(1.5)}>
-                    <Text
-                      style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-200 dark:border-gray-400 rounded-md`}
-                    >
-                      1.5x
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setPlaybackRate(1.75)}>
-                    <Text
-                      style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-200 dark:border-gray-400 rounded-md`}
-                    >
-                      1.75x
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setPlaybackRate(2.0)}>
-                    <Text
-                      style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-200 dark:border-gray-400 rounded-md`}
-                    >
-                      2.0x
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View
-                style={tw`flex-row-reverse bg-gray-50 dark:bg-gray-700 p-4`}
-              >
-                <Button
-                  title='Ok'
-                  color={
-                    scheme == 'dark'
-                      ? tw.color('lime-400')
-                      : tw.color('lime-500')
-                  }
-                  onPress={() => setRateModalVisible(!rateModalVisible)}
-                />
-              </View>
-            </View>
-          </ScreenCentered>
-        </Modal>
-
-        <View style={tw`p-4 flex-row`}>
-          <View
-            style={tw`w-1/4 rounded-xl border-gray-200 bg-gray-200 shadow-md`}
-          >
-            <Image
-              source={imageSource(authData, playerState.media.book.imagePath)}
-              style={tw.style('rounded-xl', 'w-full', {
-                aspectRatio: 10 / 15
-              })}
-            />
-          </View>
-          <View style={tw`pl-4 w-3/4`}>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.push('Book', { bookId: playerState.media.book.id })
-              }
-            >
-              <Header2>{playerState.media.book.title}</Header2>
-            </TouchableOpacity>
-            <WrappingListOfLinks
-              prefix='by'
-              items={playerState.media.book.authors}
-              navigationArgsExtractor={author => [
-                'Person',
-                { personId: author.personId }
-              ]}
-              style={tw`text-lg text-gray-500 dark:text-gray-400`}
-              linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
-            />
-            <WrappingListOfLinks
-              prefix='Narrated by'
-              items={playerState.media.narrators}
-              keyExtractor={narrator => narrator.personId}
-              navigationArgsExtractor={narrator => [
-                'Person',
-                { personId: narrator.personId }
-              ]}
-              style={tw`text-gray-500 dark:text-gray-400`}
-              linkStyle={tw`text-lime-500 dark:text-lime-400`}
-            />
-            <WrappingListOfLinks
-              items={playerState.media.book.series}
-              navigationArgsExtractor={series => [
-                'Series',
-                { seriesId: series.id }
-              ]}
-              nameExtractor={series => `${series.name} #${series.bookNumber}`}
-              style={tw`text-gray-400 dark:text-gray-500`}
-              linkStyle={tw`text-gray-400 dark:text-gray-500`}
-            />
-          </View>
-        </View>
-        <View style={tw`px-4 my-2`}>
-          <View
-            style={tw`h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden`}
-          >
-            <View
-              style={tw.style('h-2 bg-lime-500 dark:bg-lime-400', {
-                width: progressDisplay.percent
-              })}
-            ></View>
-          </View>
-          <View style={tw`flex-row justify-between`}>
-            <Text
-              style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
-            >
-              {progressDisplay.position} of {progressDisplay.duration}
-            </Text>
-            <Text
-              style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
-            >
-              {progressDisplay.percent}
-            </Text>
-            <Text
-              style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
-            >
-              {progressDisplay.remaining}
-            </Text>
-          </View>
-        </View>
-        <View style={tw`px-4 my-2 flex-row-reverse`}>
-          <TouchableOpacity onPress={() => setRateModalVisible(true)}>
-            <Text
-              style={tw`py-1 px-2 text-gray-500 dark:text-gray-400 text-sm tabular-nums border border-gray-200 dark:border-gray-400 rounded-lg`}
-            >
-              {formatPlaybackRate(playbackRate)}x
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <ScreenCentered style={tw`flex-row justify-around px-12`}>
-          <TouchableOpacity
-            onPress={() => seekRelative(-10, playerState, authData)}
-          >
-            <Back10Button width={34} height={39} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => togglePlayback(playbackState, playerState, authData)}
-          >
-            {playbackState === State.Playing ? (
-              <PauseButton width={75} height={75} />
-            ) : (
-              <PlayButton width={75} height={75} />
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => seekRelative(10, playerState, authData)}
-          >
-            <Forward10Button width={34} height={39} />
-          </TouchableOpacity>
-        </ScreenCentered>
-        <ScreenCentered style={tw`items-start flex-row justify-around px-12`}>
-          <TouchableOpacity
-            onPress={() => seekRelative(-60, playerState, authData)}
-          >
-            <BackButton width={42} height={27} />
-            <Text style={tw`text-gray-400 text-center`}>1 min</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => seekRelative(60, playerState, authData)}
-          >
-            <ForwardButton width={42} height={27} />
-            <Text style={tw`text-gray-400 text-center`}>1 min</Text>
-          </TouchableOpacity>
-        </ScreenCentered>
-      </>
+      <ScreenCentered>
+        <LargeActivityIndicator />
+      </ScreenCentered>
     )
   }
 
-  return null
+  if (error || !playerState) {
+    return (
+      <ScreenCentered>
+        <Text style={tw`text-gray-700 dark:text-gray-200`}>
+          Failed to load player!
+        </Text>
+      </ScreenCentered>
+    )
+  }
+
+  return (
+    <>
+      <Modal
+        animationType='fade'
+        transparent={true}
+        visible={rateModalVisible}
+        onRequestClose={() => {
+          setRateModalVisible(!rateModalVisible)
+        }}
+      >
+        <ScreenCentered>
+          <View
+            style={tw`shadow-lg bg-white dark:bg-gray-800 rounded-lg w-11/12 overflow-hidden`}
+          >
+            <View style={tw`p-4`}>
+              <Header4>Playback Speed</Header4>
+              <Text
+                style={tw`m-4 text-gray-700 dark:text-gray-200 text-lg text-center`}
+              >
+                {formatPlaybackRate(playbackRate)}x
+              </Text>
+              <Slider
+                style={tw`my-4`}
+                value={playbackRate}
+                minimumValue={0.5}
+                maximumValue={3.0}
+                step={0.05}
+                thumbTintColor={
+                  scheme == 'dark' ? tw.color('lime-400') : tw.color('lime-500')
+                }
+                minimumTrackTintColor={
+                  scheme == 'dark' ? tw.color('gray-400') : tw.color('gray-200')
+                }
+                maximumTrackTintColor={
+                  scheme == 'dark' ? tw.color('gray-400') : tw.color('gray-200')
+                }
+                onValueChange={async value => {
+                  setPlaybackRate(parseFloat(value.toFixed(2)))
+                }}
+              />
+              <View style={tw`flex-row justify-between my-4`}>
+                <TouchableOpacity onPress={() => setPlaybackRate(1.0)}>
+                  <Text
+                    style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-200 dark:border-gray-400 rounded-md`}
+                  >
+                    1.0x
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setPlaybackRate(1.25)}>
+                  <Text
+                    style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-200 dark:border-gray-400 rounded-md`}
+                  >
+                    1.25x
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setPlaybackRate(1.5)}>
+                  <Text
+                    style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-200 dark:border-gray-400 rounded-md`}
+                  >
+                    1.5x
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setPlaybackRate(1.75)}>
+                  <Text
+                    style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-200 dark:border-gray-400 rounded-md`}
+                  >
+                    1.75x
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setPlaybackRate(2.0)}>
+                  <Text
+                    style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-200 dark:border-gray-400 rounded-md`}
+                  >
+                    2.0x
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={tw`flex-row-reverse bg-gray-50 dark:bg-gray-700 p-4`}>
+              <Button
+                title='Ok'
+                color={
+                  scheme == 'dark' ? tw.color('lime-400') : tw.color('lime-500')
+                }
+                onPress={() => setRateModalVisible(!rateModalVisible)}
+              />
+            </View>
+          </View>
+        </ScreenCentered>
+      </Modal>
+
+      <View style={tw`p-4 flex-row`}>
+        <View
+          style={tw`w-1/4 rounded-xl border-gray-200 bg-gray-200 shadow-md`}
+        >
+          <Image
+            source={imageSource(authData, playerState.media.book.imagePath)}
+            style={tw.style('rounded-xl', 'w-full', {
+              aspectRatio: 10 / 15
+            })}
+          />
+        </View>
+        <View style={tw`pl-4 w-3/4`}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.push('Book', { bookId: playerState.media.book.id })
+            }
+          >
+            <Header2>{playerState.media.book.title}</Header2>
+          </TouchableOpacity>
+          <WrappingListOfLinks
+            prefix='by'
+            items={playerState.media.book.authors}
+            navigationArgsExtractor={author => [
+              'Person',
+              { personId: author.personId }
+            ]}
+            style={tw`text-lg text-gray-500 dark:text-gray-400`}
+            linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
+          />
+          <WrappingListOfLinks
+            prefix='Narrated by'
+            items={playerState.media.narrators}
+            keyExtractor={narrator => narrator.personId}
+            navigationArgsExtractor={narrator => [
+              'Person',
+              { personId: narrator.personId }
+            ]}
+            style={tw`text-gray-500 dark:text-gray-400`}
+            linkStyle={tw`text-lime-500 dark:text-lime-400`}
+          />
+          <WrappingListOfLinks
+            items={playerState.media.book.series}
+            navigationArgsExtractor={series => [
+              'Series',
+              { seriesId: series.id }
+            ]}
+            nameExtractor={series => `${series.name} #${series.bookNumber}`}
+            style={tw`text-gray-400 dark:text-gray-500`}
+            linkStyle={tw`text-gray-400 dark:text-gray-500`}
+          />
+        </View>
+      </View>
+      <View style={tw`px-4 my-2`}>
+        <View
+          style={tw`h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden`}
+        >
+          <View
+            style={tw.style('h-2 bg-lime-500 dark:bg-lime-400', {
+              width: progressDisplay.percent
+            })}
+          ></View>
+        </View>
+        <View style={tw`flex-row justify-between`}>
+          <Text
+            style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
+          >
+            {progressDisplay.position} of {progressDisplay.duration}
+          </Text>
+          <Text
+            style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
+          >
+            {progressDisplay.percent}
+          </Text>
+          <Text
+            style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
+          >
+            -{progressDisplay.remaining}
+          </Text>
+        </View>
+      </View>
+      <View style={tw`px-4 my-2 flex-row-reverse`}>
+        <TouchableOpacity onPress={() => setRateModalVisible(true)}>
+          <Text
+            style={tw`py-1 px-2 text-gray-500 dark:text-gray-400 text-sm tabular-nums border border-gray-200 dark:border-gray-400 rounded-lg`}
+          >
+            {formatPlaybackRate(playbackRate)}x
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <ScreenCentered style={tw`flex-row justify-around px-12`}>
+        <TouchableOpacity
+          onPress={() => seekRelative(-10, playerState, authData)}
+        >
+          <Back10Button width={34} height={39} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => togglePlayback(playbackState, playerState, authData)}
+        >
+          {playbackState === State.Playing ? (
+            <PauseButton width={75} height={75} />
+          ) : (
+            <PlayButton width={75} height={75} />
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => seekRelative(10, playerState, authData)}
+        >
+          <Forward10Button width={34} height={39} />
+        </TouchableOpacity>
+      </ScreenCentered>
+      <ScreenCentered style={tw`items-start flex-row justify-around px-12`}>
+        <TouchableOpacity
+          onPress={() => seekRelative(-60, playerState, authData)}
+        >
+          <BackButton width={42} height={27} />
+          <Text style={tw`text-gray-400 text-center`}>1 min</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => seekRelative(60, playerState, authData)}
+        >
+          <ForwardButton width={42} height={27} />
+          <Text style={tw`text-gray-400 text-center`}>1 min</Text>
+        </TouchableOpacity>
+      </ScreenCentered>
+    </>
+  )
 }

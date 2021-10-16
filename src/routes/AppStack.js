@@ -1,5 +1,6 @@
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
 import RecentBooksScreen from '../screens/RecentBooksScreen'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
@@ -7,9 +8,13 @@ import PersonDetailsScreen from '../screens/PersonDetailsScreen'
 import SeriesScreen from '../screens/SeriesScreen'
 import PlayerScreen from '../screens/PlayerScreen'
 
-const Stack = createNativeStackNavigator()
+import PlayButton from '../components/PlayButton'
+import Library from '../assets/library.svg'
 
-export const AppStack = () => {
+const Stack = createNativeStackNavigator()
+const Tab = createBottomTabNavigator()
+
+const LibraryStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -28,11 +33,33 @@ export const AppStack = () => {
         component={PersonDetailsScreen}
       />
       <Stack.Screen name='Series' component={SeriesScreen} />
-      <Stack.Screen
+    </Stack.Navigator>
+  )
+}
+
+export const AppStack = () => {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen
+        name='Library'
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Library width={size} height={size} iconColor={color} />
+          )
+        }}
+        component={LibraryStack}
+      />
+      <Tab.Screen
         name='Player'
-        options={{ title: 'Ambry Player' }}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <PlayButton width={size} height={size} iconColor={color} />
+          )
+        }}
         component={PlayerScreen}
       />
-    </Stack.Navigator>
+    </Tab.Navigator>
   )
 }
