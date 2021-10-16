@@ -133,8 +133,22 @@ export default function PlayerScreen ({ navigation, route }) {
   const fetchPlayerState = useCallback(async () => {
     dispatch(actionCreators.loading())
 
+    let mediaId
+
+    if (route.params.mediaId) {
+      mediaId = route.params.mediaId
+    } else {
+      // we're probably coming from the notification deep link, so let's just
+      // restore the state of the current track being played
+      const track = await TrackPlayer.getTrack(0)
+      const playerStateString = await AsyncStorage.getItem(track.url)
+      const playerState = JSON.parse(playerStateString)
+
+      mediaId = playerState.media.id
+    }
+
     try {
-      const playerState = await getPlayerState(authData, route.params.mediaId)
+      const playerState = await getPlayerState(authData, mediaId)
 
       const { uri: mpdUrl, headers } = imageSource(
         authData,
@@ -179,7 +193,7 @@ export default function PlayerScreen ({ navigation, route }) {
         dispatch(actionCreators.failure())
       }
     }
-  }, [route.params.mediaId])
+  }, [route.params])
 
   useEffect(() => {
     fetchPlayerState()

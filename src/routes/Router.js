@@ -34,6 +34,11 @@ const DarkTheme = {
   }
 }
 
+const linking = {
+  prefixes: ['trackplayer://'],
+  config: { screens: { Player: 'notification.click' } }
+}
+
 export const Router = () => {
   const { authData, loading } = useAuth()
   const scheme = useColorScheme()
@@ -43,6 +48,7 @@ export const Router = () => {
   }
   return (
     <NavigationContainer
+      linking={linking}
       theme={scheme === 'dark' ? DarkTheme : LightTheme}
       onReady={() => RNBootSplash.hide()}
     >
