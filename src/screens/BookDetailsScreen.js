@@ -39,7 +39,7 @@ function MediaList ({ book, media }) {
   } else {
     return (
       <View
-        style={tw`rounded-lg border border-gray-200 bg-gray-50 dark:border-0 dark:bg-gray-800 shadow-lg px-3 mb-4`}
+        style={tw`rounded-lg border border-gray-200 bg-gray-100 dark:border-0 dark:bg-gray-800 shadow-lg px-3 mb-4`}
       >
         {media.map((media, i) => (
           <View

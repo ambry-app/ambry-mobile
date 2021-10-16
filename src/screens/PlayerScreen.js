@@ -2,6 +2,7 @@ import React, { useEffect, useReducer, useCallback, useState } from 'react'
 import {
   Button,
   Image,
+  ImageBackground,
   Modal,
   Text,
   TouchableOpacity,
@@ -265,7 +266,12 @@ export default function PlayerScreen ({ navigation, route }) {
   }
 
   return (
-    <>
+    <ImageBackground
+      source={imageSource(authData, playerState.media.book.imagePath)}
+      blurRadius={10}
+      style={tw.style('h-full', { resizeMode: 'cover' })}
+    >
+      {/* Playback Speed Modal */}
       <Modal
         animationType='fade'
         transparent={true}
@@ -342,7 +348,7 @@ export default function PlayerScreen ({ navigation, route }) {
                 </TouchableOpacity>
               </View>
             </View>
-            <View style={tw`flex-row-reverse bg-gray-50 dark:bg-gray-700 p-4`}>
+            <View style={tw`flex-row-reverse bg-gray-100 dark:bg-gray-700 p-4`}>
               <Button
                 title='Ok'
                 color={tw.color('lime-500')}
@@ -353,147 +359,161 @@ export default function PlayerScreen ({ navigation, route }) {
         </ScreenCentered>
       </Modal>
 
-      <View style={tw`p-4 flex-row`}>
-        <View
-          style={tw`w-1/4 rounded-xl border-gray-200 bg-gray-200 shadow-md`}
-        >
-          <Image
-            source={imageSource(authData, playerState.media.book.imagePath)}
-            style={tw.style('rounded-xl', 'w-full', {
-              aspectRatio: 10 / 15
-            })}
-          />
-        </View>
-        <View style={tw`pl-4 w-3/4`}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.dispatch(
-                StackActions.push('Book', {
-                  bookId: playerState.media.book.id
-                })
-              )
-              navigation.navigate('Library')
-            }}
-          >
-            <Header2>{playerState.media.book.title}</Header2>
-          </TouchableOpacity>
-          <WrappingListOfLinks
-            prefix='by'
-            items={playerState.media.book.authors}
-            onPressLink={author => {
-              navigation.dispatch(
-                StackActions.push('Person', {
-                  personId: author.personId
-                })
-              )
-              navigation.navigate('Library')
-            }}
-            style={tw`text-lg text-gray-500 dark:text-gray-400`}
-            linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
-          />
-          <WrappingListOfLinks
-            prefix='Narrated by'
-            items={playerState.media.narrators}
-            keyExtractor={narrator => narrator.personId}
-            onPressLink={narrator => {
-              navigation.dispatch(
-                StackActions.push('Person', {
-                  personId: narrator.personId
-                })
-              )
-              navigation.navigate('Library')
-            }}
-            style={tw`text-gray-500 dark:text-gray-400`}
-            linkStyle={tw`text-lime-500 dark:text-lime-400`}
-          />
-          <WrappingListOfLinks
-            items={playerState.media.book.series}
-            onPressLink={series => {
-              navigation.dispatch(
-                StackActions.push('Series', {
-                  seriesId: series.seriesId
-                })
-              )
-              navigation.navigate('Library')
-            }}
-            nameExtractor={series => `${series.name} #${series.bookNumber}`}
-            style={tw`text-gray-400 dark:text-gray-500`}
-            linkStyle={tw`text-gray-400 dark:text-gray-500`}
-          />
-        </View>
-      </View>
-      <View style={tw`px-4 my-2`}>
-        <View
-          style={tw`h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden`}
-        >
+      {/* Header */}
+      <View style={tw`p-4 opacity-85 bg-gray-100 dark:bg-gray-800 shadow-md`}>
+        {/* Book Details */}
+        <View style={tw`flex-row`}>
           <View
-            style={tw.style('h-2 bg-lime-500 dark:bg-lime-400', {
-              width: progressDisplay.percent
-            })}
-          ></View>
+            style={tw`w-1/4 rounded-xl border-gray-200 bg-gray-200 shadow-md`}
+          >
+            <Image
+              source={imageSource(authData, playerState.media.book.imagePath)}
+              style={tw.style('rounded-md', 'w-full', {
+                aspectRatio: 10 / 15
+              })}
+            />
+          </View>
+          <View style={tw`pl-4 w-3/4`}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.dispatch(
+                  StackActions.push('Book', {
+                    bookId: playerState.media.book.id
+                  })
+                )
+                navigation.navigate('Library')
+              }}
+            >
+              <Header2>{playerState.media.book.title}</Header2>
+            </TouchableOpacity>
+            <WrappingListOfLinks
+              prefix='by'
+              items={playerState.media.book.authors}
+              onPressLink={author => {
+                navigation.dispatch(
+                  StackActions.push('Person', {
+                    personId: author.personId
+                  })
+                )
+                navigation.navigate('Library')
+              }}
+              style={tw`text-lg text-gray-500 dark:text-gray-400`}
+              linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
+            />
+            <WrappingListOfLinks
+              prefix='Narrated by'
+              items={playerState.media.narrators}
+              keyExtractor={narrator => narrator.personId}
+              onPressLink={narrator => {
+                navigation.dispatch(
+                  StackActions.push('Person', {
+                    personId: narrator.personId
+                  })
+                )
+                navigation.navigate('Library')
+              }}
+              style={tw`text-gray-500 dark:text-gray-400`}
+              linkStyle={tw`text-lime-500 dark:text-lime-400`}
+            />
+            <WrappingListOfLinks
+              items={playerState.media.book.series}
+              onPressLink={series => {
+                navigation.dispatch(
+                  StackActions.push('Series', {
+                    seriesId: series.seriesId
+                  })
+                )
+                navigation.navigate('Library')
+              }}
+              nameExtractor={series => `${series.name} #${series.bookNumber}`}
+              style={tw`text-gray-400 dark:text-gray-500`}
+              linkStyle={tw`text-gray-400 dark:text-gray-500`}
+            />
+          </View>
         </View>
-        <View style={tw`flex-row justify-between`}>
-          <Text
-            style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
+        {/* Progress */}
+        <View style={tw`my-4`}>
+          <View
+            style={tw`h-2 bg-gray-200 shadow-md dark:bg-gray-700 rounded-full overflow-hidden`}
           >
-            {progressDisplay.position} of {progressDisplay.duration}
-          </Text>
-          <Text
-            style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
-          >
-            {progressDisplay.percent}
-          </Text>
-          <Text
-            style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
-          >
-            -{progressDisplay.remaining}
-          </Text>
+            <View
+              style={tw.style('h-2 bg-lime-500 dark:bg-lime-400', {
+                width: progressDisplay.percent
+              })}
+            ></View>
+          </View>
+          <View style={tw`flex-row justify-between`}>
+            <Text
+              style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
+            >
+              {progressDisplay.position} of {progressDisplay.duration}
+            </Text>
+            <Text
+              style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
+            >
+              {progressDisplay.percent}
+            </Text>
+            <Text
+              style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
+            >
+              -{progressDisplay.remaining}
+            </Text>
+          </View>
+        </View>
+        {/* Playback Speed */}
+        <View style={tw`flex-row-reverse`}>
+          <TouchableOpacity onPress={() => setRateModalVisible(true)}>
+            <Text
+              style={tw`py-1 px-2 text-gray-500 dark:text-gray-400 text-sm tabular-nums border border-gray-200 dark:border-gray-400 rounded-lg`}
+            >
+              {formatPlaybackRate(playbackRate)}x
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
-      <View style={tw`px-4 my-2 flex-row-reverse`}>
-        <TouchableOpacity onPress={() => setRateModalVisible(true)}>
-          <Text
-            style={tw`py-1 px-2 text-gray-500 dark:text-gray-400 text-sm tabular-nums border border-gray-200 dark:border-gray-400 rounded-lg`}
+
+      {/* Player Controls */}
+      <View
+        style={tw.style('justify-center opacity-85 dark:bg-gray-900 mb-12', {
+          flex: 1
+        })}
+      >
+        <View style={tw`flex-row items-center justify-around px-12 mb-14`}>
+          <TouchableOpacity
+            onPress={() => seekRelative(-10, playerState, authData)}
           >
-            {formatPlaybackRate(playbackRate)}x
-          </Text>
-        </TouchableOpacity>
+            <Back10Button width={34} height={39} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => togglePlayback(playbackState, playerState, authData)}
+          >
+            {playbackState === State.Playing ? (
+              <PauseButton width={75} height={75} />
+            ) : (
+              <PlayButton width={75} height={75} />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => seekRelative(10, playerState, authData)}
+          >
+            <Forward10Button width={34} height={39} />
+          </TouchableOpacity>
+        </View>
+        <View style={tw`flex-row items-center justify-around px-12`}>
+          <TouchableOpacity
+            onPress={() => seekRelative(-60, playerState, authData)}
+          >
+            <BackButton width={42} height={27} />
+            <Text style={tw`text-gray-400 text-center`}>1 min</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => seekRelative(60, playerState, authData)}
+          >
+            <ForwardButton width={42} height={27} />
+            <Text style={tw`text-gray-400 text-center`}>1 min</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <ScreenCentered style={tw`flex-row justify-around px-12`}>
-        <TouchableOpacity
-          onPress={() => seekRelative(-10, playerState, authData)}
-        >
-          <Back10Button width={34} height={39} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => togglePlayback(playbackState, playerState, authData)}
-        >
-          {playbackState === State.Playing ? (
-            <PauseButton width={75} height={75} />
-          ) : (
-            <PlayButton width={75} height={75} />
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => seekRelative(10, playerState, authData)}
-        >
-          <Forward10Button width={34} height={39} />
-        </TouchableOpacity>
-      </ScreenCentered>
-      <ScreenCentered style={tw`items-start flex-row justify-around px-12`}>
-        <TouchableOpacity
-          onPress={() => seekRelative(-60, playerState, authData)}
-        >
-          <BackButton width={42} height={27} />
-          <Text style={tw`text-gray-400 text-center`}>1 min</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => seekRelative(60, playerState, authData)}
-        >
-          <ForwardButton width={42} height={27} />
-          <Text style={tw`text-gray-400 text-center`}>1 min</Text>
-        </TouchableOpacity>
-      </ScreenCentered>
-    </>
+    </ImageBackground>
   )
 }

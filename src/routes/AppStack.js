@@ -2,6 +2,8 @@ import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
+import tw from '../lib/tailwind'
+
 import RecentBooksScreen from '../screens/RecentBooksScreen'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
 import PersonDetailsScreen from '../screens/PersonDetailsScreen'
@@ -47,7 +49,8 @@ export const AppStack = () => {
           tabBarIcon: ({ color, size }) => (
             <Library width={size} height={size} iconColor={color} />
           ),
-          tabBarLabelPosition: 'beside-icon'
+          tabBarLabelPosition: 'beside-icon',
+          tabBarStyle: tw.style('h-12')
         }}
         component={LibraryStack}
       />
@@ -58,7 +61,8 @@ export const AppStack = () => {
           tabBarIcon: ({ color, size }) => (
             <PlayButton width={size} height={size} iconColor={color} />
           ),
-          tabBarLabelPosition: 'beside-icon'
+          tabBarLabelPosition: 'beside-icon',
+          tabBarStyle: tw.style('absolute h-12 opacity-85')
         }}
         component={PlayerScreen}
       />

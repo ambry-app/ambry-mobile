@@ -15,7 +15,7 @@ const LightTheme = {
   colors: {
     primary: tw.color('lime-500'),
     background: tw.color('white'),
-    card: tw.color('gray-50'),
+    card: tw.color('gray-100'),
     text: tw.color('gray-700'),
     border: tw.color('gray-200'),
     notification: tw.color('red-500')
