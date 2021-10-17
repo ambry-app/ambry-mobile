@@ -474,9 +474,12 @@ export default function PlayerScreen ({ navigation, route }) {
 
       {/* Player Controls */}
       <View
-        style={tw.style('justify-center opacity-85 dark:bg-gray-900 mb-12', {
-          flex: 1
-        })}
+        style={tw.style(
+          'justify-center opacity-85 bg-white dark:bg-gray-900 mb-12',
+          {
+            flex: 1
+          }
+        )}
       >
         <View style={tw`flex-row items-center justify-around px-12 mb-14`}>
           <TouchableOpacity
