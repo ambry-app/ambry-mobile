@@ -14,7 +14,11 @@ async function setupIfNecessary () {
     return
   }
 
-  await TrackPlayer.setupPlayer({})
+  await TrackPlayer.setupPlayer({
+    minBuffer: 180,
+    maxBuffer: 300,
+    backBuffer: 120
+  })
   await TrackPlayer.updateOptions({
     stopWithApp: false,
     alwaysPauseOnInterruption: true,
@@ -31,7 +35,6 @@ async function setupIfNecessary () {
       Capability.JumpBackward,
       Capability.JumpForward
     ],
-    backBuffer: 120,
     forwardJumpInterval: 10,
     backwardJumpInterval: 10
   })
