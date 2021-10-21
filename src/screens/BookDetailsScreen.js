@@ -24,11 +24,10 @@ import PlayButton from '../components/PlayButton'
 import { imageSource, getBook } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/book'
 
-import Play from '../assets/play.svg'
+import { durationDisplay } from '../lib/utils'
 
 function MediaList ({ book, media }) {
   const navigation = useNavigation()
-  const scheme = useColorScheme()
 
   if (media.length == 0) {
     return (
@@ -68,6 +67,9 @@ function MediaList ({ book, media }) {
                 style={tw`text-lg text-gray-500 dark:text-gray-400`}
                 linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
               />
+              <Text style={tw`text-sm text-gray-400 dark:text-gray-500`}>
+                {durationDisplay(media.duration)}
+              </Text>
             </View>
             <TouchableOpacity
               onPress={() =>

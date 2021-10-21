@@ -36,6 +36,7 @@ import ForwardButton from '../components/ForwardButton'
 import { getPlayerState, imageSource, reportPlayerState } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/playerState'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
+import { secondsDisplay } from '../lib/utils'
 
 const togglePlayback = async (playbackState, playerState, authData) => {
   const currentTrack = await TrackPlayer.getCurrentTrack()
@@ -215,18 +216,11 @@ export default function PlayerScreen ({ navigation, route }) {
       durationSeconds && durationSeconds > 0
         ? ((positionSeconds / durationSeconds) * 100).toFixed(1) + '%'
         : '0.0%'
-    const position =
-      positionSeconds < 3600
-        ? new Date(positionSeconds * 1000).toISOString().substr(14, 5)
-        : new Date(positionSeconds * 1000).toISOString().substr(11, 8)
-    const duration = new Date(durationSeconds * 1000)
-      .toISOString()
-      .substr(11, 8)
+    const position = secondsDisplay(positionSeconds)
+    const duration = secondsDisplay(durationSeconds)
     const remainingSeconds = Math.max(durationSeconds - positionSeconds, 0)
     const rate = playbackRate || 1
-    const remaining = new Date((remainingSeconds * 1000) / rate)
-      .toISOString()
-      .substr(11, 8)
+    const remaining = secondsDisplay(remainingSeconds / rate)
 
     setProgressDisplay({ percent, position, duration, remaining })
   }, [progress, playbackRate])
