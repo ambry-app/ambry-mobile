@@ -120,6 +120,7 @@ export default function PlayerScreen ({ navigation, route }) {
   const [progressDisplay, setProgressDisplay] = useState()
   const [rateModalVisible, setRateModalVisible] = useState(false)
   const [playbackRate, setPlaybackRate] = useState()
+  const [displayPlaybackRate, setDisplayPlaybackRate] = useState()
   const scheme = useColorScheme()
   const mediaIdParam = route?.params?.mediaId
 
@@ -235,7 +236,10 @@ export default function PlayerScreen ({ navigation, route }) {
   }, [playerState])
 
   useEffect(() => {
-    playbackRate && TrackPlayer.setRate(playbackRate)
+    if (playbackRate) {
+      TrackPlayer.setRate(playbackRate)
+      setDisplayPlaybackRate(playbackRate)
+    }
   }, [playbackRate])
 
   if (loading) {
@@ -290,7 +294,7 @@ export default function PlayerScreen ({ navigation, route }) {
               <Text
                 style={tw`m-4 text-gray-700 dark:text-gray-200 text-lg text-center`}
               >
-                {formatPlaybackRate(playbackRate)}x
+                {formatPlaybackRate(displayPlaybackRate)}x
               </Text>
               <Slider
                 style={tw`my-4`}
@@ -308,6 +312,9 @@ export default function PlayerScreen ({ navigation, route }) {
                   scheme == 'dark' ? tw.color('gray-400') : tw.color('gray-200')
                 }
                 onValueChange={async value => {
+                  setDisplayPlaybackRate(parseFloat(value.toFixed(2)))
+                }}
+                onSlidingComplete={async value => {
                   setPlaybackRate(parseFloat(value.toFixed(2)))
                 }}
               />
