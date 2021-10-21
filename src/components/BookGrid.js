@@ -8,6 +8,8 @@ import BookLink from './BookLink'
 export default function BookGrid ({
   books,
   onEndReached,
+  onRefresh,
+  refreshing,
   ListHeaderComponent,
   ListFooterComponent
 }) {
@@ -18,6 +20,8 @@ export default function BookGrid ({
       keyExtractor={item => item.id}
       numColumns={2}
       onEndReached={onEndReached}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
       renderItem={({ item }) => <BookLink book={item} />}
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}

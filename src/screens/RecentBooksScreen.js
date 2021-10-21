@@ -16,18 +16,18 @@ export default function RecentBooksScreen () {
   const { signOut, authData } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  const { books, nextPage, hasMore, loading, error } = state
+  const { books, nextPage, hasMore, loading, refreshing, error } = state
 
   const fetchBooks = useCallback(async () => {
-    if (loading || !hasMore) {
+    if (!hasMore) {
       return
     }
 
     dispatch(actionCreators.loading())
 
     try {
-      const nextBooks = await getRecentBooks(authData, nextPage)
-      dispatch(actionCreators.success(nextBooks, nextPage))
+      const [nextBooks, hasMore] = await getRecentBooks(authData, nextPage)
+      dispatch(actionCreators.success(nextBooks, nextPage, hasMore))
     } catch (status) {
       if (status == 401) {
         await signOut()
@@ -35,7 +35,22 @@ export default function RecentBooksScreen () {
         dispatch(actionCreators.failure())
       }
     }
-  }, [nextPage])
+  }, [hasMore, nextPage])
+
+  const refreshBooks = useCallback(async () => {
+    dispatch(actionCreators.refresh())
+
+    try {
+      const [nextBooks, hasMore] = await getRecentBooks(authData, 1)
+      dispatch(actionCreators.success(nextBooks, 1, hasMore, true))
+    } catch (status) {
+      if (status == 401) {
+        await signOut()
+      } else {
+        dispatch(actionCreators.failure())
+      }
+    }
+  }, [])
 
   useEffect(() => {
     fetchBooks()
@@ -66,6 +81,8 @@ export default function RecentBooksScreen () {
     <BookGrid
       books={books}
       onEndReached={fetchBooks}
+      onRefresh={refreshBooks}
+      refreshing={refreshing}
       ListFooterComponent={
         <View style={tw`h-14`}>{loading && <LargeActivityIndicator />}</View>
       }

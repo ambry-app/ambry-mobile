@@ -260,7 +260,8 @@ export default function PlayerScreen ({ navigation, route }) {
     )
   }
 
-  if (!playerState) {
+  // it was explicitly set to null; this means there is no current player state
+  if (playerState === null) {
     return (
       <ScreenCentered>
         <Text style={tw`text-gray-700 dark:text-gray-200`}>
@@ -268,6 +269,11 @@ export default function PlayerScreen ({ navigation, route }) {
         </Text>
       </ScreenCentered>
     )
+  }
+
+  // undefined (must be about to load)
+  if (!playerState) {
+    return null
   }
 
   return (

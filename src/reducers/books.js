@@ -1,20 +1,23 @@
 const types = {
   LOADING: 'LOADING',
   SUCCESS: 'SUCCESS',
-  FAILURE: 'FAILURE'
+  FAILURE: 'FAILURE',
+  REFRESH: 'REFRESH'
 }
 
 export const actionCreators = {
   loading: () => ({ type: types.LOADING }),
   failure: () => ({ type: types.FAILURE }),
-  success: (books, page) => ({
+  success: (books, page, hasMore, reset = false) => ({
     type: types.SUCCESS,
-    payload: { books, page }
-  })
+    payload: { books, page, hasMore, reset }
+  }),
+  refresh: () => ({ type: types.REFRESH })
 }
 
 export const initialState = {
   loading: false,
+  refreshing: false,
   error: false,
   books: [],
   nextPage: 1,
@@ -29,12 +32,17 @@ export function reducer (state, action) {
       return {
         ...state,
         loading: false,
+        refreshing: false,
         error: false,
-        books: [...state.books, ...action.payload.books],
+        books: action.payload.reset
+          ? action.payload.books
+          : [...state.books, ...action.payload.books],
         nextPage: state.nextPage + 1,
-        hasMore: action.payload.books.length > 0
+        hasMore: action.payload.hasMore
       }
     case types.FAILURE:
-      return { ...state, loading: false, error: true }
+      return { ...state, loading: false, refreshing: false, error: true }
+    case types.REFRESH:
+      return { ...state, nextPage: 1, refreshing: true }
   }
 }

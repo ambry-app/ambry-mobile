@@ -2,10 +2,10 @@ function apiUrl (host, path) {
   return `${host}/api/${path}`
 }
 
-async function handleResponse (response) {
+async function handleResponse (response, withHasMore = false) {
   if (response.ok) {
     const result = await response.json()
-    return result.data
+    return withHasMore ? [result.data, result.hasMore] : result.data
   } else {
     return Promise.reject(response.status)
   }
@@ -15,7 +15,14 @@ export async function getRecentBooks ({ host, token }, page = 1) {
   const response = await fetch(apiUrl(host, `books?page=${page}`), {
     headers: { Authorization: 'Bearer ' + token }
   })
-  return handleResponse(response)
+  return handleResponse(response, true)
+}
+
+export async function getRecentPlayerStates ({ host, token }, page = 1) {
+  const response = await fetch(apiUrl(host, `player_states?page=${page}`), {
+    headers: { Authorization: 'Bearer ' + token }
+  })
+  return handleResponse(response, true)
 }
 
 export async function getBook ({ host, token }, bookId) {

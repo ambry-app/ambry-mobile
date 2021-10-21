@@ -16,7 +16,7 @@ export const actionCreators = {
 export const initialState = {
   loading: false,
   error: false,
-  playerState: null
+  playerState: undefined
 }
 
 export function reducer (state, action) {
