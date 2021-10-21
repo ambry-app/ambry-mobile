@@ -43,6 +43,23 @@ export const AppStack = () => {
   return (
     <Tab.Navigator>
       <Tab.Screen
+        name='Player'
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <PlayButton
+              width={size}
+              height={size}
+              iconColor={color}
+              ringColor={color}
+            />
+          ),
+          tabBarLabelPosition: 'beside-icon',
+          tabBarStyle: tw.style('absolute h-12 opacity-85')
+        }}
+        component={PlayerScreen}
+      />
+      <Tab.Screen
         name='Library'
         options={{
           headerShown: false,
@@ -53,18 +70,6 @@ export const AppStack = () => {
           tabBarStyle: tw.style('h-12')
         }}
         component={LibraryStack}
-      />
-      <Tab.Screen
-        name='Player'
-        options={{
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <PlayButton width={size} height={size} iconColor={color} />
-          ),
-          tabBarLabelPosition: 'beside-icon',
-          tabBarStyle: tw.style('absolute h-12 opacity-85')
-        }}
-        component={PlayerScreen}
       />
     </Tab.Navigator>
   )

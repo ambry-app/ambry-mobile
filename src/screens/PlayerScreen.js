@@ -146,6 +146,7 @@ export default function PlayerScreen ({ navigation, route }) {
       // loaded.
       const trackUrl = await AsyncStorage.getItem('lastLoadedUrl')
       if (!trackUrl) {
+        dispatch(actionCreators.success(null))
         return
       }
       const playerStateString = await AsyncStorage.getItem(trackUrl)
