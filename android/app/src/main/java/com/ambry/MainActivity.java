@@ -6,6 +6,8 @@ import android.os.Bundle;
 import com.facebook.react.ReactActivity;
 import com.zoontek.rnbootsplash.RNBootSplash;
 
+import io.moox.rntransparentstatusandnavigationbar.RNTransparentStatusAndNavigationBar;
+
 public class MainActivity extends ReactActivity {
 
   /**
@@ -21,6 +23,7 @@ public class MainActivity extends ReactActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     RNBootSplash.init(R.drawable.bootsplash, MainActivity.this);
+    RNTransparentStatusAndNavigationBar.init(MainActivity.this);
   }
 
   // Fix for react-native Appearance API not reacting to system changes.

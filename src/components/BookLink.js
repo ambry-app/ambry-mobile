@@ -17,7 +17,9 @@ export default function BookLink ({ book }) {
       key={author.id}
       onPress={() => navigation.push('Person', { personId: author.personId })}
     >
-      <Text style={tw`text-lg text-gray-500 dark:text-gray-400 text-center`}>
+      <Text
+        style={tw`leading-none text-lg text-gray-500 dark:text-gray-400 text-center`}
+      >
         {author.name}
       </Text>
     </TouchableOpacity>

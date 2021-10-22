@@ -1,5 +1,5 @@
 import React from 'react'
-import { useColorScheme } from 'react-native'
+import { useColorScheme, TouchableOpacity } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createDrawerNavigator } from '@react-navigation/drawer'
@@ -87,17 +87,19 @@ export const AppStack = () => {
               ringColor={color}
             />
           ),
-          tabBarStyle: tw.style('absolute h-12 opacity-85')
+          tabBarStyle: tw.style('absolute opacity-85'),
+          tabBarButton: props => <TouchableOpacity {...props} />
         }}
         component={PlayerDrawer}
       />
       <Tab.Screen
         name='Library'
         options={{
+          lazy: false,
           tabBarIcon: ({ color, size }) => (
             <Library width={size} height={size} iconColor={color} />
           ),
-          tabBarStyle: tw.style('h-12')
+          tabBarButton: props => <TouchableOpacity {...props} />
         }}
         component={LibraryStack}
       />

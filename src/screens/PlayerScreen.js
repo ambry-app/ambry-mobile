@@ -18,6 +18,8 @@ import TrackPlayer, {
 import Slider from '@react-native-community/slider'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { StackActions } from '@react-navigation/native'
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useAuth } from '../contexts/Auth'
 
@@ -37,6 +39,7 @@ import { getPlayerState, imageSource, reportPlayerState } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/playerState'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
 import { secondsDisplay, progressPercent } from '../lib/utils'
+import tailwind from 'twrnc'
 
 const togglePlayback = async (playbackState, playerState, authData) => {
   const currentTrack = await TrackPlayer.getCurrentTrack()
@@ -124,6 +127,8 @@ export default function PlayerScreen ({ navigation, route }) {
   const [displayPlaybackRate, setDisplayPlaybackRate] = useState()
   const scheme = useColorScheme()
   const mediaIdParam = route?.params?.mediaId
+  const tabBarHeight = useBottomTabBarHeight()
+  const { top: topMargin } = useSafeAreaInsets()
 
   // report progress every 1 minute, at least while this screen is active
   useEffect(() => {
@@ -365,7 +370,12 @@ export default function PlayerScreen ({ navigation, route }) {
       </Modal>
 
       {/* Header */}
-      <View style={tw`p-4 opacity-85 bg-gray-100 dark:bg-gray-800 shadow-md`}>
+      <View
+        style={tailwind.style(
+          tw`p-4 opacity-85 bg-gray-100 dark:bg-gray-800 shadow-md`,
+          { paddingTop: topMargin + tailwind.style('pt-4').paddingTop }
+        )}
+      >
         {/* Book Details */}
         <View style={tw`flex-row`}>
           <View style={tw`w-1/4`}>
@@ -402,8 +412,8 @@ export default function PlayerScreen ({ navigation, route }) {
                 )
                 navigation.navigate('Library')
               }}
-              style={tw`text-lg text-gray-500 dark:text-gray-400`}
-              linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
+              style={tw`leading-none text-lg text-gray-500 dark:text-gray-400`}
+              linkStyle={tw`leading-none text-lg text-lime-500 dark:text-lime-400`}
             />
             <WrappingListOfLinks
               prefix='Narrated by'
@@ -425,7 +435,7 @@ export default function PlayerScreen ({ navigation, route }) {
               onPressLink={series => {
                 navigation.dispatch(
                   StackActions.push('Series', {
-                    seriesId: series.seriesId
+                    seriesId: series.id
                   })
                 )
                 navigation.navigate('Library')
@@ -479,12 +489,10 @@ export default function PlayerScreen ({ navigation, route }) {
 
       {/* Player Controls */}
       <View
-        style={tw.style(
-          'justify-center opacity-85 bg-white dark:bg-gray-900 mb-12',
-          {
-            flex: 1
-          }
-        )}
+        style={tw.style('justify-center opacity-85 bg-white dark:bg-gray-900', {
+          flex: 1,
+          marginBottom: tabBarHeight
+        })}
       >
         <View style={tw`flex-row items-center justify-around px-12 mb-14`}>
           <TouchableOpacity

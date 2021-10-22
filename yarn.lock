@@ -6624,6 +6624,11 @@ react-native-track-player@^2.1.1:
   resolved "https://registry.yarnpkg.com/react-native-track-player/-/react-native-track-player-2.1.1.tgz#21474d7e8758d6459f1e7384bb4ab1f9c0031bbe"
   integrity sha512-N+hilbML2O/H+29yoQY3OfMCggFwoab5TkfXbuD5NMJVa2iDnzL68BQ/Arz0nKp0eKbXitdcWS9Qg1MYUqJXTg==
 
+react-native-transparent-status-and-navigation-bar@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/react-native-transparent-status-and-navigation-bar/-/react-native-transparent-status-and-navigation-bar-1.0.3.tgz#367a07ef1554250439ccf4361eb69bdd38ffb239"
+  integrity sha512-q8YXU8Bl3pBQrqJU8ZqLDU02YG7aqJE0xAj5UO3ODvEtvi89Vk1ysYKwIxCWCZPxv8Zs1In3JdvBBTWCv6HpVw==
+
 react-native@0.66.0:
   version "0.66.0"
   resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.66.0.tgz#99bdd83a9a612a71b94242767989d666d445b007"

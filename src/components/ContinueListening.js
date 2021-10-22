@@ -6,6 +6,7 @@ import {
   TouchableNativeFeedback,
   View
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { useAuth } from '../contexts/Auth'
 
@@ -43,7 +44,7 @@ function Item ({ playerState, authData, navigation }) {
           </Text>
           <WrappingList
             items={playerState.media.book.authors}
-            style={tw`text-gray-500 dark:text-gray-400`}
+            style={tw`leading-none text-sm text-gray-500 dark:text-gray-400`}
           />
           <Text style={tw`text-lg text-lime-500 dark:text-lime-400`}>
             {progressPercent(playerState.media.duration, playerState.position)}
@@ -126,19 +127,25 @@ export default function ContinueListening ({ navigation }) {
   }
 
   return (
-    <FlatList
-      style={tw`py-2 mb-12`}
-      data={playerStates}
-      keyExtractor={item => item.id}
-      onEndReached={fetchPlayerStates}
-      onRefresh={refreshPlayerStates}
-      refreshing={refreshing}
-      renderItem={({ item }) => (
-        <Item playerState={item} authData={authData} navigation={navigation} />
-      )}
-      ListFooterComponent={
-        <View style={tw`h-14`}>{loading && <LargeActivityIndicator />}</View>
-      }
-    />
+    <SafeAreaView>
+      <FlatList
+        style={tw`py-2 mb-12`}
+        data={playerStates}
+        keyExtractor={item => item.id}
+        onEndReached={fetchPlayerStates}
+        onRefresh={refreshPlayerStates}
+        refreshing={refreshing}
+        renderItem={({ item }) => (
+          <Item
+            playerState={item}
+            authData={authData}
+            navigation={navigation}
+          />
+        )}
+        ListFooterComponent={
+          <View style={tw`h-14`}>{loading && <LargeActivityIndicator />}</View>
+        }
+      />
+    </SafeAreaView>
   )
 }

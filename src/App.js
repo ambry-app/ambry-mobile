@@ -1,11 +1,16 @@
 import React, { useEffect } from 'react'
+import { StatusBar, useColorScheme } from 'react-native'
 import TrackPlayer, { Capability } from 'react-native-track-player'
+import { init as initTransparentStatusBar } from 'react-native-transparent-status-and-navigation-bar'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import tw from './lib/tailwind'
 import { useDeviceContext } from 'twrnc'
 
 import { AuthProvider } from './contexts/Auth'
 import { Router } from './routes/Router'
+
+initTransparentStatusBar()
 
 async function setupIfNecessary () {
   const currentTrack = await TrackPlayer.getCurrentTrack()
@@ -41,6 +46,8 @@ async function setupIfNecessary () {
 }
 
 export default function App () {
+  const scheme = useColorScheme()
+
   useDeviceContext(tw)
 
   useEffect(() => {
@@ -48,8 +55,15 @@ export default function App () {
   }, [])
 
   return (
-    <AuthProvider>
-      <Router />
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <StatusBar
+          translucent={true}
+          backgroundColor={'transparent'}
+          barStyle={scheme == 'dark' ? 'light-content' : 'dark-content'}
+        />
+        <Router />
+      </AuthProvider>
+    </SafeAreaProvider>
   )
 }
