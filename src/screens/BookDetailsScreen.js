@@ -1,12 +1,5 @@
 import React, { useEffect, useReducer, useCallback } from 'react'
-import {
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-  useColorScheme
-} from 'react-native'
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import Moment from 'moment'
 
 import { useNavigation } from '@react-navigation/core'
@@ -73,7 +66,10 @@ function MediaList ({ book, media }) {
             </View>
             <TouchableOpacity
               onPress={() =>
-                navigation.navigate('Player', { mediaId: media.id })
+                navigation.navigate('PlayerDrawer', {
+                  screen: 'PlayerScreen',
+                  params: { mediaId: media.id }
+                })
               }
             >
               <PlayButton width={50} height={50} />

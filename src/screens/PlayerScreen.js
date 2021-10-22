@@ -36,7 +36,7 @@ import ForwardButton from '../components/ForwardButton'
 import { getPlayerState, imageSource, reportPlayerState } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/playerState'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
-import { secondsDisplay } from '../lib/utils'
+import { secondsDisplay, progressPercent } from '../lib/utils'
 
 const togglePlayback = async (playbackState, playerState, authData) => {
   const currentTrack = await TrackPlayer.getCurrentTrack()
@@ -94,7 +94,7 @@ async function seekRelative (interval, playerState, authData) {
   const playbackRate = await TrackPlayer.getRate()
   const actualInterval = interval * playbackRate
   const targetDestination = position + actualInterval
-  const actualDestination = Math.min(targetDestination, duration)
+  const actualDestination = Math.max(Math.min(targetDestination, duration), 0)
 
   await TrackPlayer.seekTo(actualDestination)
 
@@ -212,10 +212,7 @@ export default function PlayerScreen ({ navigation, route }) {
 
   useEffect(() => {
     const { duration: durationSeconds, position: positionSeconds } = progress
-    const percent =
-      durationSeconds && durationSeconds > 0
-        ? ((positionSeconds / durationSeconds) * 100).toFixed(1) + '%'
-        : '0.0%'
+    const percent = progressPercent(durationSeconds, positionSeconds)
     const position = secondsDisplay(positionSeconds)
     const duration = secondsDisplay(durationSeconds)
     const remainingSeconds = Math.max(durationSeconds - positionSeconds, 0)
@@ -371,15 +368,15 @@ export default function PlayerScreen ({ navigation, route }) {
       <View style={tw`p-4 opacity-85 bg-gray-100 dark:bg-gray-800 shadow-md`}>
         {/* Book Details */}
         <View style={tw`flex-row`}>
-          <View
-            style={tw`w-1/4 rounded-xl border-gray-200 bg-gray-200 shadow-md`}
-          >
-            <Image
-              source={imageSource(authData, playerState.media.book.imagePath)}
-              style={tw.style('rounded-md', 'w-full', {
-                aspectRatio: 10 / 15
-              })}
-            />
+          <View style={tw`w-1/4`}>
+            <View style={tw`rounded-xl border-gray-200 bg-gray-200 shadow-md`}>
+              <Image
+                source={imageSource(authData, playerState.media.book.imagePath)}
+                style={tw.style('rounded-md', 'w-full', {
+                  aspectRatio: 10 / 15
+                })}
+              />
+            </View>
           </View>
           <View style={tw`pl-4 w-3/4`}>
             <TouchableOpacity

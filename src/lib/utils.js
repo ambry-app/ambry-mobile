@@ -14,3 +14,9 @@ export function durationDisplay (input) {
 
   return `${hours} hours and ${minutes} minutes`
 }
+
+export function progressPercent (durationSeconds, positionSeconds) {
+  return durationSeconds && durationSeconds > 0
+    ? ((positionSeconds / durationSeconds) * 100).toFixed(1) + '%'
+    : '0.0%'
+}

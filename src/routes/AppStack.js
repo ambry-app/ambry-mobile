@@ -1,6 +1,8 @@
 import React from 'react'
+import { useColorScheme } from 'react-native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { createDrawerNavigator } from '@react-navigation/drawer'
 
 import tw from '../lib/tailwind'
 
@@ -10,6 +12,7 @@ import PersonDetailsScreen from '../screens/PersonDetailsScreen'
 import SeriesScreen from '../screens/SeriesScreen'
 import PlayerScreen from '../screens/PlayerScreen'
 
+import ContinueListening from '../components/ContinueListening'
 import PlayButton from '../components/PlayButton'
 import Library from '../assets/library.svg'
 
@@ -39,13 +42,43 @@ const LibraryStack = () => {
   )
 }
 
-export const AppStack = () => {
+const Drawer = createDrawerNavigator()
+
+const PlayerDrawer = () => {
   return (
-    <Tab.Navigator>
+    <Drawer.Navigator
+      drawerContent={({ navigation }) => (
+        <ContinueListening navigation={navigation} />
+      )}
+      screenOptions={{
+        drawerType: 'back'
+      }}
+    >
+      <Drawer.Screen
+        name='PlayerScreen'
+        options={{ headerShown: false }}
+        component={PlayerScreen}
+      />
+    </Drawer.Navigator>
+  )
+}
+
+export const AppStack = () => {
+  const scheme = useColorScheme()
+
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarLabelPosition: 'beside-icon',
+        tabBarInactiveTintColor:
+          scheme == 'dark' ? tw.color('gray-50') : tw.color('gray-700')
+      }}
+    >
       <Tab.Screen
-        name='Player'
+        name='PlayerDrawer'
         options={{
-          headerShown: false,
+          title: 'Player',
           tabBarIcon: ({ color, size }) => (
             <PlayButton
               width={size}
@@ -54,19 +87,16 @@ export const AppStack = () => {
               ringColor={color}
             />
           ),
-          tabBarLabelPosition: 'beside-icon',
           tabBarStyle: tw.style('absolute h-12 opacity-85')
         }}
-        component={PlayerScreen}
+        component={PlayerDrawer}
       />
       <Tab.Screen
         name='Library'
         options={{
-          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Library width={size} height={size} iconColor={color} />
           ),
-          tabBarLabelPosition: 'beside-icon',
           tabBarStyle: tw.style('h-12')
         }}
         component={LibraryStack}

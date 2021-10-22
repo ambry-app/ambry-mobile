@@ -1,25 +1,20 @@
 import React from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { Text, View } from 'react-native'
 
 import tw from '../lib/tailwind'
 
-export default function WrappingListOfLinks ({
+export default function WrappingList ({
   prefix,
   items,
   keyExtractor = item => item.id,
   nameExtractor = item => item.name,
-  onPressLink,
-  style,
-  linkStyle
+  style
 }) {
   const links = items
     .map(item => (
-      <TouchableOpacity
-        key={keyExtractor(item)}
-        onPress={() => onPressLink(item)}
-      >
-        <Text style={linkStyle}>{nameExtractor(item)}</Text>
-      </TouchableOpacity>
+      <Text key={keyExtractor(item)} style={style}>
+        {nameExtractor(item)}
+      </Text>
     ))
     .flatMap((e, i) => [
       <Text key={'comma-' + i} style={style}>
