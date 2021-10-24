@@ -57,6 +57,10 @@ async function seekRelative (interval) {
 }
 
 export default async function setup () {
+  TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => {
+    sendState()
+  })
+
   TrackPlayer.addEventListener(Event.RemoteStop, async () => {
     await TrackPlayer.pause()
     await seekRelative(-1)
@@ -89,7 +93,6 @@ export default async function setup () {
         wasPausedByDuck = playerState !== State.Paused
         await TrackPlayer.pause()
         await seekRelative(-1)
-        sendState()
       } else {
         if (wasPausedByDuck === true) {
           TrackPlayer.play()

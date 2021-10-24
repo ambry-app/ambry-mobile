@@ -36,7 +36,7 @@ const DarkTheme = {
 
 const linking = {
   prefixes: ['trackplayer://'],
-  config: { screens: { Player: 'notification.click' } }
+  config: { screens: { PlayerDrawer: 'notification.click' } }
 }
 
 export const Router = () => {

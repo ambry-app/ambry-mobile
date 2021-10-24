@@ -4,7 +4,11 @@ export function secondsDisplay (input) {
   const minutes = String(Math.floor((total % 3600) / 60)).padStart(2, '0')
   const seconds = String(Math.floor((total % 3600) % 60)).padStart(2, '0')
 
-  return `${hours}:${minutes}:${seconds}`
+  if (hours == '00') {
+    return `${minutes}:${seconds}`
+  } else {
+    return `${hours}:${minutes}:${seconds}`
+  }
 }
 
 export function durationDisplay (input) {
@@ -12,7 +16,11 @@ export function durationDisplay (input) {
   const hours = Math.floor(total / 3600)
   const minutes = Math.floor((total % 3600) / 60)
 
-  return `${hours} hours and ${minutes} minutes`
+  if (hours == 0) {
+    return `${minutes} minutes`
+  } else {
+    return `${hours} hours and ${minutes} minutes`
+  }
 }
 
 export function progressPercent (durationSeconds, positionSeconds) {
