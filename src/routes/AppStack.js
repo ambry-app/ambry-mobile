@@ -87,7 +87,12 @@ export const AppStack = () => {
               ringColor={color}
             />
           ),
-          tabBarStyle: tw.style('absolute opacity-85'),
+          tabBarStyle: tw.style(
+            'absolute shadow-none',
+            scheme == 'dark'
+              ? 'bg-gray-800 bg-opacity-85'
+              : 'bg-gray-100 bg-opacity-85'
+          ),
           tabBarButton: props => <TouchableOpacity {...props} />
         }}
         component={PlayerDrawer}

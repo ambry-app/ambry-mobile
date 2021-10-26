@@ -11,7 +11,6 @@ import {
 } from 'react-native'
 import TrackPlayer, {
   usePlaybackState,
-  useProgress,
   State,
   TrackType
 } from 'react-native-track-player'
@@ -28,8 +27,8 @@ import tw from '../lib/tailwind'
 import { Header2, Header4 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import PlayButton from '../components/PlayButton'
-import PauseButton from '../components/PauseButton'
+import ProgressDisplay from '../components/ProgressDisplay'
+import PlaybackStateButton from '../components/PlaybackStateButton'
 import Back10Button from '../components/Back10Button'
 import Forward10Button from '../components/Forward10Button'
 import BackButton from '../components/BackButton'
@@ -38,8 +37,6 @@ import ForwardButton from '../components/ForwardButton'
 import { getPlayerState, imageSource, reportPlayerState } from '../api/ambry'
 import { actionCreators, initialState, reducer } from '../reducers/playerState'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
-import { secondsDisplay, progressPercent } from '../lib/utils'
-import tailwind from 'twrnc'
 
 const togglePlayback = async (playbackState, playerState, authData) => {
   const currentTrack = await TrackPlayer.getCurrentTrack()
@@ -120,8 +117,6 @@ export default function PlayerScreen ({ navigation, route }) {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { playerState, loading, error } = state
   const playbackState = usePlaybackState()
-  const progress = useProgress()
-  const [progressDisplay, setProgressDisplay] = useState()
   const [rateModalVisible, setRateModalVisible] = useState(false)
   const [playbackRate, setPlaybackRate] = useState()
   const [displayPlaybackRate, setDisplayPlaybackRate] = useState()
@@ -214,18 +209,6 @@ export default function PlayerScreen ({ navigation, route }) {
   useEffect(() => {
     fetchPlayerState()
   }, [mediaIdParam])
-
-  useEffect(() => {
-    const { duration: durationSeconds, position: positionSeconds } = progress
-    const percent = progressPercent(durationSeconds, positionSeconds)
-    const position = secondsDisplay(positionSeconds)
-    const duration = secondsDisplay(durationSeconds)
-    const remainingSeconds = Math.max(durationSeconds - positionSeconds, 0)
-    const rate = playbackRate || 1
-    const remaining = secondsDisplay(remainingSeconds / rate)
-
-    setProgressDisplay({ percent, position, duration, remaining })
-  }, [progress, playbackRate])
 
   useEffect(() => {
     playerState && setPlaybackRate(playerState.playbackRate)
@@ -371,9 +354,12 @@ export default function PlayerScreen ({ navigation, route }) {
 
       {/* Header */}
       <View
-        style={tailwind.style(
-          tw`p-4 opacity-85 bg-gray-100 dark:bg-gray-800 shadow-md`,
-          { paddingTop: topMargin + tailwind.style('pt-4').paddingTop }
+        style={tw.style(
+          tw`p-4 shadow-sm`,
+          scheme == 'dark'
+            ? 'bg-gray-800 bg-opacity-85'
+            : 'bg-gray-100 bg-opacity-85',
+          { paddingTop: topMargin + tw.style('pt-4').paddingTop }
         )}
       >
         {/* Book Details */}
@@ -447,34 +433,7 @@ export default function PlayerScreen ({ navigation, route }) {
           </View>
         </View>
         {/* Progress */}
-        <View style={tw`my-4`}>
-          <View
-            style={tw`h-2 bg-gray-200 shadow-md dark:bg-gray-700 rounded-full overflow-hidden`}
-          >
-            <View
-              style={tw.style('h-2 bg-lime-500 dark:bg-lime-400', {
-                width: progressDisplay.percent
-              })}
-            ></View>
-          </View>
-          <View style={tw`flex-row justify-between`}>
-            <Text
-              style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
-            >
-              {progressDisplay.position} of {progressDisplay.duration}
-            </Text>
-            <Text
-              style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
-            >
-              {progressDisplay.percent}
-            </Text>
-            <Text
-              style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}
-            >
-              -{progressDisplay.remaining}
-            </Text>
-          </View>
-        </View>
+        <ProgressDisplay playbackRate={playbackRate} />
         {/* Playback Speed */}
         <View style={tw`flex-row-reverse`}>
           <TouchableOpacity onPress={() => setRateModalVisible(true)}>
@@ -489,10 +448,16 @@ export default function PlayerScreen ({ navigation, route }) {
 
       {/* Player Controls */}
       <View
-        style={tw.style('justify-center opacity-85 bg-white dark:bg-gray-900', {
-          flex: 1,
-          marginBottom: tabBarHeight
-        })}
+        style={tw.style(
+          'justify-center',
+          scheme == 'dark'
+            ? 'bg-gray-900 bg-opacity-85'
+            : 'bg-white bg-opacity-85',
+          {
+            flex: 1,
+            marginBottom: tabBarHeight
+          }
+        )}
       >
         <View style={tw`flex-row items-center justify-around px-12 mb-14`}>
           <TouchableOpacity
@@ -500,15 +465,9 @@ export default function PlayerScreen ({ navigation, route }) {
           >
             <Back10Button width={34} height={39} />
           </TouchableOpacity>
-          <TouchableOpacity
+          <PlaybackStateButton
             onPress={() => togglePlayback(playbackState, playerState, authData)}
-          >
-            {playbackState === State.Playing ? (
-              <PauseButton width={75} height={75} />
-            ) : (
-              <PlayButton width={75} height={75} />
-            )}
-          </TouchableOpacity>
+          />
           <TouchableOpacity
             onPress={() => seekRelative(10, playerState, authData)}
           >
