@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { TouchableOpacity, View } from 'react-native'
+import { useDebounce } from '@react-hook/debounce'
 
 import { State, usePlaybackState } from 'react-native-track-player'
 
@@ -21,8 +22,13 @@ function Button ({ playbackState }) {
 
 export default function PlaybackStateButton ({ onPress }) {
   const playbackState = usePlaybackState()
+  const [debouncedState, setDebouncedState] = useDebounce(State.None, 10)
 
-  if (loadingStates.includes(playbackState)) {
+  useEffect(() => {
+    setDebouncedState(playbackState)
+  }, [playbackState])
+
+  if (loadingStates.includes(debouncedState)) {
     return (
       <View width={75} height={75} style={tw`justify-center`}>
         <LargeActivityIndicator />
@@ -31,7 +37,7 @@ export default function PlaybackStateButton ({ onPress }) {
   } else {
     return (
       <TouchableOpacity onPress={onPress}>
-        <Button playbackState={playbackState} />
+        <Button playbackState={debouncedState} />
       </TouchableOpacity>
     )
   }
