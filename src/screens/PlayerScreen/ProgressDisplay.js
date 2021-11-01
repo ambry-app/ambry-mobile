@@ -47,12 +47,12 @@ export default function ProgressDisplay () {
   }, [progress, playbackRate, loadingTrack])
 
   return (
-    <View style={tw`my-4`}>
+    <View style={tw`my-4 shadow-md rounded-full`}>
       <View
-        style={tw`h-2 bg-gray-200 shadow-md dark:bg-gray-700 rounded-full overflow-hidden`}
+        style={tw`h-2 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden`}
       >
         <View
-          style={tw.style('absolute h-2 bg-gray-300 dark:bg-gray-500', {
+          style={tw.style('absolute h-2 bg-gray-400 dark:bg-gray-500', {
             width: progressDisplay.bufferedPercent
           })}
         ></View>
