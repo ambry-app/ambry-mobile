@@ -1,5 +1,5 @@
 import React from 'react'
-import { ImageBackground } from 'react-native'
+import { ImageBackground, Platform } from 'react-native'
 import { usePlayer } from '../../contexts/Player'
 import tw from '../../lib/tailwind'
 
@@ -9,7 +9,7 @@ export default function Background ({ children }) {
   return (
     <ImageBackground
       source={imageSource}
-      blurRadius={8}
+      blurRadius={Platform.OS === 'ios' ? 25 : 10}
       style={tw.style('h-full', { resizeMode: 'cover' })}
     >
       {children}
