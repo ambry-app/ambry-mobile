@@ -1,19 +1,16 @@
 import React, { useState } from 'react'
 import {
   Button,
+  ScrollView,
   Text,
   TextInput,
-  ScrollView,
-  View,
-  useColorScheme
+  useColorScheme,
+  View
 } from 'react-native'
-
-import tw from '../lib/tailwind'
-
+import Logo from '../assets/logo_256x1056.svg'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import { useAuth } from '../contexts/Auth'
-
-import Logo from '../assets/logo_256x1056.svg'
+import tw from '../lib/tailwind'
 
 export default function SignInScreen () {
   const auth = useAuth()

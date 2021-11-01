@@ -1,6 +1,5 @@
 import React from 'react'
 import { ActivityIndicator, useColorScheme } from 'react-native'
-
 import tw from '../lib/tailwind'
 
 export default function LargeActivityIndicator ({ style }) {

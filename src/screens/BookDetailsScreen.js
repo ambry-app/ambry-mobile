@@ -1,26 +1,23 @@
-import React, { useEffect, useReducer, useCallback } from 'react'
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
-import Moment from 'moment'
-
 import { useNavigation } from '@react-navigation/core'
-import { useAuth } from '../contexts/Auth'
-
-import tw from '../lib/tailwind'
-
+import Moment from 'moment'
+import React, { useCallback, useEffect, useReducer } from 'react'
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import { getBook, uriSource } from '../api/ambry'
 import Description from '../components/Description'
 import { Header1 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
+import PlayButton from '../components/PlayButton'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
-import PlayButton from '../components/PlayButton'
-
-import { imageSource, getBook } from '../api/ambry'
-import { actionCreators, initialState, reducer } from '../reducers/book'
-
+import { useAuth } from '../contexts/Auth'
+import { usePlayer } from '../contexts/Player'
+import tw from '../lib/tailwind'
 import { durationDisplay } from '../lib/utils'
+import { actionCreators, initialState, reducer } from '../reducers/book'
 
 function MediaList ({ book, media }) {
   const navigation = useNavigation()
+  const { loadMedia } = usePlayer()
 
   if (media.length == 0) {
     return (
@@ -65,12 +62,12 @@ function MediaList ({ book, media }) {
               </Text>
             </View>
             <TouchableOpacity
-              onPress={() =>
+              onPress={() => {
                 navigation.navigate('PlayerDrawer', {
-                  screen: 'PlayerScreen',
-                  params: { mediaId: media.id }
+                  screen: 'PlayerScreen'
                 })
-              }
+                loadMedia(media.id)
+              }}
             >
               <PlayButton width={50} height={50} />
             </TouchableOpacity>
@@ -157,7 +154,7 @@ export default function BookDetailsScreen ({ route, navigation }) {
             style={tw`mt-8 rounded-2xl border-gray-200 bg-gray-200 shadow-lg`}
           >
             <Image
-              source={imageSource(authData, book.imagePath)}
+              source={uriSource(authData, book.imagePath)}
               style={tw.style('rounded-2xl', 'w-full', {
                 aspectRatio: 10 / 15
               })}

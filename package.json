@@ -17,6 +17,7 @@
     "@react-navigation/drawer": "^6.1.8",
     "@react-navigation/native": "^6.0.5",
     "@react-navigation/native-stack": "^6.2.3",
+    "async-mutex": "^0.3.2",
     "moment": "^2.29.1",
     "punycode": "^2.1.1",
     "react": "17.0.2",

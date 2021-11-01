@@ -1,14 +1,12 @@
+import { NavigationContainer } from '@react-navigation/native'
 import React from 'react'
 import { useColorScheme } from 'react-native'
-import { NavigationContainer } from '@react-navigation/native'
 import RNBootSplash from 'react-native-bootsplash'
-
+import { Loading } from '../components/Loading'
+import { useAuth } from '../contexts/Auth'
 import tw from '../lib/tailwind'
-
 import { AppStack } from './AppStack'
 import { AuthStack } from './AuthStack'
-import { useAuth } from '../contexts/Auth'
-import { Loading } from '../components/Loading'
 
 const LightTheme = {
   dark: false,

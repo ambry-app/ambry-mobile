@@ -1,9 +1,7 @@
 import React from 'react'
 import { useColorScheme } from 'react-native'
-
-import tw from '../lib/tailwind'
-
 import Pause from '../assets/pause.svg'
+import tw from '../lib/tailwind'
 
 export default function PauseButton ({ width, height }) {
   const scheme = useColorScheme()

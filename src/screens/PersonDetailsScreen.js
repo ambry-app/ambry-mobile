@@ -1,17 +1,13 @@
-import React, { useEffect, useReducer, useCallback } from 'react'
+import React, { useCallback, useEffect, useReducer } from 'react'
 import { Image, SectionList, Text, View } from 'react-native'
-
-import { useAuth } from '../contexts/Auth'
-
-import tw from '../lib/tailwind'
-
+import { getPerson, uriSource } from '../api/ambry'
 import BookGrid from '../components/BookGrid'
 import Description from '../components/Description'
 import { Header1, Header2 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-
-import { imageSource, getPerson } from '../api/ambry'
+import { useAuth } from '../contexts/Auth'
+import tw from '../lib/tailwind'
 import { actionCreators, initialState, reducer } from '../reducers/person'
 
 function PersonHeader ({ person }) {
@@ -24,7 +20,7 @@ function PersonHeader ({ person }) {
         style={tw`mx-12 my-8 rounded-full border-gray-200 bg-gray-200 shadow-lg`}
       >
         <Image
-          source={imageSource(authData, person.imagePath)}
+          source={uriSource(authData, person.imagePath)}
           style={tw.style('rounded-full w-full', {
             aspectRatio: 1 / 1
           })}

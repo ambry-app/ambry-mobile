@@ -91,7 +91,7 @@ export async function createToken (host, email, password) {
   return handleResponse(response)
 }
 
-export function imageSource ({ host, token }, path) {
+export function uriSource ({ host, token }, path) {
   return {
     uri: `${host}/${path}`,
     headers: {

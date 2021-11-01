@@ -1,7 +1,6 @@
 import React from 'react'
-
-import ScreenCentered from './ScreenCentered'
 import LargeActivityIndicator from './LargeActivityIndicator'
+import ScreenCentered from './ScreenCentered'
 
 export const Loading = () => {
   return (

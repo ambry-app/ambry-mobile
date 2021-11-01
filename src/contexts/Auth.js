@@ -1,6 +1,5 @@
-import React, { createContext, useState, useContext, useEffect } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import EncryptedStorage from 'react-native-encrypted-storage'
-
 import { authService } from '../services/authService'
 
 const AuthContext = createContext({})
@@ -22,6 +21,7 @@ const AuthProvider = ({ children }) => {
         setAuthData(_authData)
       }
     } catch (error) {
+      console.error('Failed to get userSession from EncryptedStorage', error)
     } finally {
       setLoading(false)
     }

@@ -1,6 +1,5 @@
 import React from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
-
 import tw from '../lib/tailwind'
 
 export default function WrappingListOfLinks ({

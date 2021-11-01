@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useCallback } from 'react'
+import React, { useCallback, useEffect, useReducer } from 'react'
 import {
   FlatList,
   Image,
@@ -7,32 +7,39 @@ import {
   View
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-
-import { useAuth } from '../contexts/Auth'
-
+import { getRecentPlayerStates, uriSource } from '../api/ambry'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import WrappingList from './WrappingList'
-
+import { useAuth } from '../contexts/Auth'
+import { usePlayer } from '../contexts/Player'
 import tw from '../lib/tailwind'
-
-import { getRecentPlayerStates, imageSource } from '../api/ambry'
 import { progressPercent } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/playerStates'
+import WrappingList from './WrappingList'
 
 function Item ({ playerState, authData, navigation }) {
+  const { media, loadMedia } = usePlayer()
+
   return (
     <TouchableNativeFeedback
-      onPress={() =>
-        navigation.navigate('PlayerScreen', { mediaId: playerState.media.id })
-      }
+      onPress={() => {
+        navigation.navigate('PlayerScreen')
+
+        // hack: let the drawer animation complete before loading
+        // FIXME: would be great if we could somehow make this concurrent
+        if (!media || media.id != playerState.media.id) {
+          setTimeout(() => {
+            loadMedia(playerState.media.id)
+          }, 400)
+        }
+      }}
     >
       <View style={tw`p-4 py-2 flex-row items-center`}>
         <View
           style={tw`w-1/4 rounded-xl border-gray-200 bg-gray-200 shadow-md`}
         >
           <Image
-            source={imageSource(authData, playerState.media.book.imagePath)}
+            source={uriSource(authData, playerState.media.book.imagePath)}
             style={tw.style('rounded-md', 'w-full', {
               aspectRatio: 10 / 15
             })}

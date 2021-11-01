@@ -1,6 +1,5 @@
 import React from 'react'
 import { Text } from 'react-native'
-
 import tw from '../lib/tailwind'
 
 export function Header1 ({ children, style }) {

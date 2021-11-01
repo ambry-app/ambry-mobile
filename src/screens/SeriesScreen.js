@@ -1,18 +1,14 @@
-import React, { useEffect, useReducer, useCallback } from 'react'
+import React, { useCallback, useEffect, useReducer } from 'react'
 import { Text, View } from 'react-native'
-
-import { useAuth } from '../contexts/Auth'
-
-import tw from '../lib/tailwind'
-
+import { getSeries } from '../api/ambry'
 import BookGrid from '../components/BookGrid'
 import { Header1 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-
-import { getSeries } from '../api/ambry'
-import { actionCreators, initialState, reducer } from '../reducers/series'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
+import { useAuth } from '../contexts/Auth'
+import tw from '../lib/tailwind'
+import { actionCreators, initialState, reducer } from '../reducers/series'
 
 export default function SeriesScreen ({ navigation, route }) {
   const { signOut, authData } = useAuth()

@@ -1,9 +1,7 @@
 import React from 'react'
 import { useColorScheme } from 'react-native'
-
-import tw from '../lib/tailwind'
-
-import Forward from '../assets/forward.svg'
+import Forward from '../../../assets/forward.svg'
+import tw from '../../../lib/tailwind'
 
 export default function ForwardButton ({ width, height }) {
   const scheme = useColorScheme()

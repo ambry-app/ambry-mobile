@@ -1,12 +1,9 @@
+import { useNavigation } from '@react-navigation/core'
 import React from 'react'
 import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native'
-
-import { useNavigation } from '@react-navigation/core'
+import { uriSource } from '../api/ambry'
 import { useAuth } from '../contexts/Auth'
-
 import tw from '../lib/tailwind'
-
-import { imageSource } from '../api/ambry'
 
 export default function BookLink ({ book }) {
   const { authData } = useAuth()
@@ -53,7 +50,7 @@ export default function BookLink ({ book }) {
         onPress={() => navigation.push('Book', { bookId: book.id })}
       >
         <Image
-          source={imageSource(authData, book.imagePath)}
+          source={uriSource(authData, book.imagePath)}
           style={tw.style('rounded-lg', 'w-full', {
             aspectRatio: 10 / 15
           })}

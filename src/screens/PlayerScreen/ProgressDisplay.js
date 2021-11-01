@@ -1,23 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import { Text, View } from 'react-native'
-
 import { useProgress } from 'react-native-track-player'
+import { usePlayer } from '../../contexts/Player'
+import tw from '../../lib/tailwind'
+import { progressPercent, secondsDisplay } from '../../lib/utils'
 
-import tw from '../lib/tailwind'
+const initialState = {
+  percent: '0.0%',
+  bufferedPercent: '0.0%',
+  position: '00:00',
+  duration: '00:00',
+  remaining: '00:00'
+}
 
-import { secondsDisplay, progressPercent } from '../lib/utils'
-
-export default function ProgressDisplay ({ playbackRate }) {
+export default function ProgressDisplay () {
+  const { playbackRate, loadingTrack } = usePlayer()
   const progress = useProgress()
-  const [progressDisplay, setProgressDisplay] = useState({
-    percent: '0.0%',
-    bufferedPercent: '0.0%',
-    position: '00:00',
-    duration: '00:00',
-    remaining: '00:00'
-  })
+  const [progressDisplay, setProgressDisplay] = useState(initialState)
 
   useEffect(() => {
+    if (loadingTrack) {
+      setProgressDisplay(initialState)
+      return
+    }
+
     const {
       duration: durationSeconds,
       position: positionSeconds,
@@ -38,7 +44,7 @@ export default function ProgressDisplay ({ playbackRate }) {
       duration,
       remaining
     })
-  }, [progress, playbackRate])
+  }, [progress, playbackRate, loadingTrack])
 
   return (
     <View style={tw`my-4`}>

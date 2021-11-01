@@ -1,104 +1,105 @@
-import TrackPlayer, { Event, State } from 'react-native-track-player'
 import EncryptedStorage from 'react-native-encrypted-storage'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-
+import TrackPlayer, { Event, State } from 'react-native-track-player'
 import { reportPlayerState } from '../api/ambry'
+import { playerMutex } from '../contexts/Player'
 
 let wasPausedByDuck = false
 
-async function sendState () {
-  const userSession = await EncryptedStorage.getItem('userSession')
-  const authData = JSON.parse(userSession)
-
+const updateServerPosition = async () => {
+  const position = await TrackPlayer.getPosition()
   const track = await TrackPlayer.getTrack(0)
 
   if (!track) {
+    console.warn('Service: updateServerPosition called while no track loaded')
     return
   }
 
-  const currentPlayerStateString = await AsyncStorage.getItem(track.url)
-  if (!currentPlayerStateString) {
-    return
-  }
-
-  const currentPlayerState = JSON.parse(currentPlayerStateString)
-  const position = await TrackPlayer.getPosition()
-  const playbackRate = await TrackPlayer.getRate()
+  const playerStateID = track.description
 
   const playerStateReport = {
-    id: currentPlayerState.id,
-    position: position.toFixed(3),
-    playbackRate: playbackRate.toFixed(2)
+    id: playerStateID,
+    position: position.toFixed(3)
   }
 
-  // only report to server non-zero positions; mitigates race conditions when
-  // player not yet fully set-up
-  if (playerStateReport.position != '0.000') {
-    await reportPlayerState(authData, playerStateReport)
+  const userSession = await EncryptedStorage.getItem('userSession')
+  const authData = JSON.parse(userSession)
 
-    const updatedPlayerState = {
-      position,
-      playbackRate,
-      ...currentPlayerState
-    }
-
-    await AsyncStorage.setItem(track.url, JSON.stringify(updatedPlayerState))
-  }
+  console.debug('Service: updating server position', playerStateReport)
+  reportPlayerState(authData, playerStateReport)
 }
 
-async function seekRelative (interval) {
+const seekRelative = async interval => {
+  console.debug('Service: seeking', interval)
+
   const position = await TrackPlayer.getPosition()
+  const duration = await TrackPlayer.getDuration()
   const playbackRate = await TrackPlayer.getRate()
   const actualInterval = interval * playbackRate
+  const targetDestination = position + actualInterval
+  const actualDestination = Math.max(Math.min(targetDestination, duration), 0)
 
-  await TrackPlayer.seekTo(position + actualInterval)
+  await TrackPlayer.seekTo(actualDestination)
 
-  await sendState()
+  updateServerPosition()
 }
 
 export default async function setup () {
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => {
-    sendState()
+    playerMutex.runExclusive(() => {
+      updateServerPosition()
+    })
   })
 
   TrackPlayer.addEventListener(Event.RemoteStop, async () => {
-    await TrackPlayer.pause()
-    await seekRelative(-1)
-    TrackPlayer.destroy()
+    playerMutex.runExclusive(async () => {
+      await TrackPlayer.pause()
+      await seekRelative(-1)
+      TrackPlayer.destroy()
+    })
   })
 
   TrackPlayer.addEventListener(Event.RemotePause, async () => {
-    await TrackPlayer.pause()
-    seekRelative(-1)
+    playerMutex.runExclusive(async () => {
+      await TrackPlayer.pause()
+      seekRelative(-1)
+    })
   })
 
   TrackPlayer.addEventListener(Event.RemotePlay, () => {
-    TrackPlayer.play()
+    playerMutex.runExclusive(async () => {
+      TrackPlayer.play()
+    })
   })
 
   TrackPlayer.addEventListener(Event.RemoteJumpBackward, ({ interval }) => {
-    seekRelative(interval * -1)
+    playerMutex.runExclusive(async () => {
+      seekRelative(interval * -1)
+    })
   })
 
   TrackPlayer.addEventListener(Event.RemoteJumpForward, ({ interval }) => {
-    seekRelative(interval)
+    playerMutex.runExclusive(async () => {
+      seekRelative(interval)
+    })
   })
 
   TrackPlayer.addEventListener(Event.RemoteDuck, async e => {
-    if (e.permanent === true) {
-      TrackPlayer.pause()
-    } else {
-      if (e.paused === true) {
-        const playerState = await TrackPlayer.getState()
-        wasPausedByDuck = playerState !== State.Paused
-        await TrackPlayer.pause()
-        await seekRelative(-1)
+    playerMutex.runExclusive(async () => {
+      if (e.permanent === true) {
+        TrackPlayer.pause()
       } else {
-        if (wasPausedByDuck === true) {
-          TrackPlayer.play()
-          wasPausedByDuck = false
+        if (e.paused === true) {
+          const playerState = await TrackPlayer.getState()
+          wasPausedByDuck = playerState !== State.Paused
+          await TrackPlayer.pause()
+          await seekRelative(-1)
+        } else {
+          if (wasPausedByDuck === true) {
+            TrackPlayer.play()
+            wasPausedByDuck = false
+          }
         }
       }
-    }
+    })
   })
 }

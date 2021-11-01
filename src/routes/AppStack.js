@@ -1,20 +1,18 @@
-import React from 'react'
-import { useColorScheme, TouchableOpacity } from 'react-native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createDrawerNavigator } from '@react-navigation/drawer'
-
-import tw from '../lib/tailwind'
-
-import RecentBooksScreen from '../screens/RecentBooksScreen'
-import BookDetailsScreen from '../screens/BookDetailsScreen'
-import PersonDetailsScreen from '../screens/PersonDetailsScreen'
-import SeriesScreen from '../screens/SeriesScreen'
-import PlayerScreen from '../screens/PlayerScreen'
-
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import React from 'react'
+import { TouchableOpacity, useColorScheme } from 'react-native'
+import Library from '../assets/library.svg'
 import ContinueListening from '../components/ContinueListening'
 import PlayButton from '../components/PlayButton'
-import Library from '../assets/library.svg'
+import { PlayerProvider } from '../contexts/Player'
+import tw from '../lib/tailwind'
+import BookDetailsScreen from '../screens/BookDetailsScreen'
+import PersonDetailsScreen from '../screens/PersonDetailsScreen'
+import PlayerScreen from '../screens/PlayerScreen'
+import RecentBooksScreen from '../screens/RecentBooksScreen'
+import SeriesScreen from '../screens/SeriesScreen'
 
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator()
@@ -63,7 +61,7 @@ const PlayerDrawer = () => {
   )
 }
 
-export const AppStack = () => {
+const TabNavigator = () => {
   const scheme = useColorScheme()
 
   return (
@@ -109,5 +107,13 @@ export const AppStack = () => {
         component={LibraryStack}
       />
     </Tab.Navigator>
+  )
+}
+
+export const AppStack = () => {
+  return (
+    <PlayerProvider>
+      <TabNavigator />
+    </PlayerProvider>
   )
 }
