@@ -7,9 +7,11 @@ import React, {
   useEffect,
   useState
 } from 'react'
+import { Platform } from 'react-native'
 import TrackPlayer, {
   Capability,
   State,
+  PitchAlgorithm,
   TrackType,
   usePlaybackState
 } from 'react-native-track-player'
@@ -100,11 +102,19 @@ const PlayerProvider = ({ children }) => {
   }
 
   async function loadTrackIntoPlayer () {
-    const { uri: mpdUrl, headers } = uriSource(
-      authData,
-      playerState.media.mpdPath
-    )
-    const { uri: artworkUrl } = uriSource(
+    const mediaTrackForPlatform = () => {
+      const path =
+        Platform.OS === 'ios'
+          ? playerState.media.hlsPath
+          : playerState.media.mpdPath
+      const type = Platform.OS === 'ios' ? TrackType.HLS : TrackType.Dash
+      const { uri: url } = uriSource(authData, path)
+
+      return { url, type }
+    }
+
+    const mediaTrack = mediaTrackForPlatform()
+    const { uri: artworkUrl, headers } = uriSource(
       authData,
       playerState.media.book.imagePath
     )
@@ -124,12 +134,13 @@ const PlayerProvider = ({ children }) => {
         }
 
         // load new track
-        console.debug('Player: loading track', mpdUrl)
+        console.debug('Player: loading track', mediaTrack)
 
         await TrackPlayer.reset()
         await TrackPlayer.add({
-          url: mpdUrl,
-          type: TrackType.Dash,
+          url: mediaTrack.url,
+          type: mediaTrack.type,
+          pitchAlgorithm: PitchAlgorithm.Voice,
           duration: playerState.media.duration,
           title: playerState.media.book.title,
           artist: playerState.media.book.authors
