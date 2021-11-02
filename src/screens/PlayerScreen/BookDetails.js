@@ -52,6 +52,7 @@ export default function BookDetails () {
         />
         <WrappingListOfLinks
           prefix='Narrated by'
+          suffix={media.fullCast ? 'and a full cast' : null}
           items={media.narrators}
           keyExtractor={narrator => narrator.personId}
           onPressLink={narrator => {

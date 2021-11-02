@@ -42,10 +42,11 @@ function MediaList ({ book, media }) {
           >
             <View style={tw`flex-shrink`}>
               <Text style={tw`text-lg text-gray-700 dark:text-gray-200`}>
-                {book.title}
+                {book.title} ({media.abridged ? 'Abridged' : 'Unabridged'})
               </Text>
               <WrappingListOfLinks
                 prefix='Narrated by'
+                suffix={media.fullCast ? 'and a full cast' : null}
                 items={media.narrators}
                 keyExtractor={narrator => narrator.personId}
                 onPressLink={narrator =>

@@ -4,6 +4,7 @@ import tw from '../lib/tailwind'
 
 export default function WrappingListOfLinks ({
   prefix,
+  suffix,
   items,
   keyExtractor = item => item.id,
   nameExtractor = item => item.name,
@@ -34,10 +35,18 @@ export default function WrappingListOfLinks ({
     </Text>
   ) : null
 
+  const suffixElement = suffix ? (
+    <Text key='suffix' style={style}>
+      {' '}
+      {suffix}
+    </Text>
+  ) : null
+
   return (
     <View style={tw`flex-row flex-wrap`}>
       {prefixElement}
       {links}
+      {suffixElement}
     </View>
   )
 }
