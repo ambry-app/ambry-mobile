@@ -157,7 +157,7 @@ export default function BookDetailsScreen ({ route, navigation }) {
             <Image
               source={uriSource(authData, book.imagePath)}
               style={tw.style('rounded-2xl', 'w-full', {
-                aspectRatio: 10 / 15
+                aspectRatio: 10 / 15.5
               })}
             />
           </View>

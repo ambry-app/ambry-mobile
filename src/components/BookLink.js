@@ -52,7 +52,7 @@ export default function BookLink ({ book }) {
         <Image
           source={uriSource(authData, book.imagePath)}
           style={tw.style('rounded-lg', 'w-full', {
-            aspectRatio: 10 / 15
+            aspectRatio: 10 / 15.5
           })}
         />
       </Pressable>
