@@ -40,6 +40,13 @@ const PlayerProvider = ({ children }) => {
     playerMutex.runExclusive(async () => {
       console.debug('Player: setting up TrackPlayer...')
 
+      const track = await TrackPlayer.getTrack(0)
+      if (track) {
+        console.debug(new Date(), 'Player: TrackPlayer already set up')
+        setTrackPlayerReady(true)
+        return
+      }
+
       await TrackPlayer.setupPlayer({
         minBuffer: 180,
         maxBuffer: 300,
@@ -120,14 +127,15 @@ const PlayerProvider = ({ children }) => {
     )
 
     playerMutex.runExclusive(async () => {
+      setLoadingTrack(true)
       const currentTrack = await TrackPlayer.getTrack(0)
 
       if (currentTrack && currentTrack.description === playerState.id) {
         // the current track is already loaded; nothing to do
         console.debug('Player: track already loaded')
-      } else {
-        setLoadingTrack(true)
 
+        setLoadingTrack(false)
+      } else {
         // report previous track position
         if (currentTrack) {
           await updateServerPositionNoLock()

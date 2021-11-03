@@ -23,7 +23,7 @@ import { actionCreators, initialState, reducer } from '../reducers/book'
 
 function MediaList ({ book, media }) {
   const navigation = useNavigation()
-  const { loadMedia } = usePlayer()
+  const { loadMedia, media: loadedMedia } = usePlayer()
   const mediaLength = media.length
 
   if (mediaLength == 0) {
@@ -38,12 +38,11 @@ function MediaList ({ book, media }) {
         style={tw`rounded-lg bg-gray-100 dark:border-0 dark:bg-gray-800 shadow-lg my-4`}
       >
         {media.map((media, i) => (
-          <>
+          <View key={media.id}>
             <View
               style={tw`overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800`}
             >
               <TouchableNativeFeedback
-                key={media.id}
                 background={TouchableNativeFeedback.Ripple(
                   tw.color('gray-400'),
                   true
@@ -52,7 +51,9 @@ function MediaList ({ book, media }) {
                   navigation.navigate('PlayerDrawer', {
                     screen: 'PlayerScreen'
                   })
-                  loadMedia(media.id)
+                  if (loadedMedia && loadedMedia.id != media.id) {
+                    loadMedia(media.id)
+                  }
                 }}
               >
                 <View
@@ -90,11 +91,10 @@ function MediaList ({ book, media }) {
             </View>
             {i != mediaLength - 1 && (
               <View
-                key={`separator-${i}`}
                 style={tw`mx-3 border-t border-gray-200 dark:border-gray-700`}
               />
             )}
-          </>
+          </View>
         ))}
       </View>
     )
