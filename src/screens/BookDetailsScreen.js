@@ -1,7 +1,13 @@
 import { useNavigation } from '@react-navigation/core'
 import Moment from 'moment'
 import React, { useCallback, useEffect, useReducer } from 'react'
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Image,
+  ScrollView,
+  Text,
+  TouchableNativeFeedback,
+  View
+} from 'react-native'
 import { getBook, uriSource } from '../api/ambry'
 import Description from '../components/Description'
 import { Header1 } from '../components/Headers'
@@ -18,61 +24,77 @@ import { actionCreators, initialState, reducer } from '../reducers/book'
 function MediaList ({ book, media }) {
   const navigation = useNavigation()
   const { loadMedia } = usePlayer()
+  const mediaLength = media.length
 
-  if (media.length == 0) {
+  if (mediaLength == 0) {
     return (
       <Text style={tw`text-gray-700 dark:text-gray-200 my-4 font-bold`}>
-        Sorry, there are no recordings uploaded for this book.
+        Sorry, there are no recordings uploaded yet for this book.
       </Text>
     )
   } else {
     return (
       <View
-        style={tw`rounded-lg border border-gray-200 bg-gray-100 dark:border-0 dark:bg-gray-800 shadow-lg px-3 mb-4`}
+        style={tw`rounded-lg bg-gray-100 dark:border-0 dark:bg-gray-800 shadow-lg my-4`}
       >
         {media.map((media, i) => (
-          <View
-            key={media.id}
-            style={tw.style(
-              'flex-row justify-between items-center py-3 border-gray-200 dark:border-gray-700',
-              {
-                'border-t': i > 0
-              }
-            )}
-          >
-            <View style={tw`flex-shrink`}>
-              <Text style={tw`text-lg text-gray-700 dark:text-gray-200`}>
-                {book.title} ({media.abridged ? 'Abridged' : 'Unabridged'})
-              </Text>
-              <WrappingListOfLinks
-                prefix='Narrated by'
-                suffix={media.fullCast ? 'and a full cast' : null}
-                items={media.narrators}
-                keyExtractor={narrator => narrator.personId}
-                onPressLink={narrator =>
-                  navigation.navigate('Library', {
-                    screen: 'Person',
-                    params: { personId: narrator.personId }
-                  })
-                }
-                style={tw`text-lg text-gray-500 dark:text-gray-400`}
-                linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
-              />
-              <Text style={tw`text-sm text-gray-400 dark:text-gray-500`}>
-                {durationDisplay(media.duration)}
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('PlayerDrawer', {
-                  screen: 'PlayerScreen'
-                })
-                loadMedia(media.id)
-              }}
+          <>
+            <View
+              style={tw`overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800`}
             >
-              <PlayButton width={50} height={50} />
-            </TouchableOpacity>
-          </View>
+              <TouchableNativeFeedback
+                key={media.id}
+                background={TouchableNativeFeedback.Ripple(
+                  tw.color('gray-400'),
+                  true
+                )}
+                onPress={() => {
+                  navigation.navigate('PlayerDrawer', {
+                    screen: 'PlayerScreen'
+                  })
+                  loadMedia(media.id)
+                }}
+              >
+                <View
+                  style={tw.style('flex-row justify-between items-center p-3')}
+                >
+                  <View style={tw`flex-shrink`}>
+                    <WrappingListOfLinks
+                      prefix='Narrated by'
+                      suffix={media.fullCast ? 'and a full cast' : null}
+                      items={media.narrators}
+                      keyExtractor={narrator => narrator.personId}
+                      onPressLink={narrator =>
+                        navigation.navigate('Library', {
+                          screen: 'Person',
+                          params: { personId: narrator.personId }
+                        })
+                      }
+                      style={tw`text-lg text-gray-700 dark:text-gray-200`}
+                      linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
+                    />
+                    {media.abridged && (
+                      <Text
+                        style={tw`text-lg text-gray-500 dark:text-gray-400`}
+                      >
+                        (Abridged)
+                      </Text>
+                    )}
+                    <Text style={tw`text-gray-500 dark:text-gray-400`}>
+                      {durationDisplay(media.duration)}
+                    </Text>
+                  </View>
+                  <PlayButton width={50} height={50} />
+                </View>
+              </TouchableNativeFeedback>
+            </View>
+            {i != mediaLength - 1 && (
+              <View
+                key={`separator-${i}`}
+                style={tw`mx-3 border-t border-gray-200 dark:border-gray-700`}
+              />
+            )}
+          </>
         ))}
       </View>
     )
@@ -151,8 +173,9 @@ export default function BookDetailsScreen ({ route, navigation }) {
             style={tw`text-lg text-gray-400 dark:text-gray-500`}
             linkStyle={tw`text-lg text-gray-400 dark:text-gray-500`}
           />
+          <MediaList book={book} media={book.media} />
           <View
-            style={tw`mt-8 rounded-2xl border-gray-200 bg-gray-200 shadow-lg`}
+            style={tw`mt-4 rounded-2xl border-gray-200 bg-gray-200 shadow-lg`}
           >
             <Image
               source={uriSource(authData, book.imagePath)}
@@ -164,7 +187,6 @@ export default function BookDetailsScreen ({ route, navigation }) {
           <Text style={tw`text-gray-400 dark:text-gray-500 text-sm mt-1 mb-4`}>
             Published {Moment(book.published).format('MMMM Do, YYYY')}
           </Text>
-          <MediaList book={book} media={book.media} />
           <Description description={book.description} />
         </View>
       </ScrollView>

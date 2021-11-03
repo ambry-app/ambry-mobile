@@ -1,6 +1,12 @@
 import { useNavigation } from '@react-navigation/core'
 import React from 'react'
-import { Image, Pressable, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Image,
+  Text,
+  TouchableNativeFeedback,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import { uriSource } from '../api/ambry'
 import { useAuth } from '../contexts/Auth'
 import tw from '../lib/tailwind'
@@ -40,22 +46,27 @@ export default function BookLink ({ book }) {
           Book {book.bookNumber}
         </Text>
       )}
-      <Pressable
-        style={({ pressed }) => [
-          tw.style(['rounded-lg', 'border-gray-200', 'bg-gray-200']),
-          pressed
-            ? tw.style(['shadow-md', 'mt-1', 'mb-0'])
-            : tw.style(['shadow-lg', 'mb-1'])
-        ]}
-        onPress={() => navigation.push('Book', { bookId: book.id })}
+      <View
+        style={tw`rounded-lg bg-gray-100 dark:bg-gray-800 shadow-lg mb-1 overflow-hidden`}
       >
-        <Image
-          source={uriSource(authData, book.imagePath)}
-          style={tw.style('rounded-lg', 'w-full', {
-            aspectRatio: 10 / 15.5
-          })}
-        />
-      </Pressable>
+        <TouchableNativeFeedback
+          onPress={() => navigation.push('Book', { bookId: book.id })}
+          useForeground={true}
+          background={TouchableNativeFeedback.Ripple(
+            tw.color('gray-200'),
+            true
+          )}
+        >
+          <View>
+            <Image
+              source={uriSource(authData, book.imagePath)}
+              style={tw.style('rounded-lg', 'w-full', {
+                aspectRatio: 10 / 15.5
+              })}
+            />
+          </View>
+        </TouchableNativeFeedback>
+      </View>
       <TouchableOpacity
         onPress={() => navigation.push('Book', { bookId: book.id })}
       >
