@@ -85,12 +85,7 @@ const TabNavigator = () => {
               ringColor={color}
             />
           ),
-          tabBarStyle: tw.style(
-            'absolute shadow-none',
-            scheme == 'dark'
-              ? 'bg-gray-800 bg-opacity-85'
-              : 'bg-gray-100 bg-opacity-85'
-          ),
+          tabBarStyle: tw`absolute shadow-none bg-gray-100/85 dark:bg-gray-800/85`,
           tabBarButton: props => <TouchableOpacity {...props} />
         }}
         component={PlayerDrawer}

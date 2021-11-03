@@ -16,16 +16,10 @@ export default function PlayerControls () {
 
   return (
     <View
-      style={tw.style(
-        'justify-center',
-        scheme == 'dark'
-          ? 'bg-gray-900 bg-opacity-85'
-          : 'bg-white bg-opacity-85',
-        {
-          flex: 1,
-          marginBottom: tabBarHeight
-        }
-      )}
+      style={tw.style('justify-center bg-white/85 dark:bg-gray-900/85', {
+        flex: 1,
+        marginBottom: tabBarHeight
+      })}
     >
       <View style={tw`flex-row items-center justify-around px-12 mb-14`}>
         <TouchableOpacity onPress={() => seekRelative(-10)}>
