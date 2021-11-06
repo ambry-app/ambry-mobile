@@ -7,10 +7,8 @@ import PauseButton from '../../../components/PauseButton'
 import PlayButton from '../../../components/PlayButton'
 import tw from '../../../lib/tailwind'
 
-const loadingStates = [State.None, State.Buffering, State.Connecting]
-
-function Button ({ playbackState }) {
-  return playbackState === State.Playing ? (
+function Button ({ playing }) {
+  return playing ? (
     <PauseButton width={75} height={75} />
   ) : (
     <PlayButton width={75} height={75} />
@@ -19,13 +17,13 @@ function Button ({ playbackState }) {
 
 export default function PlaybackStateButton ({ onPress, loadingTrack }) {
   const playbackState = usePlaybackState()
-  const [debouncedState, setDebouncedState] = useDebounce(State.None, 15)
+  const [playing, setPlaying] = useDebounce(false, 25)
 
   useEffect(() => {
-    setDebouncedState(loadingTrack ? State.Buffering : playbackState)
-  }, [playbackState, loadingTrack])
+    playbackState == State.Playing ? setPlaying(true) : setPlaying(false)
+  }, [playbackState])
 
-  if (loadingStates.includes(debouncedState)) {
+  if (loadingTrack) {
     return (
       <View width={75} height={75} style={tw`justify-center`}>
         <LargeActivityIndicator />
@@ -34,7 +32,7 @@ export default function PlaybackStateButton ({ onPress, loadingTrack }) {
   } else {
     return (
       <TouchableOpacity onPress={onPress}>
-        <Button playbackState={debouncedState} />
+        <Button playing={playing} />
       </TouchableOpacity>
     )
   }
