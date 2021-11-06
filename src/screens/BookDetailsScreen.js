@@ -16,14 +16,14 @@ import PlayButton from '../components/PlayButton'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
 import { useAuth } from '../contexts/Auth'
-import { usePlayer } from '../contexts/Player'
+import { useSelectedMedia } from '../contexts/SelectedMedia'
 import tw from '../lib/tailwind'
 import { durationDisplay } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/book'
 
 function MediaList ({ book, media }) {
   const navigation = useNavigation()
-  const { loadMedia, media: loadedMedia } = usePlayer()
+  const { selectedMediaID, loadMedia } = useSelectedMedia()
   const mediaLength = media.length
 
   if (mediaLength == 0) {
@@ -35,12 +35,12 @@ function MediaList ({ book, media }) {
   } else {
     return (
       <View
-        style={tw`rounded-lg bg-gray-100 dark:border-0 dark:bg-gray-800 shadow-lg my-4`}
+        style={tw`rounded-lg bg-white dark:border-0 dark:bg-gray-800 shadow-lg my-4`}
       >
         {media.map((media, i) => (
           <View key={media.id}>
             <View
-              style={tw`overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800`}
+              style={tw`overflow-hidden rounded-lg bg-white dark:bg-gray-800`}
             >
               <TouchableNativeFeedback
                 background={TouchableNativeFeedback.Ripple(
@@ -48,12 +48,12 @@ function MediaList ({ book, media }) {
                   true
                 )}
                 onPress={() => {
+                  if (selectedMediaID != media.id) {
+                    loadMedia(media.id)
+                  }
                   navigation.navigate('PlayerDrawer', {
                     screen: 'PlayerScreen'
                   })
-                  if (loadedMedia && loadedMedia.id != media.id) {
-                    loadMedia(media.id)
-                  }
                 }}
               >
                 <View

@@ -1,7 +1,6 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import React from 'react'
-import { Text, TouchableOpacity, useColorScheme, View } from 'react-native'
-import { usePlayer } from '../../contexts/Player'
+import { Text, TouchableOpacity, View } from 'react-native'
 import tw from '../../lib/tailwind'
 import Back10Button from './PlayerControls/Back10Button'
 import BackButton from './PlayerControls/BackButton'
@@ -9,14 +8,16 @@ import Forward10Button from './PlayerControls/Forward10Button'
 import ForwardButton from './PlayerControls/ForwardButton'
 import PlaybackStateButton from './PlayerControls/PlaybackStateButton'
 
-export default function PlayerControls () {
-  const scheme = useColorScheme()
+export default function PlayerControls ({
+  seekRelative,
+  togglePlayback,
+  loadingTrack
+}) {
   const tabBarHeight = useBottomTabBarHeight()
-  const { seekRelative, togglePlayback } = usePlayer()
 
   return (
     <View
-      style={tw.style('justify-center bg-white/85 dark:bg-gray-900/85', {
+      style={tw.style('justify-center bg-gray-100/85 dark:bg-gray-900/85', {
         flex: 1,
         marginBottom: tabBarHeight
       })}
@@ -25,7 +26,10 @@ export default function PlayerControls () {
         <TouchableOpacity onPress={() => seekRelative(-10)}>
           <Back10Button width={34} height={39} />
         </TouchableOpacity>
-        <PlaybackStateButton onPress={() => togglePlayback()} />
+        <PlaybackStateButton
+          onPress={() => togglePlayback()}
+          loadingTrack={loadingTrack}
+        />
         <TouchableOpacity onPress={() => seekRelative(10)}>
           <Forward10Button width={34} height={39} />
         </TouchableOpacity>

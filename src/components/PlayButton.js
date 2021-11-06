@@ -12,7 +12,7 @@ export default function PlayButton ({ width, height, iconColor, ringColor }) {
       height={height}
       ringColor={
         ringColor ||
-        (scheme == 'dark' ? tw.color('gray-500') : tw.color('gray-300'))
+        (scheme == 'dark' ? tw.color('gray-500') : tw.color('gray-400'))
       }
       iconColor={
         iconColor ||

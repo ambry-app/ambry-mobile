@@ -10,7 +10,7 @@ export default function PauseButton ({ width, height }) {
     <Pause
       width={width}
       height={height}
-      ringColor={scheme == 'dark' ? tw.color('gray-500') : tw.color('gray-300')}
+      ringColor={scheme == 'dark' ? tw.color('gray-500') : tw.color('gray-400')}
       iconColor={scheme == 'dark' ? tw.color('gray-200') : tw.color('gray-700')}
     />
   )

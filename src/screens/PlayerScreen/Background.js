@@ -1,11 +1,8 @@
 import React from 'react'
 import { ImageBackground, Platform } from 'react-native'
-import { usePlayer } from '../../contexts/Player'
 import tw from '../../lib/tailwind'
 
-export default function Background ({ children }) {
-  const { imageSource } = usePlayer()
-
+export default function Background ({ children, imageSource }) {
   return (
     <ImageBackground
       source={imageSource}

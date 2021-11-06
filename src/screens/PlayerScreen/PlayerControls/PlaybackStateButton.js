@@ -2,11 +2,10 @@ import { useDebounce } from '@react-hook/debounce'
 import React, { useEffect } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { State, usePlaybackState } from 'react-native-track-player'
-import tw from '../../../lib/tailwind'
 import LargeActivityIndicator from '../../../components/LargeActivityIndicator'
 import PauseButton from '../../../components/PauseButton'
 import PlayButton from '../../../components/PlayButton'
-import { usePlayer } from '../../../contexts/Player'
+import tw from '../../../lib/tailwind'
 
 const loadingStates = [State.None, State.Buffering, State.Connecting]
 
@@ -18,16 +17,15 @@ function Button ({ playbackState }) {
   )
 }
 
-export default function PlaybackStateButton ({ onPress }) {
-  const { loadingTrack } = usePlayer()
+export default function PlaybackStateButton ({ onPress, loadingTrack }) {
   const playbackState = usePlaybackState()
-  const [debouncedState, setDebouncedState] = useDebounce(State.None, 10)
+  const [debouncedState, setDebouncedState] = useDebounce(State.None, 15)
 
   useEffect(() => {
-    setDebouncedState(playbackState)
-  }, [playbackState])
+    setDebouncedState(loadingTrack ? State.Buffering : playbackState)
+  }, [playbackState, loadingTrack])
 
-  if (loadingStates.includes(debouncedState) || loadingTrack) {
+  if (loadingStates.includes(debouncedState)) {
     return (
       <View width={75} height={75} style={tw`justify-center`}>
         <LargeActivityIndicator />

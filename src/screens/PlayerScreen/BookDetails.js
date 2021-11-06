@@ -4,12 +4,10 @@ import React from 'react'
 import { Image, TouchableOpacity, View } from 'react-native'
 import { Header2 } from '../../components/Headers'
 import WrappingListOfLinks from '../../components/WrappingListOfLinks'
-import { usePlayer } from '../../contexts/Player'
 import tw from '../../lib/tailwind'
 
-export default function BookDetails () {
+export default function BookDetails ({ imageSource, media }) {
   const navigation = useNavigation()
-  const { imageSource, media } = usePlayer()
 
   return (
     <View style={tw`flex-row`}>

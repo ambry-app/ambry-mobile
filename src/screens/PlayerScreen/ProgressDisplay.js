@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Text, View } from 'react-native'
 import { useProgress } from 'react-native-track-player'
-import { usePlayer } from '../../contexts/Player'
 import tw from '../../lib/tailwind'
 import { progressPercent, secondsDisplay } from '../../lib/utils'
 
@@ -13,38 +12,65 @@ const initialState = {
   remaining: '00:00'
 }
 
-export default function ProgressDisplay () {
-  const { playbackRate, loadingTrack } = usePlayer()
+function buildProgressDisplay (
+  durationSeconds,
+  positionSeconds,
+  bufferedSeconds,
+  playbackRate
+) {
+  const percent = progressPercent(durationSeconds, positionSeconds)
+  const bufferedPercent = progressPercent(durationSeconds, bufferedSeconds)
+  const position = secondsDisplay(positionSeconds)
+  const duration = secondsDisplay(durationSeconds)
+  const remainingSeconds = Math.max(durationSeconds - positionSeconds, 0)
+  const rate = playbackRate || 1
+  const remaining = secondsDisplay(remainingSeconds / rate)
+
+  return {
+    percent,
+    bufferedPercent,
+    position,
+    duration,
+    remaining
+  }
+}
+
+export default function ProgressDisplay ({
+  loadingTrack,
+  playbackRate,
+  playerState
+}) {
   const progress = useProgress()
   const [progressDisplay, setProgressDisplay] = useState(initialState)
 
   useEffect(() => {
-    if (loadingTrack) {
-      setProgressDisplay(initialState)
-      return
+    if (loadingTrack || progress.position == 0) {
+      const {
+        media: { duration: durationSeconds },
+        position: positionSeconds
+      } = playerState
+      const progressDisplay = buildProgressDisplay(
+        durationSeconds,
+        positionSeconds,
+        0,
+        playbackRate
+      )
+      setProgressDisplay(progressDisplay)
+    } else {
+      const {
+        duration: durationSeconds,
+        position: positionSeconds,
+        buffered: bufferedSeconds
+      } = progress
+      const progressDisplay = buildProgressDisplay(
+        durationSeconds,
+        positionSeconds,
+        bufferedSeconds,
+        playbackRate
+      )
+      setProgressDisplay(progressDisplay)
     }
-
-    const {
-      duration: durationSeconds,
-      position: positionSeconds,
-      buffered: bufferedSeconds
-    } = progress
-    const percent = progressPercent(durationSeconds, positionSeconds)
-    const bufferedPercent = progressPercent(durationSeconds, bufferedSeconds)
-    const position = secondsDisplay(positionSeconds)
-    const duration = secondsDisplay(durationSeconds)
-    const remainingSeconds = Math.max(durationSeconds - positionSeconds, 0)
-    const rate = playbackRate || 1
-    const remaining = secondsDisplay(remainingSeconds / rate)
-
-    setProgressDisplay({
-      percent,
-      bufferedPercent,
-      position,
-      duration,
-      remaining
-    })
-  }, [progress, playbackRate, loadingTrack])
+  }, [progress, playbackRate, loadingTrack, playerState])
 
   return (
     <View style={tw`my-4`}>

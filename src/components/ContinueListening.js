@@ -11,26 +11,22 @@ import { getRecentPlayerStates, uriSource } from '../api/ambry'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 import { useAuth } from '../contexts/Auth'
-import { usePlayer } from '../contexts/Player'
+import { useSelectedMedia } from '../contexts/SelectedMedia'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/playerStates'
 import WrappingList from './WrappingList'
 
 function Item ({ playerState, authData, navigation }) {
-  const { media, loadMedia } = usePlayer()
+  const { selectedMediaID, loadMedia } = useSelectedMedia()
 
   return (
     <TouchableNativeFeedback
       onPress={() => {
         navigation.navigate('PlayerScreen')
 
-        // hack: let the drawer animation complete before loading
-        // FIXME: would be great if we could somehow make this concurrent
-        if (!media || media.id != playerState.media.id) {
-          setTimeout(() => {
-            loadMedia(playerState.media.id)
-          }, 400)
+        if (!selectedMediaID || selectedMediaID != playerState.media.id) {
+          loadMedia(playerState.media.id)
         }
       }}
     >

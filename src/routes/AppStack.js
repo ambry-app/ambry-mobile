@@ -6,7 +6,7 @@ import { TouchableOpacity, useColorScheme } from 'react-native'
 import Library from '../assets/library.svg'
 import ContinueListening from '../components/ContinueListening'
 import PlayButton from '../components/PlayButton'
-import { PlayerProvider } from '../contexts/Player'
+import { SelectedMediaProvider } from '../contexts/SelectedMedia'
 import tw from '../lib/tailwind'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
 import PersonDetailsScreen from '../screens/PersonDetailsScreen'
@@ -85,7 +85,7 @@ const TabNavigator = () => {
               ringColor={color}
             />
           ),
-          tabBarStyle: tw`absolute shadow-none bg-gray-100/85 dark:bg-gray-800/85`,
+          tabBarStyle: tw`absolute shadow-none bg-white/85 dark:bg-gray-800/85`,
           tabBarButton: props => <TouchableOpacity {...props} />
         }}
         component={PlayerDrawer}
@@ -107,8 +107,8 @@ const TabNavigator = () => {
 
 export const AppStack = () => {
   return (
-    <PlayerProvider>
+    <SelectedMediaProvider>
       <TabNavigator />
-    </PlayerProvider>
+    </SelectedMediaProvider>
   )
 }

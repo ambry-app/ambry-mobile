@@ -1,8 +1,8 @@
 import React from 'react'
-import { Text } from 'react-native'
+import { Text, View } from 'react-native'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import { usePlayer } from '../contexts/Player'
+import usePlayerState from '../hooks/playerState'
 import tw from '../lib/tailwind'
 import Background from './PlayerScreen/Background'
 import BookDetails from './PlayerScreen/BookDetails'
@@ -12,9 +12,20 @@ import PlayerHeader from './PlayerScreen/PlayerHeader'
 import ProgressDisplay from './PlayerScreen/ProgressDisplay'
 
 export default function PlayerScreen () {
-  const { media, loadingMedia, error } = usePlayer()
+  const {
+    state: {
+      error,
+      loading,
+      loadingTrack,
+      media,
+      imageSource,
+      playbackRate,
+      playerState
+    },
+    actions: { setPlaybackRate, seekRelative, togglePlayback }
+  } = usePlayerState()
 
-  if (loadingMedia) {
+  if (loading) {
     return (
       <ScreenCentered>
         <LargeActivityIndicator />
@@ -49,13 +60,27 @@ export default function PlayerScreen () {
   }
 
   return (
-    <Background>
+    <Background imageSource={imageSource}>
       <PlayerHeader>
-        <BookDetails />
-        <ProgressDisplay />
-        <PlaybackRate />
+        <BookDetails imageSource={imageSource} media={media} />
+        <ProgressDisplay
+          playerState={playerState}
+          loadingTrack={loadingTrack}
+          playbackRate={playbackRate}
+        />
+        <View style={tw`flex-row`}>
+          <View style={tw`flex-grow`} />
+          <PlaybackRate
+            playbackRate={playbackRate}
+            setPlaybackRate={setPlaybackRate}
+          />
+        </View>
       </PlayerHeader>
-      <PlayerControls />
+      <PlayerControls
+        seekRelative={seekRelative}
+        togglePlayback={togglePlayback}
+        loadingTrack={loadingTrack}
+      />
     </Background>
   )
 }

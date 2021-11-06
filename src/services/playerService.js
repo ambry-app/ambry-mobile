@@ -1,7 +1,7 @@
 import EncryptedStorage from 'react-native-encrypted-storage'
 import TrackPlayer, { Event, State } from 'react-native-track-player'
 import { reportPlayerState } from '../api/ambry'
-import { playerMutex } from '../contexts/Player'
+import { playerMutex } from '../hooks/playerState'
 
 let wasPausedByDuck = false
 
