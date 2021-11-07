@@ -1,4 +1,5 @@
-import React from 'react'
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import React, { useRef } from 'react'
 import { Text, View } from 'react-native'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
@@ -6,6 +7,11 @@ import usePlayerState from '../hooks/playerState'
 import tw from '../lib/tailwind'
 import Background from './PlayerScreen/Background'
 import BookDetails from './PlayerScreen/BookDetails'
+import {
+  Bookmarks,
+  BookmarksToggle,
+  useBookmarks
+} from './PlayerScreen/Bookmarks'
 import PlaybackRate from './PlayerScreen/PlaybackRate'
 import PlayerControls from './PlayerScreen/PlayerControls'
 import PlayerHeader from './PlayerScreen/PlayerHeader'
@@ -24,6 +30,11 @@ export default function PlayerScreen () {
     },
     actions: { setPlaybackRate, seekRelative, seekTo, togglePlayback }
   } = usePlayerState()
+  const bookmarksRef = useRef()
+  const { onBookmarksChange, toggleBookmarks } = useBookmarks(
+    bookmarksRef,
+    loading
+  )
 
   if (loading) {
     return (
@@ -60,30 +71,38 @@ export default function PlayerScreen () {
   }
 
   return (
-    <Background imageSource={imageSource}>
-      <PlayerHeader>
-        <BookDetails imageSource={imageSource} media={media} />
-        <ProgressDisplay
+    <BottomSheetModalProvider>
+      <Background imageSource={imageSource}>
+        <PlayerHeader>
+          <BookDetails imageSource={imageSource} media={media} />
+          <ProgressDisplay
+            playerState={playerState}
+            loadingTrack={loadingTrack}
+            playbackRate={playbackRate}
+          />
+          <View style={tw`flex-row`}>
+            <BookmarksToggle click={toggleBookmarks} />
+            <View style={tw`flex-grow`} />
+            <PlaybackRate
+              playbackRate={playbackRate}
+              setPlaybackRate={setPlaybackRate}
+            />
+          </View>
+        </PlayerHeader>
+        <PlayerControls
+          media={media}
+          seekRelative={seekRelative}
+          seekTo={seekTo}
+          togglePlayback={togglePlayback}
           playerState={playerState}
           loadingTrack={loadingTrack}
-          playbackRate={playbackRate}
         />
-        <View style={tw`flex-row`}>
-          <View style={tw`flex-grow`} />
-          <PlaybackRate
-            playbackRate={playbackRate}
-            setPlaybackRate={setPlaybackRate}
-          />
-        </View>
-      </PlayerHeader>
-      <PlayerControls
-        media={media}
-        seekRelative={seekRelative}
-        seekTo={seekTo}
-        togglePlayback={togglePlayback}
-        playerState={playerState}
-        loadingTrack={loadingTrack}
+      </Background>
+      <Bookmarks
+        sheetRef={bookmarksRef}
+        onChange={onBookmarksChange}
+        seek={seekTo}
       />
-    </Background>
+    </BottomSheetModalProvider>
   )
 }

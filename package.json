@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@gorhom/bottom-sheet": "^4",
     "@react-hook/debounce": "^4.0.0",
     "@react-hook/previous": "^1.0.1",
     "@react-hook/throttle": "^2.2.0",

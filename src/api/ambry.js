@@ -53,6 +53,16 @@ export async function getPlayerState ({ host, token }, mediaId) {
   return handleResponse(response)
 }
 
+export async function listBookmarks ({ host, token }, mediaId, page = 1) {
+  const response = await fetch(
+    apiUrl(host, `bookmarks/${mediaId}?page=${page}`),
+    {
+      headers: { Authorization: 'Bearer ' + token }
+    }
+  )
+  return handleResponse(response, true)
+}
+
 export async function reportPlayerState (
   { host, token },
   { id, position, playbackRate }
