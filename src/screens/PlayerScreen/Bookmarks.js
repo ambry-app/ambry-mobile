@@ -16,6 +16,7 @@ import {
 import { listBookmarks } from '../../api/ambry'
 import Bookmark from '../../assets/bookmark.svg'
 import LargeActivityIndicator from '../../components/LargeActivityIndicator'
+import PlusCircleButton from '../../components/PlusCircleButton'
 import ScreenCentered from '../../components/ScreenCentered'
 import { useAuth } from '../../contexts/Auth'
 import { useSelectedMedia } from '../../contexts/SelectedMedia'
@@ -82,6 +83,31 @@ export function BookmarksToggle ({ click }) {
         }
       />
     </TouchableOpacity>
+  )
+}
+
+function BookmarksHeader ({ click }) {
+  return (
+    <View style={tw`flex-row flex-row-reverse my-2 `}>
+      <View
+        style={tw`border border-lime-500 rounded-lg bg-white dark:bg-gray-800 overflow-hidden`}
+      >
+        <TouchableNativeFeedback
+          background={TouchableNativeFeedback.Ripple(
+            tw.color('gray-400'),
+            true
+          )}
+          onPress={click}
+        >
+          <View style={tw`px-2 py-1 flex-row items-center`}>
+            <PlusCircleButton height={24} width={24} />
+            <Text style={tw`text-lg text-lime-400 dark:text-lime-500 pl-1`}>
+              New Bookmark
+            </Text>
+          </View>
+        </TouchableNativeFeedback>
+      </View>
+    </View>
   )
 }
 
@@ -221,6 +247,10 @@ function BookmarksList ({ longPressRef, sheetRef, seek }) {
       // onRefresh={refreshBookmarks}
       // refreshing={refreshing}
       ListFooterComponent={() => <View style={{ height: tabBarHeight }}></View>}
+      ListHeaderComponent={() => (
+        <BookmarksHeader click={() => console.log('new bookmark')} />
+      )}
+      stickyHeaderIndices={[0]}
     />
   )
 }
