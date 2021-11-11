@@ -1,13 +1,13 @@
 export function secondsDisplay (input) {
   const total = Number(input)
-  const hours = String(Math.floor(total / 3600)).padStart(2, '0')
-  const minutes = String(Math.floor((total % 3600) / 60)).padStart(2, '0')
-  const seconds = String(Math.floor((total % 3600) % 60)).padStart(2, '0')
+  const hours = String(Math.floor(total / 3600))
+  const minutes = String(Math.floor((total % 3600) / 60))
+  const seconds = String(Math.floor((total % 3600) % 60))
 
-  if (hours == '00') {
-    return `${minutes}:${seconds}`
+  if (hours == '0') {
+    return `${minutes}:${seconds.padStart(2, '0')}`
   } else {
-    return `${hours}:${minutes}:${seconds}`
+    return `${hours}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`
   }
 }
 

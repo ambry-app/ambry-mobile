@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@react-hook/debounce": "^4.0.0",
+    "@react-hook/previous": "^1.0.1",
+    "@react-hook/throttle": "^2.2.0",
     "@react-native-async-storage/async-storage": "^1.15.9",
     "@react-native-community/slider": "^4.1.9",
     "@react-navigation/bottom-tabs": "^6.0.9",
@@ -27,6 +29,7 @@
     "react-native-gesture-handler": "^1.10.3",
     "react-native-markdown-display": "^7.0.0-alpha.2",
     "react-native-reanimated": "^2.2.3",
+    "react-native-redash": "^16.2.2",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.8.0",
     "react-native-svg": "^12.1.1",

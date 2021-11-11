@@ -44,7 +44,7 @@ export default function ProgressDisplay ({
   const [progressDisplay, setProgressDisplay] = useState(initialState)
 
   useEffect(() => {
-    if (loadingTrack || progress.position == 0) {
+    if (loadingTrack) {
       const {
         media: { duration: durationSeconds },
         position: positionSeconds

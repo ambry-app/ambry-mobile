@@ -22,7 +22,7 @@ export default function PlayerScreen () {
       playbackRate,
       playerState
     },
-    actions: { setPlaybackRate, seekRelative, togglePlayback }
+    actions: { setPlaybackRate, seekRelative, seekTo, togglePlayback }
   } = usePlayerState()
 
   if (loading) {
@@ -77,8 +77,11 @@ export default function PlayerScreen () {
         </View>
       </PlayerHeader>
       <PlayerControls
+        media={media}
         seekRelative={seekRelative}
+        seekTo={seekTo}
         togglePlayback={togglePlayback}
+        playerState={playerState}
         loadingTrack={loadingTrack}
       />
     </Background>
