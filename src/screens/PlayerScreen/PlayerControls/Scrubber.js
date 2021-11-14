@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Dimensions, View } from 'react-native'
+import { Dimensions } from 'react-native'
 import { PanGestureHandler } from 'react-native-gesture-handler'
 import Animated, {
   Easing,
@@ -12,12 +12,14 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated'
 import { clamp, ReText } from 'react-native-redash'
+import Svg, { Line, Path } from 'react-native-svg'
 import tw from '../../../lib/tailwind'
 
 const SPACING = 10 // pixels between ticks
 const FACTOR = SPACING / 5 // 5 seconds per tick
 
 const WIDTH = Dimensions.get('window').width
+const HEIGHT = 60
 const HALF_WIDTH = WIDTH / 2
 const NUM_TICKS = Math.ceil(WIDTH / SPACING)
 
@@ -198,49 +200,70 @@ export default function Scrubber ({
   }, [positionInput])
 
   return (
-    <>
-      <ReText
-        text={timecode}
-        style={{
-          textAlign: 'center',
-          color: 'white',
-          fontVariant: ['tabular-nums']
-        }}
-      />
-      <View
-        style={tw`relative left-[${HALF_WIDTH +
-          1}px] h-2 border-l-2 border-white`}
-      ></View>
-      <PanGestureHandler onGestureEvent={onGestureEventHandler}>
+    <PanGestureHandler onGestureEvent={onGestureEventHandler}>
+      <Animated.View>
+        <ReText
+          text={timecode}
+          style={{
+            fontWeight: '300',
+            fontSize: 16,
+            padding: 0,
+            marginBottom: -6,
+            textAlign: 'center',
+            color: tw.color('gray-200'),
+            fontVariant: ['tabular-nums']
+          }}
+        />
+        <Svg
+          style={{ left: HALF_WIDTH - 5, top: 5, elevation: 10 }}
+          height='10'
+          width='10'
+          viewBox='0 0 8 8'
+        >
+          <Path
+            d='m 0.17 0 c -1 -0 2.83 8 3.83 8 c 1 0 4.83 -8 3.83 -8 z'
+            fill='white'
+            stroke={tw.color('gray-800')}
+            strokeWidth='2'
+          />
+        </Svg>
+
         <Animated.View
           style={[
-            tw`h-[75px] `,
-            { width: WIDTH + 12 * SPACING },
+            { height: HEIGHT, width: WIDTH + 12 * SPACING },
             animatedScrubberStyle
           ]}
         >
           <>
             <Animated.View
-              style={[tw`h-[75px]  overflow-hidden`, animatedMaskStyle]}
+              style={[
+                { height: HEIGHT, overflow: 'hidden' },
+                animatedMaskStyle
+              ]}
             >
-              {Array.from({ length: NUM_TICKS + 12 }, (_, i) => (
-                <View
-                  key={`tick-${i}`}
-                  style={[
-                    tw`absolute border-r`,
-                    i % 12 == 0
-                      ? tw`h-10 border-gray-300`
-                      : i % 6 == 0
-                      ? tw`h-8 border-gray-400`
-                      : tw`h-6 border-gray-500`,
-                    { transform: [{ translateX: i * SPACING }] }
-                  ]}
-                ></View>
-              ))}
+              <Svg height={HEIGHT} width={WIDTH + 120}>
+                {Array.from({ length: NUM_TICKS + 12 }, (_, i) => (
+                  <Line
+                    key={i}
+                    x1={0.5 + i * SPACING}
+                    y1={0}
+                    x2={0.5 + i * SPACING}
+                    y2={i % 12 == 0 ? 40 : i % 6 == 0 ? 32 : 24}
+                    stroke={tw.color(
+                      i % 12 == 0
+                        ? 'gray-300'
+                        : i % 6 == 0
+                        ? 'gray-400'
+                        : 'gray-500'
+                    )}
+                    strokeWidth='1'
+                  />
+                ))}
+              </Svg>
             </Animated.View>
           </>
         </Animated.View>
-      </PanGestureHandler>
-    </>
+      </Animated.View>
+    </PanGestureHandler>
   )
 }
