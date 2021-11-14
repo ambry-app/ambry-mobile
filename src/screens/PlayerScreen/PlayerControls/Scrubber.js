@@ -12,11 +12,13 @@ import Animated, {
   withDecay,
   withTiming
 } from 'react-native-reanimated'
-import { ReText } from 'react-native-redash'
+import { clamp, ReText } from 'react-native-redash'
 import { useState } from 'react/cjs/react.development'
 import tw from '../../../lib/tailwind'
 
-const SPACING = 10
+const SPACING = 10 // pixels between ticks
+const FACTOR = SPACING / 5 // 5 seconds per tick
+
 const WIDTH = Dimensions.get('window').width
 const HALF_WIDTH = WIDTH / 2
 const NUM_TICKS = Math.ceil(WIDTH / SPACING)
@@ -42,48 +44,57 @@ function friction (value) {
   return res
 }
 
+function timeToTranslateX (time) {
+  return time * -FACTOR
+}
+
+function translateXToTime (translateX) {
+  'worklet'
+  return translateX / -FACTOR
+}
+
 export default function Scrubber ({
   position: positionInput,
-  duration: durationInput,
+  duration,
   onChange
 }) {
-  const position = useSharedValue(positionInput * -2)
-  const duration = useSharedValue(-durationInput * 2)
+  const translateX = useSharedValue(timeToTranslateX(positionInput))
   const [isAnimating, setIsAnimating] = useState(false)
   const previousIsAnimating = usePrevious(isAnimating)
+  const maxTranslateX = timeToTranslateX(duration)
 
   const onGestureEventHandler = useAnimatedGestureHandler({
     onStart: (_event, ctx) => {
       runOnJS(setIsAnimating)(true)
-      const currentX = position.value
+      const currentX = translateX.value
       ctx.startX = currentX
-      position.value = currentX
+      translateX.value = currentX
     },
     onActive: (event, ctx) => {
       const nextTranslateX = ctx.startX + event.translationX
 
-      if (nextTranslateX < duration.value) {
-        position.value =
-          duration.value + friction(nextTranslateX - duration.value)
+      if (nextTranslateX < maxTranslateX) {
+        translateX.value =
+          maxTranslateX + friction(nextTranslateX - maxTranslateX)
       } else if (nextTranslateX > 0) {
-        position.value = friction(nextTranslateX)
+        translateX.value = friction(nextTranslateX)
       } else {
-        position.value = nextTranslateX
+        translateX.value = nextTranslateX
       }
     },
     onEnd: (event, _ctx) => {
       const onFinish = finished => {
         if (finished) {
-          const newPosition = Math.abs(position.value / -2)
+          const newPosition = translateXToTime(translateX.value)
           runOnJS(onChange)(newPosition)
           runOnJS(setIsAnimating)(false)
         }
       }
 
-      if (position.value < duration.value || position.value > 0) {
-        const toValue = position.value > 0 ? 0 : duration.value
+      if (translateX.value < maxTranslateX || translateX.value > 0) {
+        const toValue = translateX.value > 0 ? 0 : maxTranslateX
 
-        position.value = withTiming(
+        translateX.value = withTiming(
           toValue,
           {
             duration: 250,
@@ -92,10 +103,10 @@ export default function Scrubber ({
           onFinish
         )
       } else {
-        position.value = withDecay(
+        translateX.value = withDecay(
           {
             velocity: event.velocityX,
-            clamp: [duration.value, 0]
+            clamp: [maxTranslateX, 0]
           },
           onFinish
         )
@@ -103,41 +114,43 @@ export default function Scrubber ({
     }
   })
 
-  const animatedStyle = useAnimatedStyle(() => {
-    const value = position.value
-    const durationValue = duration.value
+  const animatedScrubberStyle = useAnimatedStyle(() => {
+    const value = translateX.value
 
     if (value < -HALF_WIDTH) {
-      if (value - HALF_WIDTH <= durationValue) {
-        // we're at the end
-        const translate = (HALF_WIDTH + value) % (SPACING * 12)
-        const diff = durationValue - value
-        const width = HALF_WIDTH - translate - diff
-        return {
-          width: width,
-          transform: [{ translateX: translate }]
-        }
-      } else {
-        // we're in the middle somewhere
-        return {
-          width: WIDTH + 120,
-          transform: [{ translateX: (HALF_WIDTH + value) % (SPACING * 12) }]
-        }
+      // we're at the end or in the middle somewhere
+      return {
+        transform: [{ translateX: (HALF_WIDTH + value) % (SPACING * 12) }]
       }
     } else {
       // we're at the beginning
       return {
-        width: WIDTH + 120,
         transform: [{ translateX: HALF_WIDTH + value }]
       }
     }
   })
 
+  const animatedMaskStyle = useAnimatedStyle(() => {
+    const value = translateX.value
+
+    if (value < -HALF_WIDTH && value - HALF_WIDTH <= maxTranslateX) {
+      // we're at the end
+      const translate = (HALF_WIDTH + value) % (SPACING * 12)
+      const diff = maxTranslateX - value
+      const width = HALF_WIDTH - translate - diff
+      return {
+        width: width
+      }
+    } else {
+      // we're at the beginning or in the middle somewhere
+      return {
+        width: WIDTH + 120
+      }
+    }
+  })
+
   const timecode = useDerivedValue(() => {
-    const value = position.value / 2
-    const durationValue = duration.value / 2
-    const total =
-      value > 0 ? 0 : value < durationValue ? durationValue * -1 : value * -1
+    const total = clamp(translateXToTime(translateX.value), 0, duration)
     const hours = Math.floor(total / 3600).toString()
     const minutes = Math.floor((total % 3600) / 60).toString()
     const seconds = Math.floor((total % 3600) % 60).toString()
@@ -151,7 +164,7 @@ export default function Scrubber ({
 
   useEffect(() => {
     if (!isAnimating && !previousIsAnimating) {
-      position.value = positionInput * -2
+      translateX.value = timeToTranslateX(positionInput)
     }
   }, [positionInput])
 
@@ -170,25 +183,33 @@ export default function Scrubber ({
           1}px] h-2 border-l-2 border-white`}
       ></View>
       <PanGestureHandler onGestureEvent={onGestureEventHandler}>
-        <Animated.View style={[tw`h-[75px] overflow-hidden`, animatedStyle]}>
-          {Array.from({ length: NUM_TICKS + 12 }, (_, i) => {
-            const idx = i
-            return (
-              <View key={`tick-${idx}`}>
+        <Animated.View
+          style={[
+            tw`h-[75px] `,
+            { width: WIDTH + 12 * SPACING },
+            animatedScrubberStyle
+          ]}
+        >
+          <>
+            <Animated.View
+              style={[tw`h-[75px]  overflow-hidden`, animatedMaskStyle]}
+            >
+              {Array.from({ length: NUM_TICKS + 12 }, (_, i) => (
                 <View
+                  key={`tick-${i}`}
                   style={[
                     tw`absolute border-r`,
-                    idx % 12 == 0
+                    i % 12 == 0
                       ? tw`h-10 border-gray-300`
-                      : idx % 6 == 0
+                      : i % 6 == 0
                       ? tw`h-8 border-gray-400`
                       : tw`h-6 border-gray-500`,
-                    { transform: [{ translateX: idx * SPACING }] }
+                    { transform: [{ translateX: i * SPACING }] }
                   ]}
                 ></View>
-              </View>
-            )
-          })}
+              ))}
+            </Animated.View>
+          </>
         </Animated.View>
       </PanGestureHandler>
     </>
