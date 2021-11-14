@@ -79,7 +79,7 @@ export default function Scrubber ({
   duration,
   onChange
 }) {
-  const translateX = useSharedValue(timeToTranslateX(positionInput))
+  const translateX = useSharedValue(timeToTranslateX(Math.round(positionInput)))
   const [isScrubbing, setIsScrubbing] = useIsScrubbing()
   const maxTranslateX = timeToTranslateX(duration)
 
@@ -195,7 +195,7 @@ export default function Scrubber ({
 
   useEffect(() => {
     if (!isScrubbing) {
-      translateX.value = timeToTranslateX(positionInput)
+      translateX.value = timeToTranslateX(Math.round(positionInput))
     }
   }, [positionInput])
 

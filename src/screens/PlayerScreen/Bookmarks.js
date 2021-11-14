@@ -173,7 +173,6 @@ function BookmarksList ({ longPressRef, sheetRef, seek }) {
     dispatch(actionCreators.loading())
 
     try {
-      console.log('fetching bookmarks from server')
       const [nextBookmarks, hasMore] = await listBookmarks(
         authData,
         selectedMediaID,

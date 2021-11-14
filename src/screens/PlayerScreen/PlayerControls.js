@@ -6,6 +6,7 @@ import { useEffect } from 'react/cjs/react.development'
 import tw from '../../lib/tailwind'
 import Back10Button from './PlayerControls/Back10Button'
 import BackButton from './PlayerControls/BackButton'
+import ChapterControls from './PlayerControls/ChapterControls'
 import Forward10Button from './PlayerControls/Forward10Button'
 import ForwardButton from './PlayerControls/ForwardButton'
 import PlaybackStateButton from './PlayerControls/PlaybackStateButton'
@@ -17,7 +18,8 @@ export default function PlayerControls ({
   seekTo,
   togglePlayback,
   playerState,
-  loadingTrack
+  loadingTrack,
+  toggleChapters
 }) {
   const tabBarHeight = useBottomTabBarHeight()
   const progress = useProgress()
@@ -35,6 +37,11 @@ export default function PlayerControls ({
     <View style={[tw`flex-col`, { flex: 1 }]}>
       <View style={tw`flex-grow bg-gray-100/85 dark:bg-gray-900/85`}>
         <View style={[tw`flex-col`, { flex: 1 }]}>
+          <ChapterControls
+            loadingTrack={loadingTrack}
+            playerState={playerState}
+            toggleChapters={toggleChapters}
+          />
           <View style={tw`flex-grow`}>
             <View style={[tw`flex-col justify-center`, { flex: 1 }]}>
               <View
@@ -63,13 +70,11 @@ export default function PlayerControls ({
               </View>
             </View>
           </View>
-          <View>
-            <Scrubber
-              position={position}
-              duration={media.duration}
-              onChange={seekTo}
-            />
-          </View>
+          <Scrubber
+            position={position}
+            duration={media.duration}
+            onChange={seekTo}
+          />
         </View>
       </View>
       <View style={{ height: tabBarHeight }}></View>

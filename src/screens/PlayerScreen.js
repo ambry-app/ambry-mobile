@@ -14,6 +14,10 @@ import {
 } from './PlayerScreen/Bookmarks'
 import PlaybackRate from './PlayerScreen/PlaybackRate'
 import PlayerControls from './PlayerScreen/PlayerControls'
+import {
+  Chapters,
+  useChapters
+} from './PlayerScreen/PlayerControls/ChapterControls'
 import PlayerHeader from './PlayerScreen/PlayerHeader'
 import ProgressDisplay from './PlayerScreen/ProgressDisplay'
 
@@ -35,6 +39,9 @@ export default function PlayerScreen () {
     bookmarksRef,
     loading
   )
+
+  const chaptersRef = useRef()
+  const { onChaptersChange, toggleChapters } = useChapters(chaptersRef, loading)
 
   if (loading) {
     return (
@@ -96,12 +103,19 @@ export default function PlayerScreen () {
           togglePlayback={togglePlayback}
           playerState={playerState}
           loadingTrack={loadingTrack}
+          toggleChapters={toggleChapters}
         />
       </Background>
       <Bookmarks
         sheetRef={bookmarksRef}
         onChange={onBookmarksChange}
         seek={seekTo}
+      />
+      <Chapters
+        sheetRef={chaptersRef}
+        onChange={onChaptersChange}
+        seek={seekTo}
+        chapters={media.chapters}
       />
     </BottomSheetModalProvider>
   )
