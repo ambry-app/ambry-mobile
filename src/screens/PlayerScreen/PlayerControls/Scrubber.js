@@ -1,5 +1,4 @@
-import usePrevious from '@react-hook/previous'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Dimensions, View } from 'react-native'
 import { PanGestureHandler } from 'react-native-gesture-handler'
 import Animated, {
@@ -13,7 +12,6 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated'
 import { clamp, ReText } from 'react-native-redash'
-import { useState } from 'react/cjs/react.development'
 import tw from '../../../lib/tailwind'
 
 const SPACING = 10 // pixels between ticks
@@ -53,19 +51,39 @@ function translateXToTime (translateX) {
   return translateX / -FACTOR
 }
 
+function useIsScrubbing () {
+  const [isScrubbing, _setIsScrubbing] = useState(false)
+  const timerRef = useRef()
+
+  const setIsScrubbing = useCallback(newValue => {
+    if (newValue) {
+      // if true, set immediately
+      _setIsScrubbing(true)
+      // and cancel any active timer that may be waiting
+      clearTimeout(timerRef.current)
+    } else {
+      // if false, delay by 1 second
+      timerRef.current = setTimeout(() => {
+        _setIsScrubbing(false)
+      }, 1000)
+    }
+  })
+
+  return [isScrubbing, setIsScrubbing]
+}
+
 export default function Scrubber ({
   position: positionInput,
   duration,
   onChange
 }) {
   const translateX = useSharedValue(timeToTranslateX(positionInput))
-  const [isAnimating, setIsAnimating] = useState(false)
-  const previousIsAnimating = usePrevious(isAnimating)
+  const [isScrubbing, setIsScrubbing] = useIsScrubbing()
   const maxTranslateX = timeToTranslateX(duration)
 
   const onGestureEventHandler = useAnimatedGestureHandler({
     onStart: (_event, ctx) => {
-      runOnJS(setIsAnimating)(true)
+      runOnJS(setIsScrubbing)(true)
       const currentX = translateX.value
       ctx.startX = currentX
       translateX.value = currentX
@@ -82,14 +100,18 @@ export default function Scrubber ({
         translateX.value = nextTranslateX
       }
     },
-    onEnd: (event, _ctx) => {
+    onEnd: (event, ctx) => {
       const onFinish = finished => {
+        ctx.animating = false
+
         if (finished) {
           const newPosition = translateXToTime(translateX.value)
           runOnJS(onChange)(newPosition)
-          runOnJS(setIsAnimating)(false)
+          runOnJS(setIsScrubbing)(false)
         }
       }
+
+      ctx.animating = true
 
       if (translateX.value < maxTranslateX || translateX.value > 0) {
         const toValue = translateX.value > 0 ? 0 : maxTranslateX
@@ -110,6 +132,13 @@ export default function Scrubber ({
           },
           onFinish
         )
+      }
+    },
+    onFinish (_event, ctx) {
+      if (!ctx.animating) {
+        const newPosition = translateXToTime(translateX.value)
+        runOnJS(onChange)(newPosition)
+        runOnJS(setIsScrubbing)(false)
       }
     }
   })
@@ -163,7 +192,7 @@ export default function Scrubber ({
   })
 
   useEffect(() => {
-    if (!isAnimating && !previousIsAnimating) {
+    if (!isScrubbing) {
       translateX.value = timeToTranslateX(positionInput)
     }
   }, [positionInput])
