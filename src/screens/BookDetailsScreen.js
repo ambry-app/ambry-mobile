@@ -23,7 +23,7 @@ import { actionCreators, initialState, reducer } from '../reducers/book'
 
 function MediaList ({ book, media }) {
   const navigation = useNavigation()
-  const { selectedMediaID, loadMedia } = useSelectedMedia()
+  const { selectedMedia, loadMedia } = useSelectedMedia()
   const mediaLength = media.length
 
   if (mediaLength == 0) {
@@ -48,11 +48,13 @@ function MediaList ({ book, media }) {
                   true
                 )}
                 onPress={() => {
-                  if (selectedMediaID != media.id) {
-                    loadMedia(media.id)
+                  if (selectedMedia.id != media.id) {
+                    loadMedia({ ...media, book })
                   }
-                  navigation.navigate('PlayerDrawer', {
-                    screen: 'PlayerScreen'
+                  setImmediate(() => {
+                    navigation.navigate('PlayerDrawer', {
+                      screen: 'PlayerScreen'
+                    })
                   })
                 }}
               >

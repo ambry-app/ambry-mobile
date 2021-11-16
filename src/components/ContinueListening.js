@@ -18,15 +18,15 @@ import { actionCreators, initialState, reducer } from '../reducers/playerStates'
 import WrappingList from './WrappingList'
 
 function Item ({ playerState, authData, navigation }) {
-  const { selectedMediaID, loadMedia } = useSelectedMedia()
+  const { selectedMedia, loadMedia } = useSelectedMedia()
 
   return (
     <TouchableNativeFeedback
       onPress={() => {
         navigation.navigate('PlayerScreen')
 
-        if (!selectedMediaID || selectedMediaID != playerState.media.id) {
-          loadMedia(playerState.media.id)
+        if (!selectedMedia || selectedMedia.id != playerState.media.id) {
+          loadMedia(playerState.media)
         }
       }}
     >

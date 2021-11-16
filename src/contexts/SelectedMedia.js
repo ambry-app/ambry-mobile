@@ -1,32 +1,32 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
+const SELECTED_MEDIA_KEY = 'selectedMedia'
+
 const SelectedMediaContext = createContext({})
 
 const SelectedMediaProvider = ({ children }) => {
-  const [selectedMediaID, setSelectedMediaID] = useState()
+  const [selectedMedia, setSelectedMedia] = useState()
 
   async function loadStoredState () {
     try {
       console.debug(
-        'SelectedMediaContext: loading selectedMediaID from AsyncStorage'
+        'SelectedMediaContext: loading selectedMedia from AsyncStorage'
       )
-      const selectedMediaIDString = await AsyncStorage.getItem(
-        'selectedMediaID'
-      )
+      const selectedMediaString = await AsyncStorage.getItem(SELECTED_MEDIA_KEY)
 
-      if (!selectedMediaIDString) {
-        console.debug('SelectedMediaContext: no selectedMediaID found')
-        setSelectedMediaID(null)
+      if (!selectedMediaString) {
+        console.debug('SelectedMediaContext: no selectedMedia found')
+        setSelectedMedia(null)
         return
       }
 
-      const id = parseInt(selectedMediaIDString)
+      const selectedMedia = JSON.parse(selectedMediaString)
       console.debug(
-        `SelectedMediaContext: restored selectedMediaID ${id} from AsyncStorage`
+        `SelectedMediaContext: restored selectedMedia ${selectedMedia.id} from AsyncStorage`
       )
 
-      setSelectedMediaID(id)
+      setSelectedMedia(selectedMedia)
     } catch (error) {
       console.error(error)
     }
@@ -37,17 +37,17 @@ const SelectedMediaProvider = ({ children }) => {
   }, [])
 
   useEffect(() => {
-    if (selectedMediaID) {
+    if (selectedMedia) {
       console.debug(
-        `SelectedMediaContext: storing selectedMediaID ${selectedMediaID} into AsyncStorage`
+        `SelectedMediaContext: storing selectedMedia ${selectedMedia.id} into AsyncStorage`
       )
-      AsyncStorage.setItem('selectedMediaID', selectedMediaID.toString())
+      AsyncStorage.setItem(SELECTED_MEDIA_KEY, JSON.stringify(selectedMedia))
     }
-  }, [selectedMediaID])
+  }, [selectedMedia])
 
   return (
     <SelectedMediaContext.Provider
-      value={{ selectedMediaID, loadMedia: setSelectedMediaID }}
+      value={{ selectedMedia, loadMedia: setSelectedMedia }}
     >
       {children}
     </SelectedMediaContext.Provider>

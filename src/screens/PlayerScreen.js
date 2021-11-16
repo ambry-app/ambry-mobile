@@ -1,6 +1,11 @@
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
-import React, { useRef } from 'react'
-import { Text, View } from 'react-native'
+import React, { useEffect, useRef } from 'react'
+import { Platform, Text, View } from 'react-native'
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from 'react-native-reanimated'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 import usePlayerState from '../hooks/playerState'
@@ -26,30 +31,37 @@ export default function PlayerScreen () {
     state: {
       error,
       loading,
-      loadingTrack,
       media,
       imageSource,
       playbackRate,
-      playerState
+      position,
+      buffered,
+      currentChapter
     },
     actions: { setPlaybackRate, seekRelative, seekTo, togglePlayback }
   } = usePlayerState()
-  const bookmarksRef = useRef()
-  const { onBookmarksChange, toggleBookmarks } = useBookmarks(
-    bookmarksRef,
-    loading
-  )
+  const opacity = useSharedValue(0)
 
-  const chaptersRef = useRef()
-  const { onChaptersChange, toggleChapters } = useChapters(chaptersRef, loading)
+  useEffect(() => {
+    if (loading) {
+      opacity.value = 0
+    } else {
+      opacity.value = withTiming(1, { duration: 200 })
+    }
+  }, [loading])
 
-  if (loading) {
-    return (
-      <ScreenCentered>
-        <LargeActivityIndicator />
-      </ScreenCentered>
-    )
-  }
+  const animatedStyle = useAnimatedStyle(() => {
+    return { opacity: opacity.value }
+  })
+
+  // const bookmarksRef = useRef()
+  // const { onBookmarksChange, toggleBookmarks } = useBookmarks(
+  //   bookmarksRef,
+  //   loading
+  // )
+
+  // const chaptersRef = useRef()
+  // const { onChaptersChange, toggleChapters } = useChapters(chaptersRef, loading)
 
   if (error) {
     return (
@@ -74,39 +86,74 @@ export default function PlayerScreen () {
 
   // undefined (must be about to load)
   if (!media) {
-    return null
+    return (
+      <ScreenCentered>
+        <LargeActivityIndicator />
+      </ScreenCentered>
+    )
+  }
+
+  if (loading && imageSource) {
+    return (
+      <Background loading={loading} imageSource={imageSource} blur={0}>
+        <ScreenCentered>
+          <View
+            style={tw`flex items-center justify-center w-14 h-14 rounded-full bg-gray-800`}
+          >
+            <LargeActivityIndicator />
+          </View>
+        </ScreenCentered>
+      </Background>
+    )
+  }
+
+  if (loading) {
+    return (
+      <ScreenCentered>
+        <LargeActivityIndicator />
+      </ScreenCentered>
+    )
   }
 
   return (
     <BottomSheetModalProvider>
-      <Background imageSource={imageSource}>
-        <PlayerHeader>
-          <BookDetails imageSource={imageSource} media={media} />
-          <ProgressDisplay
-            playerState={playerState}
-            loadingTrack={loadingTrack}
-            playbackRate={playbackRate}
-          />
-          <View style={tw`flex-row`}>
-            <BookmarksToggle click={toggleBookmarks} />
-            <View style={tw`flex-grow`} />
-            <PlaybackRate
-              playbackRate={playbackRate}
-              setPlaybackRate={setPlaybackRate}
+      <Background
+        imageSource={imageSource}
+        blur={Platform.OS === 'ios' ? 25 : 10}
+      >
+        <Animated.View style={animatedStyle}>
+          <View style={tw`h-full`}>
+            <PlayerHeader>
+              <BookDetails imageSource={imageSource} media={media} />
+              <ProgressDisplay
+                position={position}
+                buffered={buffered}
+                duration={media.duration}
+                playbackRate={playbackRate}
+              />
+              <View style={tw`flex-row`}>
+                {/* <BookmarksToggle click={toggleBookmarks} /> */}
+                <View style={tw`flex-grow`} />
+                <PlaybackRate
+                  playbackRate={playbackRate}
+                  setPlaybackRate={setPlaybackRate}
+                />
+              </View>
+            </PlayerHeader>
+            <PlayerControls
+              media={media}
+              seekRelative={seekRelative}
+              seekTo={seekTo}
+              togglePlayback={togglePlayback}
+              position={position}
+              duration={media.duration}
+              // toggleChapters={toggleChapters}
+              currentChapter={currentChapter}
             />
           </View>
-        </PlayerHeader>
-        <PlayerControls
-          media={media}
-          seekRelative={seekRelative}
-          seekTo={seekTo}
-          togglePlayback={togglePlayback}
-          playerState={playerState}
-          loadingTrack={loadingTrack}
-          toggleChapters={toggleChapters}
-        />
+        </Animated.View>
       </Background>
-      <Bookmarks
+      {/* <Bookmarks
         sheetRef={bookmarksRef}
         onChange={onBookmarksChange}
         seek={seekTo}
@@ -116,7 +163,8 @@ export default function PlayerScreen () {
         onChange={onChaptersChange}
         seek={seekTo}
         chapters={media.chapters}
-      />
+        currentChapter={currentChapter}
+      /> */}
     </BottomSheetModalProvider>
   )
 }

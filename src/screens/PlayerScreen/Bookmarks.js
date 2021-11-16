@@ -161,7 +161,7 @@ function BookmarkItem ({
 function BookmarksList ({ longPressRef, sheetRef, seek }) {
   const { signOut, authData } = useAuth()
   const tabBarHeight = useBottomTabBarHeight()
-  const { selectedMediaID } = useSelectedMedia()
+  const { selectedMedia } = useSelectedMedia()
   const [state, dispatch] = useReducer(reducer, initialState)
   const { bookmarks, nextPage, hasMore, loading, refreshing, error } = state
 
@@ -175,7 +175,7 @@ function BookmarksList ({ longPressRef, sheetRef, seek }) {
     try {
       const [nextBookmarks, hasMore] = await listBookmarks(
         authData,
-        selectedMediaID,
+        selectedMedia,
         nextPage
       )
       dispatch(actionCreators.success(nextBookmarks, nextPage, hasMore))
@@ -186,7 +186,7 @@ function BookmarksList ({ longPressRef, sheetRef, seek }) {
         dispatch(actionCreators.failure())
       }
     }
-  }, [selectedMediaID, hasMore, nextPage])
+  }, [selectedMedia, hasMore, nextPage])
 
   const refreshBookmarks = useCallback(async () => {
     dispatch(actionCreators.refresh())
@@ -194,7 +194,7 @@ function BookmarksList ({ longPressRef, sheetRef, seek }) {
     try {
       const [bookmarks, hasMore] = await listBookmarks(
         authData,
-        selectedMediaID,
+        selectedMedia,
         1
       )
       dispatch(actionCreators.success(bookmarks, 1, hasMore, true))
@@ -205,7 +205,7 @@ function BookmarksList ({ longPressRef, sheetRef, seek }) {
         dispatch(actionCreators.failure())
       }
     }
-  }, [selectedMediaID])
+  }, [selectedMedia])
 
   useEffect(() => {
     fetchBookmarks()

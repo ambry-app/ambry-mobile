@@ -1,12 +1,12 @@
 import React from 'react'
-import { ImageBackground, Platform } from 'react-native'
+import { ImageBackground } from 'react-native'
 import tw from '../../lib/tailwind'
 
-export default function Background ({ children, imageSource }) {
+export default function Background ({ children, imageSource, blur }) {
   return (
     <ImageBackground
       source={imageSource}
-      blurRadius={Platform.OS === 'ios' ? 25 : 10}
+      blurRadius={blur}
       style={tw.style('h-full', { resizeMode: 'cover' })}
     >
       {children}

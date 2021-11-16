@@ -21,10 +21,11 @@
     "@react-navigation/native": "^6.0.5",
     "@react-navigation/native-stack": "^6.2.3",
     "async-mutex": "^0.3.2",
+    "immer": "^9.0.6",
     "moment": "^2.29.1",
     "punycode": "^2.1.1",
     "react": "17.0.2",
-    "react-native": "0.66.0",
+    "react-native": "0.66.3",
     "react-native-bootsplash": "^3.2.6",
     "react-native-encrypted-storage": "^4.0.2",
     "react-native-gesture-handler": "^1.10.3",
@@ -37,7 +38,8 @@
     "react-native-track-player": "^2.1.1",
     "react-native-transparent-status-and-navigation-bar": "^1.0.3",
     "tailwindcss": "^2.2.16",
-    "twrnc": "^2.0.0-rc.3"
+    "twrnc": "^2.0.0-rc.3",
+    "use-immer": "^0.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

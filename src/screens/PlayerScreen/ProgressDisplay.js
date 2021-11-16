@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Text, View } from 'react-native'
-import { useProgress } from 'react-native-track-player'
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from 'react-native-reanimated'
 import tw from '../../lib/tailwind'
 import { progressPercent, secondsDisplay } from '../../lib/utils'
-
-const initialState = {
-  percent: '0.0%',
-  bufferedPercent: '0.0%',
-  position: '00:00',
-  duration: '00:00',
-  remaining: '00:00'
-}
 
 function buildProgressDisplay (
   durationSeconds,
@@ -36,71 +32,67 @@ function buildProgressDisplay (
 }
 
 export default function ProgressDisplay ({
-  loadingTrack,
-  playbackRate,
-  playerState
+  position,
+  buffered,
+  duration,
+  playbackRate
 }) {
-  const progress = useProgress()
-  const [progressDisplay, setProgressDisplay] = useState(initialState)
+  const [progressDisplay, setProgressDisplay] = useState()
+  const opacity = useSharedValue(0)
 
   useEffect(() => {
-    if (loadingTrack) {
-      const {
-        media: { duration: durationSeconds },
-        position: positionSeconds
-      } = playerState
-      const progressDisplay = buildProgressDisplay(
-        durationSeconds,
-        positionSeconds,
-        0,
-        playbackRate
-      )
-      setProgressDisplay(progressDisplay)
+    const progressDisplay = buildProgressDisplay(
+      duration,
+      position,
+      buffered,
+      playbackRate
+    )
+    setProgressDisplay(progressDisplay)
+  }, [position, buffered, duration, playbackRate])
+
+  useEffect(() => {
+    if (progressDisplay) {
+      opacity.value = withTiming(1, { duration: 150 })
     } else {
-      const {
-        duration: durationSeconds,
-        position: positionSeconds,
-        buffered: bufferedSeconds
-      } = progress
-      const progressDisplay = buildProgressDisplay(
-        durationSeconds,
-        positionSeconds,
-        bufferedSeconds,
-        playbackRate
-      )
-      setProgressDisplay(progressDisplay)
+      opacity.value = 0
     }
-  }, [progress, playbackRate, loadingTrack, playerState])
+  }, [progressDisplay])
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value
+    }
+  })
 
   return (
-    <View style={tw`my-4`}>
+    <Animated.View style={[tw`my-4`, animatedStyle]}>
       <View style={tw`shadow-md rounded-full`}>
         <View
           style={tw`h-2 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden`}
         >
           <View
             style={tw.style('absolute h-2 bg-gray-400 dark:bg-gray-500', {
-              width: progressDisplay.bufferedPercent
+              width: progressDisplay?.bufferedPercent
             })}
           ></View>
           <View
             style={tw.style('h-2 bg-lime-500 dark:bg-lime-400', {
-              width: progressDisplay.percent
+              width: progressDisplay?.percent
             })}
           ></View>
         </View>
       </View>
       <View style={tw`flex-row justify-between`}>
         <Text style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}>
-          {progressDisplay.position} of {progressDisplay.duration}
+          {progressDisplay?.position} of {progressDisplay?.duration}
         </Text>
         <Text style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}>
-          {progressDisplay.percent}
+          {progressDisplay?.percent}
         </Text>
         <Text style={tw`text-gray-500 dark:text-gray-400 text-sm tabular-nums`}>
-          -{progressDisplay.remaining}
+          -{progressDisplay?.remaining}
         </Text>
       </View>
-    </View>
+    </Animated.View>
   )
 }
