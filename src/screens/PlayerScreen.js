@@ -95,7 +95,7 @@ const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
       <Background loading={loading} imageSource={imageSource} blur={0}>
         <ScreenCentered>
           <View
-            style={tw`flex items-center justify-center w-14 h-14 rounded-full bg-gray-800`}
+            style={tw`flex items-center justify-center w-14 h-14 rounded-full bg-gray-200 dark:bg-gray-800`}
           >
             <LargeActivityIndicator />
           </View>

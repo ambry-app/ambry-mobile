@@ -75,7 +75,9 @@ const ActualChapterControls = memo(({ currentChapter, toggleChapters }) => {
     <TouchableOpacity onPress={toggleChapters}>
       <View style={tw`py-4`}>
         {currentChapter && (
-          <Text style={tw`text-center text-lg text-gray-200`}>
+          <Text
+            style={tw`text-center text-lg text-gray-700 dark:text-gray-200`}
+          >
             {currentChapter.title}
           </Text>
         )}

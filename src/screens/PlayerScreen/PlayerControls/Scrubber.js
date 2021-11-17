@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Dimensions } from 'react-native'
+import { Dimensions, useColorScheme } from 'react-native'
 import { PanGestureHandler } from 'react-native-gesture-handler'
 import Animated, {
   Easing,
@@ -83,6 +83,22 @@ export default function Scrubber ({
   const translateX = useSharedValue(timeToTranslateX(Math.round(positionInput)))
   const [isScrubbing, setIsScrubbing] = useIsScrubbing()
   const maxTranslateX = timeToTranslateX(duration)
+  const scheme = useColorScheme()
+
+  const theme =
+    scheme == 'dark'
+      ? {
+          strong: tw.color('gray-200'),
+          emphasized: tw.color('gray-300'),
+          normal: tw.color('gray-400'),
+          dimmed: tw.color('gray-500')
+        }
+      : {
+          strong: tw.color('gray-800'),
+          emphasized: tw.color('gray-600'),
+          normal: tw.color('gray-500'),
+          dimmed: tw.color('gray-400')
+        }
 
   const onGestureEventHandler = useAnimatedGestureHandler({
     onStart: (_event, ctx) => {
@@ -211,21 +227,23 @@ export default function Scrubber ({
             padding: 0,
             marginBottom: -6,
             textAlign: 'center',
-            color: tw.color('gray-200'),
+            color: theme.strong,
             fontVariant: ['tabular-nums']
           }}
         />
         <Svg
-          style={{ left: HALF_WIDTH - 5, top: 5, elevation: 10 }}
-          height='10'
-          width='10'
+          style={{ left: HALF_WIDTH - 4, top: 4, zIndex: 1 }}
+          height='8'
+          width='8'
           viewBox='0 0 8 8'
         >
           <Path
             d='m 0.17 0 c -1 -0 2.83 8 3.83 8 c 1 0 4.83 -8 3.83 -8 z'
-            fill='white'
-            stroke={tw.color('gray-800')}
-            strokeWidth='2'
+            fill={theme.strong}
+            stroke={
+              scheme == 'dark' ? tw.color('gray-800') : tw.color('gray-300')
+            }
+            strokeWidth='1'
           />
         </Svg>
 
@@ -250,13 +268,13 @@ export default function Scrubber ({
                     y1={0}
                     x2={0.5 + i * SPACING}
                     y2={i % 12 == 0 ? 40 : i % 6 == 0 ? 32 : 24}
-                    stroke={tw.color(
+                    stroke={
                       i % 12 == 0
-                        ? 'gray-300'
+                        ? theme.emphasized
                         : i % 6 == 0
-                        ? 'gray-400'
-                        : 'gray-500'
-                    )}
+                        ? theme.normal
+                        : theme.dimmed
+                    }
                     strokeWidth='1'
                   />
                 ))}
