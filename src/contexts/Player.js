@@ -1,5 +1,12 @@
 import { Mutex } from 'async-mutex'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react'
 import { Platform } from 'react-native'
 import TrackPlayer, {
   Capability,
@@ -24,6 +31,8 @@ const initialState = {
   currentChapter: undefined
 }
 
+const PlayerContext = createContext({})
+
 export const playerMutex = new Mutex()
 
 function mediaTrackForPlatform (authData, media) {
@@ -45,9 +54,7 @@ async function updateServerPositionNoLock (authData) {
   const track = await TrackPlayer.getTrack(0)
 
   if (!track) {
-    console.warn(
-      'usePlayerState: updateServerPosition called while no track loaded'
-    )
+    console.warn('Player: updateServerPosition called while no track loaded')
     return
   }
 
@@ -58,7 +65,7 @@ async function updateServerPositionNoLock (authData) {
     position: position.toFixed(3)
   }
 
-  console.debug('usePlayerState: updating server position', playerStateReport)
+  console.debug('Player: updating server position', playerStateReport)
   reportPlayerState(authData, playerStateReport)
 }
 
@@ -68,7 +75,7 @@ async function setTrackPlayerPlaybackRate (
   setPlaybackRate
 ) {
   playerMutex.runExclusive(async () => {
-    console.debug('usePlayerState: setting playback rate', newPlaybackRate)
+    console.debug('Player: setting playback rate', newPlaybackRate)
 
     // set rate on player async
     TrackPlayer.setRate(newPlaybackRate)
@@ -79,9 +86,7 @@ async function setTrackPlayerPlaybackRate (
     const track = await TrackPlayer.getTrack(0)
 
     if (!track) {
-      console.warn(
-        'usePlayerState: setPlaybackRate called while no track loaded'
-      )
+      console.warn('Player: setPlaybackRate called while no track loaded')
       return
     }
 
@@ -92,24 +97,21 @@ async function setTrackPlayerPlaybackRate (
       playbackRate: newPlaybackRate.toFixed(2)
     }
 
-    console.debug(
-      'usePlayerState: updating server playback rate',
-      playerStateReport
-    )
+    console.debug('Player: updating server playback rate', playerStateReport)
     reportPlayerState(authData, playerStateReport)
   })
 }
 
 async function togglePlaybackNoLock (authData) {
-  console.debug('usePlayerState: toggling playback')
+  console.debug('Player: toggling playback')
 
   const playbackState = await TrackPlayer.getState()
 
   if (playbackState !== State.Playing) {
-    console.debug('usePlayerState: playing')
+    console.debug('Player: playing')
     await TrackPlayer.play()
   } else {
-    console.debug('usePlayerState: pausing')
+    console.debug('Player: pausing')
     await TrackPlayer.pause()
     seekRelativeNoLock(-1, authData)
   }
@@ -120,7 +122,7 @@ function togglePlayback (authData) {
 }
 
 async function seekRelativeNoLock (interval, authData) {
-  console.debug('usePlayerState: seeking', interval)
+  console.debug('Player: seeking', interval)
 
   const position = await TrackPlayer.getPosition()
   const duration = await TrackPlayer.getDuration()
@@ -135,7 +137,7 @@ async function seekRelativeNoLock (interval, authData) {
 }
 
 async function seekToNoLock (position, authData) {
-  console.debug('usePlayerState: seeking to', position)
+  console.debug('Player: seeking to', position)
 
   await TrackPlayer.seekTo(position)
 
@@ -161,10 +163,13 @@ function usePosition (
   // and correcting for drift each update.
   useEffect(() => {
     const updatePosition = async () => {
-      const position = await TrackPlayer.getPosition()
+      const [position, buffered] = await Promise.all([
+        TrackPlayer.getPosition(),
+        TrackPlayer.getBufferedPosition()
+      ])
       const chapter = findChapter(position, media.chapters)
 
-      setPosition(position, chapter)
+      setPosition(position, buffered, chapter)
     }
 
     if (trackPlayerReady && !loading && !isSeeking) {
@@ -184,28 +189,7 @@ function usePosition (
   ])
 }
 
-function useBuffered (setBuffered, trackPlayerReady, loading) {
-  const intervalRef = useRef()
-
-  useEffect(() => {
-    const updateBuffered = async () => {
-      const buffered = await TrackPlayer.getBufferedPosition()
-
-      setBuffered(buffered)
-    }
-
-    if (trackPlayerReady && !loading) {
-      updateBuffered()
-      intervalRef.current = setInterval(updateBuffered, 1000)
-    }
-
-    return () => {
-      clearInterval(intervalRef.current)
-    }
-  }, [trackPlayerReady, loading])
-}
-
-export default function usePlayerState () {
+export default function PlayerProvider ({ children }) {
   const { authData, signOut } = useAuth()
   const { selectedMedia } = useSelectedMedia()
   const [state, updateState] = useImmer(initialState)
@@ -257,16 +241,11 @@ export default function usePlayerState () {
     })
   }
 
-  const setPosition = (position, chapter) => {
+  const setPosition = (position, buffered, chapter) => {
     updateState(draft => {
       draft.position = position
-      draft.currentChapter = chapter
-    })
-  }
-
-  const setBuffered = buffered => {
-    updateState(draft => {
       draft.buffered = buffered
+      draft.currentChapter = chapter
     })
   }
 
@@ -287,11 +266,11 @@ export default function usePlayerState () {
 
   useEffect(() => {
     const setupTrackPlayer = async () => {
-      console.debug('usePlayerState: setting up TrackPlayer...')
+      console.debug('Player: setting up TrackPlayer...')
 
       const track = await TrackPlayer.getTrack(0)
       if (track) {
-        console.debug('usePlayerState: TrackPlayer already set up')
+        console.debug('Player: TrackPlayer already set up')
         setReady()
         return
       }
@@ -321,7 +300,7 @@ export default function usePlayerState () {
         backwardJumpInterval: 10
       })
 
-      console.debug('usePlayerState: done setting up TrackPlayer')
+      console.debug('Player: done setting up TrackPlayer')
       setReady()
     }
 
@@ -331,12 +310,12 @@ export default function usePlayerState () {
   useEffect(() => {
     const loadPlayerStateFromServer = async () => {
       if (selectedMedia === undefined) {
-        console.debug('usePlayerState: selectedMedia is undefined')
+        console.debug('Player: selectedMedia is undefined')
         return
       }
 
       if (selectedMedia === null) {
-        console.debug('usePlayerState: no selectedMedia')
+        console.debug('Player: no selectedMedia')
         setEmpty()
         return
       }
@@ -346,17 +325,17 @@ export default function usePlayerState () {
         setLoading(selectedMedia)
 
         console.debug(
-          `usePlayerState: loading playerState ${selectedMedia.id} from server`
+          `Player: loading playerState ${selectedMedia.id} from server`
         )
         const serverPlayerState = await getPlayerState(
           authData,
           selectedMedia.id
         )
 
-        console.debug('usePlayerState: playerState loaded', serverPlayerState)
+        console.debug('Player: playerState loaded', serverPlayerState)
         loadTrackIntoPlayer(selectedMedia, serverPlayerState)
       } catch (err) {
-        console.error('usePlayerState: failed to load playerState', err)
+        console.error('Player: failed to load playerState', err)
 
         if (err == 401) {
           await signOut()
@@ -378,7 +357,7 @@ export default function usePlayerState () {
 
       if (currentTrack && currentTrack.description == playerState.id) {
         // the current track is already loaded; nothing to do
-        console.debug('usePlayerState: track already loaded')
+        console.debug('Player: track already loaded')
 
         const [currentPosition, currentPlaybackRate] = await Promise.all([
           TrackPlayer.getPosition(),
@@ -395,7 +374,7 @@ export default function usePlayerState () {
         }
 
         // load new track
-        console.debug('usePlayerState: loading track', mediaTrack)
+        console.debug('Player: loading track', mediaTrack)
 
         await TrackPlayer.reset()
         await TrackPlayer.add({
@@ -436,7 +415,16 @@ export default function usePlayerState () {
     isSeeking
   )
 
-  useBuffered(setBuffered, trackPlayerReady, loading)
+  // useBuffered(setBuffered, trackPlayerReady, loading)
+
+  // actions
+
+  const setPlaybackRateAction = useCallback(
+    rate => setTrackPlayerPlaybackRate(rate, authData, setPlaybackRate),
+    []
+  )
+
+  const togglePlaybackAction = useCallback(() => togglePlayback(authData), [])
 
   const seekTimerRef = useRef()
   const seekRelativeAction = useCallback(
@@ -450,7 +438,7 @@ export default function usePlayerState () {
       )
       const chapter = findChapter(actualDestination, media.chapters)
 
-      setPosition(actualDestination, chapter)
+      setPosition(actualDestination, 0, chapter)
 
       // throttle actually seeking TrackPlayer
       clearTimeout(seekTimerRef.current)
@@ -466,7 +454,7 @@ export default function usePlayerState () {
     position => {
       const chapter = findChapter(position, media.chapters)
 
-      setPosition(position, chapter)
+      setPosition(position, 0, chapter)
       seekTo(position, authData)
     },
     [media]
@@ -475,12 +463,27 @@ export default function usePlayerState () {
   // return
 
   const actions = {
-    setPlaybackRate: rate =>
-      setTrackPlayerPlaybackRate(rate, authData, setPlaybackRate),
-    togglePlayback: () => togglePlayback(authData),
+    setPlaybackRate: setPlaybackRateAction,
+    togglePlayback: togglePlaybackAction,
     seekRelative: seekRelativeAction,
     seekTo: seekToAction
   }
 
-  return { state, actions }
+  return (
+    <PlayerContext.Provider value={{ state, actions }}>
+      {children}
+    </PlayerContext.Provider>
+  )
 }
+
+function usePlayer () {
+  const context = useContext(PlayerContext)
+
+  if (!context) {
+    throw new Error('usePlayer must be used within an PlayerProvider')
+  }
+
+  return context
+}
+
+export { PlayerContext, PlayerProvider, usePlayer }

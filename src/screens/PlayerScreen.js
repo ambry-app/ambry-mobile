@@ -1,5 +1,5 @@
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
-import React, { useEffect, useRef } from 'react'
+import React, { memo, useEffect, useRef } from 'react'
 import { Platform, Text, View } from 'react-native'
 import Animated, {
   useAnimatedStyle,
@@ -8,15 +8,10 @@ import Animated, {
 } from 'react-native-reanimated'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import usePlayerState from '../hooks/playerState'
+import { usePlayer } from '../contexts/Player'
 import tw from '../lib/tailwind'
 import Background from './PlayerScreen/Background'
 import BookDetails from './PlayerScreen/BookDetails'
-import {
-  Bookmarks,
-  BookmarksToggle,
-  useBookmarks
-} from './PlayerScreen/Bookmarks'
 import PlaybackRate from './PlayerScreen/PlaybackRate'
 import PlayerControls from './PlayerScreen/PlayerControls'
 import {
@@ -27,19 +22,21 @@ import PlayerHeader from './PlayerScreen/PlayerHeader'
 import ProgressDisplay from './PlayerScreen/ProgressDisplay'
 
 export default function PlayerScreen () {
-  const {
-    state: {
-      error,
-      loading,
-      media,
-      imageSource,
-      playbackRate,
-      position,
-      buffered,
-      currentChapter
-    },
-    actions: { setPlaybackRate, seekRelative, seekTo, togglePlayback }
-  } = usePlayerState()
+  const { state } = usePlayer()
+  const { error, loading, media, imageSource } = state
+
+  return (
+    <ActualPlayerScreen
+      error={error}
+      loading={loading}
+      media={media}
+      imageSource={imageSource}
+    />
+  )
+}
+
+const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
+  // console.log('RENDERING: PlayerScreen')
   const opacity = useSharedValue(0)
 
   useEffect(() => {
@@ -60,8 +57,8 @@ export default function PlayerScreen () {
   //   loading
   // )
 
-  // const chaptersRef = useRef()
-  // const { onChaptersChange, toggleChapters } = useChapters(chaptersRef, loading)
+  const chaptersRef = useRef()
+  const { onChaptersChange, toggleChapters } = useChapters(chaptersRef, loading)
 
   if (error) {
     return (
@@ -125,31 +122,14 @@ export default function PlayerScreen () {
           <View style={tw`h-full`}>
             <PlayerHeader>
               <BookDetails imageSource={imageSource} media={media} />
-              <ProgressDisplay
-                position={position}
-                buffered={buffered}
-                duration={media.duration}
-                playbackRate={playbackRate}
-              />
+              <ProgressDisplay />
               <View style={tw`flex-row`}>
                 {/* <BookmarksToggle click={toggleBookmarks} /> */}
                 <View style={tw`flex-grow`} />
-                <PlaybackRate
-                  playbackRate={playbackRate}
-                  setPlaybackRate={setPlaybackRate}
-                />
+                <PlaybackRate />
               </View>
             </PlayerHeader>
-            <PlayerControls
-              media={media}
-              seekRelative={seekRelative}
-              seekTo={seekTo}
-              togglePlayback={togglePlayback}
-              position={position}
-              duration={media.duration}
-              // toggleChapters={toggleChapters}
-              currentChapter={currentChapter}
-            />
+            <PlayerControls toggleChapters={toggleChapters} />
           </View>
         </Animated.View>
       </Background>
@@ -157,14 +137,8 @@ export default function PlayerScreen () {
         sheetRef={bookmarksRef}
         onChange={onBookmarksChange}
         seek={seekTo}
-      />
-      <Chapters
-        sheetRef={chaptersRef}
-        onChange={onChaptersChange}
-        seek={seekTo}
-        chapters={media.chapters}
-        currentChapter={currentChapter}
       /> */}
+      <Chapters sheetRef={chaptersRef} onChange={onChaptersChange} />
     </BottomSheetModalProvider>
   )
-}
+})

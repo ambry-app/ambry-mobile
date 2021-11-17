@@ -1,11 +1,13 @@
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Text, View } from 'react-native'
 import {
   TouchableNativeFeedback,
   TouchableOpacity
 } from 'react-native-gesture-handler'
+import Svg, { Path } from 'react-native-svg'
+import { usePlayer } from '../../../contexts/Player'
 import useBackButton from '../../../hooks/backButton'
 import tw from '../../../lib/tailwind'
 import { secondsDisplay } from '../../../lib/utils'
@@ -55,51 +57,72 @@ export function useChapters (ref, loading) {
   return { onChaptersChange, toggleChapters }
 }
 
-export default function ChapterControls ({ currentChapter, toggleChapters }) {
+export default function ChapterControls ({ toggleChapters }) {
+  const { state } = usePlayer()
+  const { currentChapter } = state
+
   return (
-    // <TouchableOpacity onPress={toggleChapters}>
-    <View style={tw`py-4`}>
-      {currentChapter && (
-        <Text style={tw`text-center text-lg text-gray-200`}>
-          {currentChapter.title}
-        </Text>
-      )}
-    </View>
-    // </TouchableOpacity>
+    <ActualChapterControls
+      currentChapter={currentChapter}
+      toggleChapters={toggleChapters}
+    />
   )
 }
+
+const ActualChapterControls = memo(({ currentChapter, toggleChapters }) => {
+  // console.log('RENDERING: ChapterControls')
+  return (
+    <TouchableOpacity onPress={toggleChapters}>
+      <View style={tw`py-4`}>
+        {currentChapter && (
+          <Text style={tw`text-center text-lg text-gray-200`}>
+            {currentChapter.title}
+          </Text>
+        )}
+      </View>
+    </TouchableOpacity>
+  )
+})
 
 function ChaptersHeader () {
   return (
     <Text
-      style={tw`text-2xl font-bold text-gray-500 border-b border-gray-200 dark:border-gray-700 py-2 bg-white dark:bg-gray-800`}
+      style={tw`text-2xl font-bold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 py-2 bg-white dark:bg-gray-800`}
     >
       Chapters
     </Text>
   )
 }
 
-function ChapterItem ({ chapter, sheetRef, seek, currentChapter }) {
-  const seekTo = useCallback(() => {
-    seek(chapter.startTime)
-    sheetRef.current.close()
-  }, [])
-
+const ChapterItem = memo(({ chapter, active, onPress }) => {
+  // console.log('RENDERING: ChaptersItem')
   return (
     <View style={tw`rounded-md overflow-hidden bg-white dark:bg-gray-800`}>
       <TouchableNativeFeedback
         background={TouchableNativeFeedback.Ripple(tw.color('gray-600'), true)}
-        onPress={seekTo}
+        onPress={() => onPress(chapter)}
       >
         <View
-          style={tw`flex-row py-4 border-b border-gray-200 dark:border-gray-700`}
+          style={[
+            tw`flex-row mx-4 py-4 border-b items-center`,
+            active
+              ? tw`border-t-2 border-b-2 border-gray-500 dark:border-gray-400`
+              : tw`border-gray-200 dark:border-gray-700`
+          ]}
         >
+          <View>
+            {active && (
+              <Svg height='10' width='10' viewBox='0 0 8 10' style={tw`-ml-4`}>
+                <Path d='M 0 0 L 8 5 L 0 10' fill='white' />
+              </Svg>
+            )}
+          </View>
           <Text
             style={[
               tw`flex-shrink text-lg pr-2`,
-              currentChapter && currentChapter.id == chapter.id
+              active
                 ? tw`text-gray-700 dark:text-gray-200`
-                : tw`text-gray-500 dark:text-gray-500`
+                : tw`text-gray-500 dark:text-gray-400`
             ]}
           >
             {chapter.title}
@@ -113,38 +136,65 @@ function ChapterItem ({ chapter, sheetRef, seek, currentChapter }) {
       </TouchableNativeFeedback>
     </View>
   )
-}
+})
 
-function ChaptersList ({ sheetRef, seek, chapters, currentChapter }) {
-  const tabBarHeight = useBottomTabBarHeight()
+function ChaptersList ({ sheetRef }) {
+  const { state, actions } = usePlayer()
+  const { media, currentChapter } = state
+  const { chapters } = media
+  const { seekTo } = actions
 
   return (
-    <BottomSheetFlatList
-      data={chapters}
-      style={tw`px-4`}
-      keyExtractor={item => item.id}
-      renderItem={({ item }) => (
-        <ChapterItem
-          chapter={item}
-          sheetRef={sheetRef}
-          seek={seek}
-          currentChapter={currentChapter}
-        />
-      )}
-      ListFooterComponent={() => <View style={{ height: tabBarHeight }}></View>}
-      ListHeaderComponent={() => <ChaptersHeader />}
-      stickyHeaderIndices={[0]}
+    <ActualChapterList
+      sheetRef={sheetRef}
+      chapters={chapters}
+      currentChapter={currentChapter}
+      seekTo={seekTo}
     />
   )
 }
 
-export function Chapters ({
-  sheetRef,
-  onChange,
-  seek,
-  chapters,
-  currentChapter
-}) {
+const ActualChapterList = memo(
+  ({ sheetRef, chapters, currentChapter, seekTo }) => {
+    // console.log('RENDERING: ChaptersList')
+    const tabBarHeight = useBottomTabBarHeight()
+
+    const onPress = useCallback(chapter => {
+      seekTo(chapter.startTime)
+      sheetRef.current.close()
+    }, [])
+
+    const renderItem = useCallback(
+      ({ item: chapter }) => {
+        return (
+          <ChapterItem
+            chapter={chapter}
+            active={chapter.id == currentChapter.id}
+            onPress={onPress}
+          />
+        )
+      },
+      [currentChapter]
+    )
+
+    return (
+      <BottomSheetFlatList
+        data={chapters}
+        style={tw`px-4`}
+        keyExtractor={item => item.id}
+        renderItem={renderItem}
+        ListFooterComponent={() => (
+          <View style={{ height: tabBarHeight }}></View>
+        )}
+        ListHeaderComponent={() => <ChaptersHeader />}
+        stickyHeaderIndices={[0]}
+      />
+    )
+  }
+)
+
+export function Chapters ({ sheetRef, onChange }) {
+  // console.log('RENDERING: Chapters')
   return (
     <BottomSheet
       ref={sheetRef}
@@ -155,12 +205,7 @@ export function Chapters ({
       snapPoints={['80%']}
       onChange={onChange}
     >
-      <ChaptersList
-        sheetRef={sheetRef}
-        seek={seek}
-        chapters={chapters}
-        currentChapter={currentChapter}
-      />
+      <ChaptersList sheetRef={sheetRef} />
     </BottomSheet>
   )
 }

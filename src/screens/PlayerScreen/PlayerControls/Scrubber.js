@@ -79,6 +79,7 @@ export default function Scrubber ({
   duration,
   onChange
 }) {
+  // console.log('RENDERING: Scrubber')
   const translateX = useSharedValue(timeToTranslateX(Math.round(positionInput)))
   const [isScrubbing, setIsScrubbing] = useIsScrubbing()
   const maxTranslateX = timeToTranslateX(duration)
