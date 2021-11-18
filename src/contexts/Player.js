@@ -45,7 +45,9 @@ function mediaTrackForPlatform (authData, media) {
 
 function findChapter (position, chapters) {
   return chapters.find(
-    chapter => position >= chapter.startTime && position < chapter.endTime
+    chapter =>
+      position >= chapter.startTime &&
+      (!chapter.endTime || position < chapter.endTime)
   )
 }
 

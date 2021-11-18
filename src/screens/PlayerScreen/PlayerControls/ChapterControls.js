@@ -171,7 +171,7 @@ const ActualChapterList = memo(
         return (
           <ChapterItem
             chapter={chapter}
-            active={chapter.id == currentChapter.id}
+            active={chapter.id == currentChapter?.id}
             onPress={onPress}
           />
         )
