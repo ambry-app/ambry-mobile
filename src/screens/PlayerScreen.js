@@ -81,15 +81,6 @@ const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
     )
   }
 
-  // undefined (must be about to load)
-  if (!media) {
-    return (
-      <ScreenCentered>
-        <LargeActivityIndicator />
-      </ScreenCentered>
-    )
-  }
-
   if (loading && imageSource) {
     return (
       <Background loading={loading} imageSource={imageSource} blur={0}>
@@ -104,7 +95,7 @@ const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
     )
   }
 
-  if (loading) {
+  if (loading || !media) {
     return (
       <ScreenCentered>
         <LargeActivityIndicator />

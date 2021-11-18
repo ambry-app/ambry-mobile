@@ -38,18 +38,16 @@ const SelectedMediaProvider = ({ children }) => {
     }
   }
 
-  useEffect(() => {
-    loadStoredState()
-  }, [])
+  const loadMedia = useCallback((id, imagePath) => {
+    const newSelectedMedia = { id, imagePath }
 
-  useEffect(() => {
-    if (selectedMedia) {
-      console.debug(
-        `SelectedMediaContext: storing selectedMedia ${selectedMedia.id} into AsyncStorage`
-      )
-      AsyncStorage.setItem(SELECTED_MEDIA_KEY, JSON.stringify(selectedMedia))
-    }
-  }, [selectedMedia])
+    console.debug(
+      `SelectedMediaContext: storing selectedMedia ${newSelectedMedia.id} into AsyncStorage`
+    )
+    AsyncStorage.setItem(SELECTED_MEDIA_KEY, JSON.stringify(newSelectedMedia))
+
+    setSelectedMedia(newSelectedMedia)
+  }, [])
 
   const clearMedia = useCallback(() => {
     console.debug(
@@ -59,9 +57,13 @@ const SelectedMediaProvider = ({ children }) => {
     setSelectedMedia(null)
   }, [])
 
+  useEffect(() => {
+    loadStoredState()
+  }, [])
+
   return (
     <SelectedMediaContext.Provider
-      value={{ selectedMedia, loadMedia: setSelectedMedia, clearMedia }}
+      value={{ selectedMedia, loadMedia, clearMedia }}
     >
       {children}
     </SelectedMediaContext.Provider>

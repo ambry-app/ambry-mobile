@@ -218,26 +218,25 @@ export default function PlayerProvider ({ children }) {
   const setEmpty = () => {
     updateState(draft => {
       draft.loading = false
-      draft.playerState = null
       draft.media = null
       draft.imageSource = null
       draft.playbackRate = null
     })
   }
 
-  const setLoading = selectedMedia => {
+  const setLoading = imagePath => {
     updateState(draft => {
       draft.loading = true
-      draft.playerState = undefined
-      draft.media = selectedMedia
-      draft.imageSource = uriSource(authData, selectedMedia.book.imagePath)
+      draft.media = undefined
+      draft.imageSource = uriSource(authData, imagePath)
       draft.playbackRate = null
     })
   }
 
-  const setLoaded = (position, playbackRate, chapter) => {
+  const setLoaded = (media, position, playbackRate, chapter) => {
     updateState(draft => {
       draft.loading = false
+      draft.media = media
       draft.position = position
       draft.buffered = 0
       draft.currentChapter = chapter
@@ -325,8 +324,8 @@ export default function PlayerProvider ({ children }) {
       }
 
       try {
-        // loading, but media is available
-        setLoading(selectedMedia)
+        // loading, but image is available
+        setLoading(selectedMedia.imagePath)
 
         console.debug(
           `Player: loading playerState ${selectedMedia.id} from server`
@@ -337,7 +336,7 @@ export default function PlayerProvider ({ children }) {
         )
 
         console.debug('Player: playerState loaded', serverPlayerState)
-        loadTrackIntoPlayer(selectedMedia, serverPlayerState)
+        loadTrackIntoPlayer(serverPlayerState)
       } catch (err) {
         console.error('Player: failed to load playerState', err)
 
@@ -349,13 +348,13 @@ export default function PlayerProvider ({ children }) {
       }
     }
 
-    const loadTrackIntoPlayer = async (media, playerState) => {
+    const loadTrackIntoPlayer = async playerState => {
+      const { media, position, playbackRate } = playerState
       const mediaTrack = mediaTrackForPlatform(authData, media)
       const { uri: artworkUrl, headers } = uriSource(
         authData,
         media.book.imagePath
       )
-      const { position, playbackRate } = playerState
 
       const currentTrack = await TrackPlayer.getTrack(0)
 
@@ -370,7 +369,7 @@ export default function PlayerProvider ({ children }) {
 
         const chapter = findChapter(currentPosition, media.chapters)
 
-        setLoaded(currentPosition, currentPlaybackRate, chapter)
+        setLoaded(media, currentPosition, currentPlaybackRate, chapter)
       } else {
         // report previous track position
         if (currentTrack) {
@@ -398,7 +397,7 @@ export default function PlayerProvider ({ children }) {
 
         const chapter = findChapter(position, media.chapters)
 
-        setLoaded(position, playbackRate, chapter)
+        setLoaded(media, position, playbackRate, chapter)
       }
     }
 

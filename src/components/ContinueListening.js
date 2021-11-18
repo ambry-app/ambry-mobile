@@ -27,7 +27,7 @@ function Item ({ playerState, authData, navigation }) {
         navigation.navigate('PlayerScreen')
 
         if (!selectedMedia || selectedMedia.id != playerState.media.id) {
-          loadMedia(playerState.media)
+          loadMedia(playerState.media.id, playerState.media.book.imagePath)
         }
       }}
     >

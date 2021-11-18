@@ -48,8 +48,8 @@ function MediaList ({ book, media }) {
                   true
                 )}
                 onPress={() => {
-                  if (selectedMedia.id != media.id) {
-                    loadMedia({ ...media, book })
+                  if (selectedMedia?.id != media.id) {
+                    loadMedia(media.id, book.imagePath)
                   }
                   setImmediate(() => {
                     navigation.navigate('PlayerDrawer', {
