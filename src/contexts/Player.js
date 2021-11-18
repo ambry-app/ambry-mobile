@@ -44,10 +44,11 @@ function mediaTrackForPlatform (authData, media) {
 }
 
 function findChapter (position, chapters) {
+  const rounded = Math.round(position * 100) / 100
   return chapters.find(
     chapter =>
-      position >= chapter.startTime &&
-      (!chapter.endTime || position < chapter.endTime)
+      rounded >= chapter.startTime &&
+      (!chapter.endTime || rounded < chapter.endTime)
   )
 }
 
@@ -64,7 +65,7 @@ async function updateServerPositionNoLock (authData) {
 
   const playerStateReport = {
     id: playerStateID,
-    position: position.toFixed(3)
+    position: position.toString()
   }
 
   console.debug('Player: updating server position', playerStateReport)

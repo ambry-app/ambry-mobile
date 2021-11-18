@@ -18,7 +18,7 @@ const updateServerPosition = async () => {
 
   const playerStateReport = {
     id: playerStateID,
-    position: position.toFixed(3)
+    position: position.toString()
   }
 
   const userSession = await EncryptedStorage.getItem('userSession')

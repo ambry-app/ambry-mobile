@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { Dimensions, useColorScheme } from 'react-native'
 import { PanGestureHandler } from 'react-native-gesture-handler'
 import Animated, {
@@ -12,7 +12,7 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated'
 import { clamp, ReText } from 'react-native-redash'
-import Svg, { Line, Path } from 'react-native-svg'
+import Svg, { Line, Path, Rect } from 'react-native-svg'
 import tw from '../../../lib/tailwind'
 
 const SPACING = 10 // pixels between ticks
@@ -74,10 +74,58 @@ function useIsScrubbing () {
   return [isScrubbing, setIsScrubbing]
 }
 
+const Ticks = memo(({ theme }) => {
+  return (
+    <Svg height={HEIGHT} width={WIDTH + 120}>
+      {Array.from({ length: NUM_TICKS + 12 }, (_, i) => (
+        <Line
+          key={i}
+          x1={0.5 + i * SPACING}
+          y1={0}
+          x2={0.5 + i * SPACING}
+          y2={i % 12 == 0 ? 40 : i % 6 == 0 ? 32 : 24}
+          stroke={
+            i % 12 == 0
+              ? theme.emphasized
+              : i % 6 == 0
+              ? theme.normal
+              : theme.dimmed
+          }
+          strokeWidth='1'
+        />
+      ))}
+    </Svg>
+  )
+})
+
+const Markers = memo(({ markers, duration, theme }) => {
+  return (
+    <Svg height={12} width={duration * FACTOR}>
+      {markers.map((marker, i) => {
+        return (
+          <Rect
+            key={i}
+            x={marker * FACTOR}
+            y='0'
+            rx='2.5'
+            ry='2.5'
+            height='12'
+            width='5'
+            fill={theme.accent}
+            stroke={theme.weak}
+            strokeWidth='2'
+          />
+        )
+      })}
+    </Svg>
+  )
+})
+
 export default function Scrubber ({
   position: positionInput,
   duration,
-  onChange
+  onChange,
+  markers
 }) {
   // console.log('RENDERING: Scrubber')
   const translateX = useSharedValue(timeToTranslateX(Math.round(positionInput)))
@@ -88,16 +136,20 @@ export default function Scrubber ({
   const theme =
     scheme == 'dark'
       ? {
+          accent: tw.color('lime-400'),
           strong: tw.color('gray-200'),
           emphasized: tw.color('gray-300'),
           normal: tw.color('gray-400'),
-          dimmed: tw.color('gray-500')
+          dimmed: tw.color('gray-500'),
+          weak: tw.color('gray-800')
         }
       : {
+          accent: tw.color('lime-500'),
           strong: tw.color('gray-800'),
           emphasized: tw.color('gray-600'),
           normal: tw.color('gray-500'),
-          dimmed: tw.color('gray-400')
+          dimmed: tw.color('gray-400'),
+          weak: tw.color('gray-300')
         }
 
   const onGestureEventHandler = useAnimatedGestureHandler({
@@ -197,6 +249,12 @@ export default function Scrubber ({
     }
   })
 
+  const animatedMarkerStyle = useAnimatedStyle(() => {
+    const value = translateX.value
+
+    return { transform: [{ translateX: HALF_WIDTH + value }] }
+  })
+
   const timecode = useDerivedValue(() => {
     const total = clamp(translateXToTime(translateX.value), 0, duration)
     const hours = Math.floor(total / 3600).toString()
@@ -240,9 +298,7 @@ export default function Scrubber ({
           <Path
             d='m 0.17 0 c -1 -0 2.83 8 3.83 8 c 1 0 4.83 -8 3.83 -8 z'
             fill={theme.strong}
-            stroke={
-              scheme == 'dark' ? tw.color('gray-800') : tw.color('gray-300')
-            }
+            stroke={theme.weak}
             strokeWidth='1'
           />
         </Svg>
@@ -253,34 +309,20 @@ export default function Scrubber ({
             animatedScrubberStyle
           ]}
         >
-          <>
-            <Animated.View
-              style={[
-                { height: HEIGHT, overflow: 'hidden' },
-                animatedMaskStyle
-              ]}
-            >
-              <Svg height={HEIGHT} width={WIDTH + 120}>
-                {Array.from({ length: NUM_TICKS + 12 }, (_, i) => (
-                  <Line
-                    key={i}
-                    x1={0.5 + i * SPACING}
-                    y1={0}
-                    x2={0.5 + i * SPACING}
-                    y2={i % 12 == 0 ? 40 : i % 6 == 0 ? 32 : 24}
-                    stroke={
-                      i % 12 == 0
-                        ? theme.emphasized
-                        : i % 6 == 0
-                        ? theme.normal
-                        : theme.dimmed
-                    }
-                    strokeWidth='1'
-                  />
-                ))}
-              </Svg>
-            </Animated.View>
-          </>
+          <Animated.View
+            style={[{ height: HEIGHT, overflow: 'hidden' }, animatedMaskStyle]}
+          >
+            <Ticks theme={theme} />
+          </Animated.View>
+        </Animated.View>
+
+        <Animated.View
+          style={[
+            { position: 'absolute', bottom: 42, left: -2 },
+            animatedMarkerStyle
+          ]}
+        >
+          <Markers markers={markers} duration={duration} theme={theme} />
         </Animated.View>
       </Animated.View>
     </PanGestureHandler>

@@ -14,7 +14,7 @@ import Scrubber from './PlayerControls/Scrubber'
 function ScrubberWrapper () {
   const { state, actions } = usePlayer()
   const { position, media } = state
-  const { duration } = media
+  const { chapters, duration } = media
   const { seekTo } = actions
 
   return (
@@ -22,13 +22,26 @@ function ScrubberWrapper () {
       position={position}
       duration={duration}
       seekTo={seekTo}
+      chapters={chapters}
     />
   )
 }
 
-const ActualScrubberWrapper = memo(({ position, duration, seekTo }) => {
-  return <Scrubber position={position} duration={duration} onChange={seekTo} />
-})
+const ActualScrubberWrapper = memo(
+  ({ position, duration, seekTo, chapters }) => {
+    const markers = chapters.map(
+      chapter => Math.round(chapter.startTime / 5) * 5
+    )
+    return (
+      <Scrubber
+        position={position}
+        duration={duration}
+        onChange={seekTo}
+        markers={markers}
+      />
+    )
+  }
+)
 
 export default function PlayerControls ({ toggleChapters }) {
   const { actions } = usePlayer()
