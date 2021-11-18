@@ -232,7 +232,7 @@ export default function Scrubber ({
           }}
         />
         <Svg
-          style={{ left: HALF_WIDTH - 4, top: 4, zIndex: 1 }}
+          style={{ left: HALF_WIDTH - 3.75, top: 4, zIndex: 1 }}
           height='8'
           width='8'
           viewBox='0 0 8 8'

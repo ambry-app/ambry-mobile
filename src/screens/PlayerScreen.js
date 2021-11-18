@@ -58,7 +58,10 @@ const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
   // )
 
   const chaptersRef = useRef()
-  const { onChaptersChange, toggleChapters } = useChapters(chaptersRef, loading)
+  const { chaptersOpen, onChaptersChange, toggleChapters } = useChapters(
+    chaptersRef,
+    loading
+  )
 
   if (error) {
     return (
@@ -129,7 +132,11 @@ const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
         onChange={onBookmarksChange}
         seek={seekTo}
       /> */}
-      <Chapters sheetRef={chaptersRef} onChange={onChaptersChange} />
+      <Chapters
+        sheetRef={chaptersRef}
+        onChange={onChaptersChange}
+        isOpen={chaptersOpen}
+      />
     </BottomSheetModalProvider>
   )
 })

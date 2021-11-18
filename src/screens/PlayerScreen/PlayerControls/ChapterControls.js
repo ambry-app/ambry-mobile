@@ -1,6 +1,6 @@
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
-import React, { memo, useCallback, useEffect, useState } from 'react'
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { Text, View } from 'react-native'
 import {
   TouchableNativeFeedback,
@@ -54,7 +54,7 @@ export function useChapters (ref, loading) {
     }
   }, [loading])
 
-  return { onChaptersChange, toggleChapters }
+  return { chaptersOpen, onChaptersChange, toggleChapters }
 }
 
 export default function ChapterControls ({ toggleChapters }) {
@@ -140,7 +140,7 @@ const ChapterItem = memo(({ chapter, active, onPress }) => {
   )
 })
 
-function ChaptersList ({ sheetRef }) {
+function ChaptersList ({ sheetRef, isOpen }) {
   const { state, actions } = usePlayer()
   const { media, currentChapter } = state
   const { chapters } = media
@@ -152,14 +152,16 @@ function ChaptersList ({ sheetRef }) {
       chapters={chapters}
       currentChapter={currentChapter}
       seekTo={seekTo}
+      isOpen={isOpen}
     />
   )
 }
 
 const ActualChapterList = memo(
-  ({ sheetRef, chapters, currentChapter, seekTo }) => {
+  ({ sheetRef, chapters, currentChapter, seekTo, isOpen }) => {
     // console.log('RENDERING: ChaptersList')
     const tabBarHeight = useBottomTabBarHeight()
+    const ref = useRef()
 
     const onPress = useCallback(chapter => {
       seekTo(chapter.startTime)
@@ -179,8 +181,20 @@ const ActualChapterList = memo(
       [currentChapter]
     )
 
+    useEffect(() => {
+      if (isOpen) {
+        const index = chapters.findIndex(
+          chapter => chapter.id == currentChapter?.id
+        )
+        if (index >= 0 && index < chapters.length) {
+          ref.current.scrollToIndex({ index, viewPosition: 0.5 })
+        }
+      }
+    }, [chapters, currentChapter, isOpen])
+
     return (
       <BottomSheetFlatList
+        ref={ref}
         data={chapters}
         style={tw`px-4`}
         keyExtractor={item => item.id}
@@ -195,7 +209,7 @@ const ActualChapterList = memo(
   }
 )
 
-export function Chapters ({ sheetRef, onChange }) {
+export function Chapters ({ sheetRef, onChange, isOpen }) {
   // console.log('RENDERING: Chapters')
   return (
     <BottomSheet
@@ -207,7 +221,7 @@ export function Chapters ({ sheetRef, onChange }) {
       snapPoints={['80%']}
       onChange={onChange}
     >
-      <ChaptersList sheetRef={sheetRef} />
+      <ChaptersList sheetRef={sheetRef} isOpen={isOpen} />
     </BottomSheet>
   )
 }
