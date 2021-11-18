@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useReducer } from 'react'
 import {
+  Button,
   FlatList,
   Image,
   Text,
@@ -61,6 +62,7 @@ function Item ({ playerState, authData, navigation }) {
 export default function ContinueListening ({ navigation }) {
   const { signOut, authData } = useAuth()
   const [state, dispatch] = useReducer(reducer, initialState)
+  const { clearMedia } = useSelectedMedia()
 
   const { playerStates, nextPage, hasMore, loading, refreshing, error } = state
 
@@ -104,6 +106,11 @@ export default function ContinueListening ({ navigation }) {
     }
   }, [])
 
+  const clearMediaAndNavigate = useCallback(() => {
+    clearMedia()
+    navigation.navigate('PlayerScreen')
+  })
+
   useEffect(() => {
     fetchPlayerStates()
   }, [])
@@ -146,7 +153,15 @@ export default function ContinueListening ({ navigation }) {
           />
         )}
         ListFooterComponent={
-          <View style={tw`h-14`}>{loading && <LargeActivityIndicator />}</View>
+          <View style={tw`h-14`}>
+            {__DEV__ && (
+              <Button
+                title='Clear Selected Media'
+                onPress={clearMediaAndNavigate}
+              />
+            )}
+            {loading && <LargeActivityIndicator />}
+          </View>
         }
       />
     </SafeAreaView>

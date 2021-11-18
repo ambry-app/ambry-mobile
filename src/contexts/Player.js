@@ -162,6 +162,10 @@ function usePosition (
   // TODO: fix drift by using setTimeout and keeping track of previous position
   // and correcting for drift each update.
   useEffect(() => {
+    if (!media) {
+      return
+    }
+
     const updatePosition = async () => {
       const [position, buffered] = await Promise.all([
         TrackPlayer.getPosition(),
@@ -414,8 +418,6 @@ export default function PlayerProvider ({ children }) {
     currentChapter,
     isSeeking
   )
-
-  // useBuffered(setBuffered, trackPlayerReady, loading)
 
   // actions
 

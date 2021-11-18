@@ -1,5 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 
 const SELECTED_MEDIA_KEY = 'selectedMedia'
 
@@ -45,9 +51,17 @@ const SelectedMediaProvider = ({ children }) => {
     }
   }, [selectedMedia])
 
+  const clearMedia = useCallback(() => {
+    console.debug(
+      `SelectedMediaContext: clearing selectedMedia from AsyncStorage`
+    )
+    AsyncStorage.removeItem(SELECTED_MEDIA_KEY)
+    setSelectedMedia(null)
+  }, [])
+
   return (
     <SelectedMediaContext.Provider
-      value={{ selectedMedia, loadMedia: setSelectedMedia }}
+      value={{ selectedMedia, loadMedia: setSelectedMedia, clearMedia }}
     >
       {children}
     </SelectedMediaContext.Provider>
