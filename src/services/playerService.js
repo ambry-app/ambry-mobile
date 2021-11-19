@@ -46,12 +46,14 @@ const seekRelative = async interval => {
 export default async function setup () {
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => {
     playerMutex.runExclusive(() => {
+      console.debug('Service: playback queue ended')
       updateServerPosition()
     })
   })
 
   TrackPlayer.addEventListener(Event.RemoteStop, async () => {
     playerMutex.runExclusive(async () => {
+      console.debug('Service: stop requested, destroying player')
       await TrackPlayer.pause()
       await seekRelative(-1)
       TrackPlayer.destroy()
@@ -60,6 +62,7 @@ export default async function setup () {
 
   TrackPlayer.addEventListener(Event.RemotePause, async () => {
     playerMutex.runExclusive(async () => {
+      console.debug('Service: pausing')
       await TrackPlayer.pause()
       seekRelative(-1)
     })
@@ -67,18 +70,21 @@ export default async function setup () {
 
   TrackPlayer.addEventListener(Event.RemotePlay, () => {
     playerMutex.runExclusive(async () => {
+      console.debug('Service: playing')
       TrackPlayer.play()
     })
   })
 
   TrackPlayer.addEventListener(Event.RemoteJumpBackward, ({ interval }) => {
     playerMutex.runExclusive(async () => {
+      console.debug('Service: jump backward', interval)
       seekRelative(interval * -1)
     })
   })
 
   TrackPlayer.addEventListener(Event.RemoteJumpForward, ({ interval }) => {
     playerMutex.runExclusive(async () => {
+      console.debug('Service: jump forward', interval)
       seekRelative(interval)
     })
   })
@@ -86,15 +92,18 @@ export default async function setup () {
   TrackPlayer.addEventListener(Event.RemoteDuck, async e => {
     playerMutex.runExclusive(async () => {
       if (e.permanent === true) {
+        console.debug('Service: duck permanent, pausing')
         TrackPlayer.pause()
       } else {
         if (e.paused === true) {
+          console.debug('Service: duck temporary, pausing')
           const playerState = await TrackPlayer.getState()
           wasPausedByDuck = playerState !== State.Paused
           await TrackPlayer.pause()
           await seekRelative(-1)
         } else {
           if (wasPausedByDuck === true) {
+            console.debug('Service: duck resuming')
             TrackPlayer.play()
             wasPausedByDuck = false
           }

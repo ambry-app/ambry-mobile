@@ -44,7 +44,7 @@ function mediaTrackForPlatform (authData, media) {
 }
 
 function findChapter (position, chapters) {
-  const rounded = Math.round(position * 100) / 100
+  const rounded = Math.round(position)
   return chapters.find(
     chapter =>
       rounded >= chapter.startTime &&
