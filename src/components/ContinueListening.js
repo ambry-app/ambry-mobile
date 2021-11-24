@@ -8,18 +8,18 @@ import {
   View
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { getRecentPlayerStates, uriSource } from '../api/ambry'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import { useAuth } from '../contexts/Auth'
+import { useAmbryAPI } from '../contexts/AmbryAPI'
 import { useSelectedMedia } from '../contexts/SelectedMedia'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/playerStates'
 import WrappingList from './WrappingList'
 
-function Item ({ playerState, authData, navigation }) {
+function Item ({ playerState, navigation }) {
   const { selectedMedia, loadMedia } = useSelectedMedia()
+  const { uriSource } = useAmbryAPI()
 
   return (
     <TouchableNativeFeedback
@@ -36,7 +36,7 @@ function Item ({ playerState, authData, navigation }) {
           style={tw`w-1/4 rounded-xl border-gray-200 bg-gray-200 shadow-md`}
         >
           <Image
-            source={uriSource(authData, playerState.media.book.imagePath)}
+            source={uriSource(playerState.media.book.imagePath)}
             style={tw.style('rounded-md', 'w-full', {
               aspectRatio: 10 / 15
             })}
@@ -60,7 +60,7 @@ function Item ({ playerState, authData, navigation }) {
 }
 
 export default function ContinueListening ({ navigation }) {
-  const { signOut, authData } = useAuth()
+  const { getRecentPlayerStates } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
   const { clearMedia } = useSelectedMedia()
 
@@ -74,17 +74,10 @@ export default function ContinueListening ({ navigation }) {
     dispatch(actionCreators.loading())
 
     try {
-      const [nextPlayerStates, hasMore] = await getRecentPlayerStates(
-        authData,
-        nextPage
-      )
+      const [nextPlayerStates, hasMore] = await getRecentPlayerStates(nextPage)
       dispatch(actionCreators.success(nextPlayerStates, nextPage, hasMore))
-    } catch (status) {
-      if (status == 401) {
-        await signOut()
-      } else {
-        dispatch(actionCreators.failure())
-      }
+    } catch {
+      dispatch(actionCreators.failure())
     }
   }, [hasMore, nextPage])
 
@@ -92,17 +85,10 @@ export default function ContinueListening ({ navigation }) {
     dispatch(actionCreators.refresh())
 
     try {
-      const [nextPlayerStates, hasMore] = await getRecentPlayerStates(
-        authData,
-        1
-      )
+      const [nextPlayerStates, hasMore] = await getRecentPlayerStates(1)
       dispatch(actionCreators.success(nextPlayerStates, 1, hasMore, true))
-    } catch (status) {
-      if (status == 401) {
-        await signOut()
-      } else {
-        dispatch(actionCreators.failure())
-      }
+    } catch {
+      dispatch(actionCreators.failure())
     }
   }, [])
 
@@ -146,11 +132,7 @@ export default function ContinueListening ({ navigation }) {
         onRefresh={refreshPlayerStates}
         refreshing={refreshing}
         renderItem={({ item }) => (
-          <Item
-            playerState={item}
-            authData={authData}
-            navigation={navigation}
-          />
+          <Item playerState={item} navigation={navigation} />
         )}
         ListFooterComponent={
           <View style={tw`h-14`}>

@@ -15,8 +15,7 @@ import TrackPlayer, {
   TrackType
 } from 'react-native-track-player'
 import { useImmer } from 'use-immer'
-import { getPlayerState, reportPlayerState, uriSource } from '../api/ambry'
-import { useAuth } from '../contexts/Auth'
+import { useAmbryAPI } from '../contexts/AmbryAPI'
 import { useSelectedMedia } from '../contexts/SelectedMedia'
 
 const initialState = {
@@ -35,10 +34,10 @@ const PlayerContext = createContext({})
 
 export const playerMutex = new Mutex()
 
-function mediaTrackForPlatform (authData, media) {
+function mediaTrackForPlatform (uriSource, media) {
   const path = Platform.OS === 'ios' ? media.hlsPath : media.mpdPath
   const type = Platform.OS === 'ios' ? TrackType.HLS : TrackType.Dash
-  const { uri: url } = uriSource(authData, path)
+  const { uri: url } = uriSource(path)
 
   return { url, type }
 }
@@ -52,7 +51,7 @@ function findChapter (position, chapters) {
   )
 }
 
-async function updateServerPositionNoLock (authData) {
+async function updateServerPositionNoLock (reportPlayerState) {
   const position = await TrackPlayer.getPosition()
   const track = await TrackPlayer.getTrack(0)
 
@@ -69,12 +68,12 @@ async function updateServerPositionNoLock (authData) {
   }
 
   console.debug('Player: updating server position', playerStateReport)
-  reportPlayerState(authData, playerStateReport)
+  reportPlayerState(playerStateReport)
 }
 
 async function setTrackPlayerPlaybackRate (
   newPlaybackRate,
-  authData,
+  reportPlayerState,
   setPlaybackRate
 ) {
   playerMutex.runExclusive(async () => {
@@ -101,11 +100,11 @@ async function setTrackPlayerPlaybackRate (
     }
 
     console.debug('Player: updating server playback rate', playerStateReport)
-    reportPlayerState(authData, playerStateReport)
+    reportPlayerState(playerStateReport)
   })
 }
 
-async function togglePlaybackNoLock (authData) {
+async function togglePlaybackNoLock (reportPlayerState) {
   console.debug('Player: toggling playback')
 
   const playbackState = await TrackPlayer.getState()
@@ -116,15 +115,15 @@ async function togglePlaybackNoLock (authData) {
   } else {
     console.debug('Player: pausing')
     await TrackPlayer.pause()
-    seekRelativeNoLock(-1, authData)
+    seekRelativeNoLock(-1, reportPlayerState)
   }
 }
 
-function togglePlayback (authData) {
-  playerMutex.runExclusive(() => togglePlaybackNoLock(authData))
+function togglePlayback (reportPlayerState) {
+  playerMutex.runExclusive(() => togglePlaybackNoLock(reportPlayerState))
 }
 
-async function seekRelativeNoLock (interval, authData) {
+async function seekRelativeNoLock (interval, reportPlayerState) {
   console.debug('Player: seeking', interval)
 
   const position = await TrackPlayer.getPosition()
@@ -136,19 +135,19 @@ async function seekRelativeNoLock (interval, authData) {
 
   await TrackPlayer.seekTo(actualDestination)
 
-  updateServerPositionNoLock(authData)
+  updateServerPositionNoLock(reportPlayerState)
 }
 
-async function seekToNoLock (position, authData) {
+async function seekToNoLock (position, reportPlayerState) {
   console.debug('Player: seeking to', position)
 
   await TrackPlayer.seekTo(position)
 
-  updateServerPositionNoLock(authData)
+  updateServerPositionNoLock(reportPlayerState)
 }
 
-function seekTo (position, authData) {
-  playerMutex.runExclusive(() => seekToNoLock(position, authData))
+function seekTo (position, reportPlayerState) {
+  playerMutex.runExclusive(() => seekToNoLock(position, reportPlayerState))
 }
 
 function usePosition (
@@ -197,7 +196,7 @@ function usePosition (
 }
 
 export default function PlayerProvider ({ children }) {
-  const { authData, signOut } = useAuth()
+  const { getPlayerState, reportPlayerState, uriSource } = useAmbryAPI()
   const { selectedMedia } = useSelectedMedia()
   const [state, updateState] = useImmer(initialState)
 
@@ -231,7 +230,7 @@ export default function PlayerProvider ({ children }) {
     updateState(draft => {
       draft.loading = true
       draft.media = undefined
-      draft.imageSource = uriSource(authData, imagePath)
+      draft.imageSource = uriSource(imagePath)
       draft.playbackRate = null
     })
   }
@@ -333,31 +332,20 @@ export default function PlayerProvider ({ children }) {
         console.debug(
           `Player: loading playerState ${selectedMedia.id} from server`
         )
-        const serverPlayerState = await getPlayerState(
-          authData,
-          selectedMedia.id
-        )
+        const serverPlayerState = await getPlayerState(selectedMedia.id)
 
         console.debug('Player: playerState loaded', serverPlayerState)
         loadTrackIntoPlayer(serverPlayerState)
       } catch (err) {
         console.error('Player: failed to load playerState', err)
-
-        if (err == 401) {
-          await signOut()
-        } else {
-          setError()
-        }
+        setError()
       }
     }
 
     const loadTrackIntoPlayer = async playerState => {
       const { media, position, playbackRate } = playerState
-      const mediaTrack = mediaTrackForPlatform(authData, media)
-      const { uri: artworkUrl, headers } = uriSource(
-        authData,
-        media.book.imagePath
-      )
+      const mediaTrack = mediaTrackForPlatform(uriSource, media)
+      const { uri: artworkUrl, headers } = uriSource(media.book.imagePath)
 
       const currentTrack = await TrackPlayer.getTrack(0)
 
@@ -376,7 +364,7 @@ export default function PlayerProvider ({ children }) {
       } else {
         // report previous track position
         if (currentTrack) {
-          await updateServerPositionNoLock(authData)
+          await updateServerPositionNoLock(reportPlayerState)
         }
 
         // load new track
@@ -424,11 +412,15 @@ export default function PlayerProvider ({ children }) {
   // actions
 
   const setPlaybackRateAction = useCallback(
-    rate => setTrackPlayerPlaybackRate(rate, authData, setPlaybackRate),
+    rate =>
+      setTrackPlayerPlaybackRate(rate, reportPlayerState, setPlaybackRate),
     []
   )
 
-  const togglePlaybackAction = useCallback(() => togglePlayback(authData), [])
+  const togglePlaybackAction = useCallback(
+    () => togglePlayback(reportPlayerState),
+    []
+  )
 
   const seekTimerRef = useRef()
   const seekRelativeAction = useCallback(
@@ -448,7 +440,7 @@ export default function PlayerProvider ({ children }) {
       clearTimeout(seekTimerRef.current)
       seekTimerRef.current = setTimeout(() => {
         setIsSeeking(false)
-        seekTo(actualDestination, authData)
+        seekTo(actualDestination, reportPlayerState)
       }, 500)
     },
     [position, playbackRate, media]
@@ -459,7 +451,7 @@ export default function PlayerProvider ({ children }) {
       const chapter = findChapter(position, media.chapters)
 
       setPosition(position, 0, chapter)
-      seekTo(position, authData)
+      seekTo(position, reportPlayerState)
     },
     [media]
   )

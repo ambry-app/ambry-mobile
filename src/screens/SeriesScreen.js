@@ -1,17 +1,16 @@
 import React, { useCallback, useEffect, useReducer } from 'react'
 import { Text, View } from 'react-native'
-import { getSeries } from '../api/ambry'
 import BookGrid from '../components/BookGrid'
 import { Header1 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
-import { useAuth } from '../contexts/Auth'
+import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 import { actionCreators, initialState, reducer } from '../reducers/series'
 
 export default function SeriesScreen ({ navigation, route }) {
-  const { signOut, authData } = useAuth()
+  const { getSeries } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { series, loading, error } = state
@@ -20,14 +19,10 @@ export default function SeriesScreen ({ navigation, route }) {
     dispatch(actionCreators.loading())
 
     try {
-      const series = await getSeries(authData, route.params.seriesId)
+      const series = await getSeries(route.params.seriesId)
       dispatch(actionCreators.success(series))
-    } catch (status) {
-      if (status == 401) {
-        await signOut()
-      } else {
-        dispatch(actionCreators.failure())
-      }
+    } catch {
+      dispatch(actionCreators.failure())
     }
   }, [route.params.seriesId])
 

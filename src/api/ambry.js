@@ -7,7 +7,7 @@ async function handleResponse (response, withHasMore = false) {
     const result = await response.json()
     return withHasMore ? [result.data, result.hasMore] : result.data
   } else {
-    return Promise.reject(response.status)
+    throw response.status
   }
 }
 
@@ -108,4 +108,16 @@ export function uriSource ({ host, token }, path) {
       Authorization: 'Bearer ' + token
     }
   }
+}
+
+export default {
+  getRecentBooks,
+  getRecentPlayerStates,
+  getBook,
+  getPerson,
+  getSeries,
+  getPlayerState,
+  listBookmarks,
+  reportPlayerState,
+  uriSource
 }

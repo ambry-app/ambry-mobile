@@ -2,8 +2,9 @@ import { NavigationContainer } from '@react-navigation/native'
 import React from 'react'
 import { useColorScheme } from 'react-native'
 import RNBootSplash from 'react-native-bootsplash'
-import { Loading } from '../components/Loading'
-import { useAuth } from '../contexts/Auth'
+import LargeActivityIndicator from '../components/LargeActivityIndicator'
+import ScreenCentered from '../components/ScreenCentered'
+import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 import { AppStack } from './AppStack'
 import { AuthStack } from './AuthStack'
@@ -38,19 +39,24 @@ const linking = {
 }
 
 export const Router = () => {
-  const { authData, loading } = useAuth()
+  const { loggedIn, ready } = useAmbryAPI()
   const scheme = useColorScheme()
 
-  if (loading) {
-    return <Loading />
+  if (!ready) {
+    return (
+      <ScreenCentered>
+        <LargeActivityIndicator />
+      </ScreenCentered>
+    )
   }
+
   return (
     <NavigationContainer
       linking={linking}
       theme={scheme === 'dark' ? DarkTheme : LightTheme}
       onReady={() => RNBootSplash.hide()}
     >
-      {authData ? <AppStack /> : <AuthStack />}
+      {loggedIn ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
   )
 }

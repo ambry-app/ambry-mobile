@@ -9,11 +9,11 @@ import {
 } from 'react-native'
 import Logo from '../assets/logo_256x1056.svg'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
-import { useAuth } from '../contexts/Auth'
+import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 
 export default function SignInScreen () {
-  const auth = useAuth()
+  const { signIn } = useAmbryAPI()
   const [loading, isLoading] = useState(false)
   const [error, isError] = useState(false)
   const [email, setEmail] = useState('')
@@ -21,12 +21,12 @@ export default function SignInScreen () {
   const [password, setPassword] = useState('')
   const scheme = useColorScheme()
 
-  const signIn = async (host, email, password) => {
+  const signInCallback = async (host, email, password) => {
     isError(false)
     isLoading(true)
 
     try {
-      await auth.signIn(host, email, password)
+      await signIn(host, email, password)
     } catch (e) {
       isLoading(false)
       isError(true)
@@ -88,7 +88,7 @@ export default function SignInScreen () {
       <Button
         title='Sign in'
         color={tw.color('lime-500')}
-        onPress={() => signIn(host, email, password)}
+        onPress={() => signInCallback(host, email, password)}
         disabled={loading}
       />
       {loading && <LargeActivityIndicator style={tw`mt-4`} />}

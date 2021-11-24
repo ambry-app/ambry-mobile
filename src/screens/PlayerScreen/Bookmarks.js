@@ -13,12 +13,11 @@ import {
   State,
   TouchableNativeFeedback
 } from 'react-native-gesture-handler'
-import { listBookmarks } from '../../api/ambry'
 import Bookmark from '../../assets/bookmark.svg'
 import LargeActivityIndicator from '../../components/LargeActivityIndicator'
 import PlusCircleButton from '../../components/PlusCircleButton'
 import ScreenCentered from '../../components/ScreenCentered'
-import { useAuth } from '../../contexts/Auth'
+import { useAmbryAPI } from '../../contexts/AmbryAPI'
 import { useSelectedMedia } from '../../contexts/SelectedMedia'
 import useBackButton from '../../hooks/backButton'
 import tw from '../../lib/tailwind'
@@ -159,7 +158,7 @@ function BookmarkItem ({
 }
 
 function BookmarksList ({ longPressRef, sheetRef, seek }) {
-  const { signOut, authData } = useAuth()
+  const { listBookmarks } = useAmbryAPI()
   const tabBarHeight = useBottomTabBarHeight()
   const { selectedMedia } = useSelectedMedia()
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -174,17 +173,12 @@ function BookmarksList ({ longPressRef, sheetRef, seek }) {
 
     try {
       const [nextBookmarks, hasMore] = await listBookmarks(
-        authData,
         selectedMedia,
         nextPage
       )
       dispatch(actionCreators.success(nextBookmarks, nextPage, hasMore))
-    } catch (status) {
-      if (status == 401) {
-        await signOut()
-      } else {
-        dispatch(actionCreators.failure())
-      }
+    } catch {
+      dispatch(actionCreators.failure())
     }
   }, [selectedMedia, hasMore, nextPage])
 
@@ -192,18 +186,10 @@ function BookmarksList ({ longPressRef, sheetRef, seek }) {
     dispatch(actionCreators.refresh())
 
     try {
-      const [bookmarks, hasMore] = await listBookmarks(
-        authData,
-        selectedMedia,
-        1
-      )
+      const [bookmarks, hasMore] = await listBookmarks(selectedMedia, 1)
       dispatch(actionCreators.success(bookmarks, 1, hasMore, true))
-    } catch (status) {
-      if (status == 401) {
-        await signOut()
-      } else {
-        dispatch(actionCreators.failure())
-      }
+    } catch {
+      dispatch(actionCreators.failure())
     }
   }, [selectedMedia])
 

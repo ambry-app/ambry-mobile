@@ -1,17 +1,16 @@
 import React, { useCallback, useEffect, useReducer } from 'react'
 import { Image, SectionList, Text, View } from 'react-native'
-import { getPerson, uriSource } from '../api/ambry'
 import BookGrid from '../components/BookGrid'
 import Description from '../components/Description'
 import { Header1, Header2 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import { useAuth } from '../contexts/Auth'
+import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 import { actionCreators, initialState, reducer } from '../reducers/person'
 
 function PersonHeader ({ person }) {
-  const { authData } = useAuth()
+  const { uriSource } = useAmbryAPI()
 
   return (
     <View style={tw`p-4`}>
@@ -20,7 +19,7 @@ function PersonHeader ({ person }) {
         style={tw`mx-12 my-8 rounded-full border-gray-200 bg-gray-200 shadow-lg`}
       >
         <Image
-          source={uriSource(authData, person.imagePath)}
+          source={uriSource(person.imagePath)}
           style={tw.style('rounded-full w-full', {
             aspectRatio: 1 / 1
           })}
@@ -32,7 +31,7 @@ function PersonHeader ({ person }) {
 }
 
 export default function PersonDetailsScreen ({ route, navigation }) {
-  const { authData } = useAuth()
+  const { getPerson } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { person, loading, error } = state
@@ -41,14 +40,10 @@ export default function PersonDetailsScreen ({ route, navigation }) {
     dispatch(actionCreators.loading())
 
     try {
-      const person = await getPerson(authData, route.params.personId)
+      const person = await getPerson(route.params.personId)
       dispatch(actionCreators.success(person))
-    } catch (status) {
-      if (status == 401) {
-        await signOut()
-      } else {
-        dispatch(actionCreators.failure())
-      }
+    } catch {
+      dispatch(actionCreators.failure())
     }
   }, [route.params.personId])
 

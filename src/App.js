@@ -3,7 +3,7 @@ import { StatusBar, useColorScheme } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { init as initTransparentStatusBar } from 'react-native-transparent-status-and-navigation-bar'
 import { useDeviceContext } from 'twrnc'
-import { AuthProvider } from './contexts/Auth'
+import { AmbryAPIProvider } from './contexts/AmbryAPI'
 import tw from './lib/tailwind'
 import { Router } from './routes/Router'
 
@@ -16,14 +16,14 @@ export default function App () {
 
   return (
     <SafeAreaProvider>
-      <AuthProvider>
+      <AmbryAPIProvider>
         <StatusBar
           translucent={true}
           backgroundColor={'transparent'}
           barStyle={scheme == 'dark' ? 'light-content' : 'dark-content'}
         />
         <Router />
-      </AuthProvider>
+      </AmbryAPIProvider>
     </SafeAreaProvider>
   )
 }

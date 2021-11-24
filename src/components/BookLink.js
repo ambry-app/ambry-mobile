@@ -7,12 +7,11 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import { uriSource } from '../api/ambry'
-import { useAuth } from '../contexts/Auth'
+import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 
 export default function BookLink ({ book }) {
-  const { authData } = useAuth()
+  const { uriSource } = useAmbryAPI()
   const navigation = useNavigation()
 
   const authors = book.authors.map(author => (
@@ -59,7 +58,7 @@ export default function BookLink ({ book }) {
         >
           <View>
             <Image
-              source={uriSource(authData, book.imagePath)}
+              source={uriSource(book.imagePath)}
               style={tw.style('rounded-lg', 'w-full', {
                 aspectRatio: 10 / 15.5
               })}

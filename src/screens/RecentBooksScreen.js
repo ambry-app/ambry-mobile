@@ -1,15 +1,14 @@
 import React, { useCallback, useEffect, useReducer } from 'react'
-import { Text, View } from 'react-native'
-import { getRecentBooks } from '../api/ambry'
+import { Button, Text, View } from 'react-native'
 import BookGrid from '../components/BookGrid'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import { useAuth } from '../contexts/Auth'
+import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 import { actionCreators, initialState, reducer } from '../reducers/books'
 
 export default function RecentBooksScreen () {
-  const { signOut, authData } = useAuth()
+  const { getRecentBooks } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { books, nextPage, hasMore, loading, refreshing, error } = state
@@ -22,14 +21,10 @@ export default function RecentBooksScreen () {
     dispatch(actionCreators.loading())
 
     try {
-      const [nextBooks, hasMore] = await getRecentBooks(authData, nextPage)
+      const [nextBooks, hasMore] = await getRecentBooks(nextPage)
       dispatch(actionCreators.success(nextBooks, nextPage, hasMore))
-    } catch (status) {
-      if (status == 401) {
-        await signOut()
-      } else {
-        dispatch(actionCreators.failure())
-      }
+    } catch {
+      dispatch(actionCreators.failure())
     }
   }, [hasMore, nextPage])
 
@@ -37,14 +32,10 @@ export default function RecentBooksScreen () {
     dispatch(actionCreators.refresh())
 
     try {
-      const [nextBooks, hasMore] = await getRecentBooks(authData, 1)
+      const [nextBooks, hasMore] = await getRecentBooks(1)
       dispatch(actionCreators.success(nextBooks, 1, hasMore, true))
-    } catch (status) {
-      if (status == 401) {
-        await signOut()
-      } else {
-        dispatch(actionCreators.failure())
-      }
+    } catch {
+      dispatch(actionCreators.failure())
     }
   }, [])
 
@@ -65,9 +56,14 @@ export default function RecentBooksScreen () {
     if (error) {
       return (
         <ScreenCentered>
-          <Text style={tw`text-gray-700 dark:text-gray-200`}>
+          <Text style={tw`text-gray-700 dark:text-gray-200 mb-4`}>
             Failed to load books!
           </Text>
+          <Button
+            title='Retry'
+            color={tw.color('lime-500')}
+            onPress={fetchBooks}
+          />
         </ScreenCentered>
       )
     }

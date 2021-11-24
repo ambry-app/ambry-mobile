@@ -8,14 +8,13 @@ import {
   TouchableNativeFeedback,
   View
 } from 'react-native'
-import { getBook, uriSource } from '../api/ambry'
 import Description from '../components/Description'
 import { Header1 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import PlayButton from '../components/PlayButton'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
-import { useAuth } from '../contexts/Auth'
+import { useAmbryAPI } from '../contexts/AmbryAPI'
 import { useSelectedMedia } from '../contexts/SelectedMedia'
 import tw from '../lib/tailwind'
 import { durationDisplay } from '../lib/utils'
@@ -104,7 +103,7 @@ function MediaList ({ book, media }) {
 }
 
 export default function BookDetailsScreen ({ route, navigation }) {
-  const { signOut, authData } = useAuth()
+  const { getBook, uriSource } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { book, loading, error } = state
@@ -113,14 +112,10 @@ export default function BookDetailsScreen ({ route, navigation }) {
     dispatch(actionCreators.loading())
 
     try {
-      const book = await getBook(authData, route.params.bookId)
+      const book = await getBook(route.params.bookId)
       dispatch(actionCreators.success(book))
-    } catch (status) {
-      if (status == 401) {
-        await signOut()
-      } else {
-        dispatch(actionCreators.failure())
-      }
+    } catch {
+      dispatch(actionCreators.failure())
     }
   }, [route.params.bookId])
 
@@ -180,7 +175,7 @@ export default function BookDetailsScreen ({ route, navigation }) {
             style={tw`mt-4 rounded-2xl border-gray-200 bg-gray-200 shadow-lg`}
           >
             <Image
-              source={uriSource(authData, book.imagePath)}
+              source={uriSource(book.imagePath)}
               style={tw.style('rounded-2xl', 'w-full', {
                 aspectRatio: 10 / 15.5
               })}
