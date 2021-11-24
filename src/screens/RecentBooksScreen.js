@@ -1,13 +1,15 @@
-import React, { useCallback, useEffect, useReducer } from 'react'
+import React, { useCallback, useReducer } from 'react'
 import { Button, Text, View } from 'react-native'
 import BookGrid from '../components/BookGrid'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 import { useAmbryAPI } from '../contexts/AmbryAPI'
+import useFirstRender from '../hooks/firstRender'
 import tw from '../lib/tailwind'
 import { actionCreators, initialState, reducer } from '../reducers/books'
 
 export default function RecentBooksScreen() {
+  const isFirstRender = useFirstRender()
   const { getRecentBooks } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -21,27 +23,27 @@ export default function RecentBooksScreen() {
     dispatch(actionCreators.loading())
 
     try {
-      const [nextBooks, hasMore] = await getRecentBooks(nextPage)
-      dispatch(actionCreators.success(nextBooks, nextPage, hasMore))
+      const [nextBooks, newHasMore] = await getRecentBooks(nextPage)
+      dispatch(actionCreators.success(nextBooks, nextPage, newHasMore))
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [hasMore, nextPage])
+  }, [getRecentBooks, hasMore, nextPage])
 
   const refreshBooks = useCallback(async () => {
     dispatch(actionCreators.refresh())
 
     try {
-      const [nextBooks, hasMore] = await getRecentBooks(1)
-      dispatch(actionCreators.success(nextBooks, 1, hasMore, true))
+      const [nextBooks, newHasMore] = await getRecentBooks(1)
+      dispatch(actionCreators.success(nextBooks, 1, newHasMore, true))
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [])
+  }, [getRecentBooks])
 
-  useEffect(() => {
+  if (isFirstRender) {
     fetchBooks()
-  }, [])
+  }
 
   // We'll show an error only if the first page fails to load
   if (books.length === 0) {

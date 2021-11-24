@@ -16,7 +16,7 @@ export function useChapters(ref, loading) {
   const [chaptersOpen, setChaptersOpen] = useState(false)
 
   const onChaptersChange = useCallback(index => {
-    if (index == -1) {
+    if (index === -1) {
       setChaptersOpen(false)
     } else {
       setChaptersOpen(true)
@@ -33,7 +33,7 @@ export function useChapters(ref, loading) {
     } else {
       ref.current.snapToIndex(0)
     }
-  }, [chaptersOpen])
+  }, [ref, chaptersOpen])
 
   const closeOnBack = useCallback(() => {
     if (chaptersOpen) {
@@ -42,7 +42,7 @@ export function useChapters(ref, loading) {
     } else {
       return false
     }
-  }, [chaptersOpen])
+  }, [ref, chaptersOpen])
 
   useBackButton(closeOnBack)
 
@@ -163,28 +163,31 @@ const ActualChapterList = memo(
     const tabBarHeight = useBottomTabBarHeight()
     const ref = useRef()
 
-    const onPress = useCallback(chapter => {
-      seekTo(chapter.startTime)
-      sheetRef.current.close()
-    }, [])
+    const onPress = useCallback(
+      chapter => {
+        seekTo(chapter.startTime)
+        sheetRef.current.close()
+      },
+      [sheetRef, seekTo]
+    )
 
     const renderItem = useCallback(
       ({ item: chapter }) => {
         return (
           <ChapterItem
             chapter={chapter}
-            active={chapter.id == currentChapter?.id}
+            active={chapter.id === currentChapter?.id}
             onPress={onPress}
           />
         )
       },
-      [currentChapter]
+      [onPress, currentChapter]
     )
 
     useEffect(() => {
       if (isOpen) {
         const index = chapters.findIndex(
-          chapter => chapter.id == currentChapter?.id
+          chapter => chapter.id === currentChapter?.id
         )
         if (index >= 0 && index < chapters.length) {
           ref.current.scrollToIndex({ index, viewPosition: 0.5 })

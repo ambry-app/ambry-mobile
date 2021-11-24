@@ -10,7 +10,9 @@ export default function PlusCircleButton({ width, height }) {
     <PlusCircle
       width={width}
       height={height}
-      iconColor={scheme == 'dark' ? tw.color('lime-500') : tw.color('lime-400')}
+      iconColor={
+        scheme === 'dark' ? tw.color('lime-500') : tw.color('lime-400')
+      }
     />
   )
 }

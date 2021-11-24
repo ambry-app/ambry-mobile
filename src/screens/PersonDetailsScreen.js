@@ -40,22 +40,22 @@ export default function PersonDetailsScreen({ route, navigation }) {
     dispatch(actionCreators.loading())
 
     try {
-      const person = await getPerson(route.params.personId)
-      dispatch(actionCreators.success(person))
+      const loadedPerson = await getPerson(route.params.personId)
+      dispatch(actionCreators.success(loadedPerson))
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [route.params.personId])
+  }, [getPerson, route.params.personId])
 
   useEffect(() => {
     fetchPerson()
-  }, [route.params.personId])
+  }, [fetchPerson, route.params.personId])
 
   useEffect(() => {
     if (person) {
       navigation.setOptions({ title: person.name })
     }
-  }, [person])
+  }, [navigation, person])
 
   if (!person) {
     if (loading) {
@@ -79,7 +79,7 @@ export default function PersonDetailsScreen({ route, navigation }) {
     const authorSections = person.authors.map(author => {
       return {
         title:
-          author.name == person.name
+          author.name === person.name
             ? `Written by ${author.name}`
             : `Written by ${person.name} as ${author.name}`,
         data: [{ id: author.id, books: author.books }]
@@ -89,7 +89,7 @@ export default function PersonDetailsScreen({ route, navigation }) {
     const narratorSections = person.narrators.map(narrator => {
       return {
         title:
-          narrator.name == person.name
+          narrator.name === person.name
             ? `Narrated by ${narrator.name}`
             : `Narrated by ${person.name} as ${narrator.name}`,
         data: [{ id: narrator.id, books: narrator.books }]

@@ -21,12 +21,12 @@ export default function SignInScreen() {
   const [password, setPassword] = useState('')
   const scheme = useColorScheme()
 
-  const signInCallback = async (host, email, password) => {
+  const signInCallback = async (...args) => {
     isError(false)
     isLoading(true)
 
     try {
-      await signIn(host, email, password)
+      await signIn(...args)
     } catch (e) {
       isLoading(false)
       isError(true)
@@ -40,10 +40,10 @@ export default function SignInScreen() {
           height="86"
           width="352"
           brandColor={
-            scheme == 'dark' ? tw.color('lime-400') : tw.color('lime-500')
+            scheme === 'dark' ? tw.color('lime-400') : tw.color('lime-500')
           }
           textColor={
-            scheme == 'dark' ? tw.color('gray-200') : tw.color('gray-700')
+            scheme === 'dark' ? tw.color('gray-200') : tw.color('gray-700')
           }
         />
         <Text
@@ -59,7 +59,7 @@ export default function SignInScreen() {
         onChangeText={setHost}
         style={tw`my-2 text-gray-700 dark:text-gray-200 border-2 border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700 rounded px-3 py-2`}
         placeholderTextColor={
-          scheme == 'dark' ? tw.color('gray-500') : tw.color('gray-300')
+          scheme === 'dark' ? tw.color('gray-500') : tw.color('gray-300')
         }
       />
       <TextInput
@@ -72,7 +72,7 @@ export default function SignInScreen() {
         keyboardType="email-address"
         style={tw`my-2 text-gray-700 dark:text-gray-200 border-2 border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700 rounded px-3 py-2`}
         placeholderTextColor={
-          scheme == 'dark' ? tw.color('gray-500') : tw.color('gray-300')
+          scheme === 'dark' ? tw.color('gray-500') : tw.color('gray-300')
         }
       />
       <TextInput
@@ -82,7 +82,7 @@ export default function SignInScreen() {
         secureTextEntry
         style={tw`my-2 mb-4 text-gray-700 dark:text-gray-200 border-2 border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700 rounded px-3 py-2`}
         placeholderTextColor={
-          scheme == 'dark' ? tw.color('gray-500') : tw.color('gray-300')
+          scheme === 'dark' ? tw.color('gray-500') : tw.color('gray-300')
         }
       />
       <Button

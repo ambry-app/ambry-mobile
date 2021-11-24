@@ -27,12 +27,12 @@ const SelectedMediaProvider = ({ children }) => {
         return
       }
 
-      const selectedMedia = JSON.parse(selectedMediaString)
+      const loadedSelectedMedia = JSON.parse(selectedMediaString)
       console.debug(
-        `SelectedMediaContext: restored selectedMedia ${selectedMedia.id} from AsyncStorage`
+        `SelectedMediaContext: restored selectedMedia ${loadedSelectedMedia.id} from AsyncStorage`
       )
 
-      setSelectedMedia(selectedMedia)
+      setSelectedMedia(loadedSelectedMedia)
     } catch (error) {
       console.error(error)
     }

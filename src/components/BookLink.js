@@ -14,7 +14,7 @@ export default function BookLink({ book }) {
   const { uriSource } = useAmbryAPI()
   const navigation = useNavigation()
 
-  const authors = book.authors.map(author => (
+  const authorsList = book.authors.map(author => (
     <TouchableOpacity
       key={author.id}
       onPress={() => navigation.push('Person', { personId: author.personId })}
@@ -27,7 +27,7 @@ export default function BookLink({ book }) {
     </TouchableOpacity>
   ))
 
-  const series = book.series.map(series => (
+  const seriesList = book.series.map(series => (
     <TouchableOpacity
       key={series.id}
       onPress={() => navigation.push('Series', { seriesId: series.id })}
@@ -73,8 +73,8 @@ export default function BookLink({ book }) {
           {book.title}
         </Text>
       </TouchableOpacity>
-      {authors}
-      {series}
+      {authorsList}
+      {seriesList}
     </View>
   )
 }

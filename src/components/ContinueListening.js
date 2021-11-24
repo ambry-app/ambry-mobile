@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer } from 'react'
+import React, { useCallback, useReducer } from 'react'
 import {
   Button,
   FlatList,
@@ -12,6 +12,7 @@ import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 import { useAmbryAPI } from '../contexts/AmbryAPI'
 import { useSelectedMedia } from '../contexts/SelectedMedia'
+import useFirstRender from '../hooks/firstRender'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/playerStates'
@@ -26,7 +27,7 @@ function Item({ playerState, navigation }) {
       onPress={() => {
         navigation.navigate('PlayerScreen')
 
-        if (!selectedMedia || selectedMedia.id != playerState.media.id) {
+        if (!selectedMedia || selectedMedia.id !== playerState.media.id) {
           loadMedia(playerState.media.id, playerState.media.book.imagePath)
         }
       }}
@@ -60,6 +61,7 @@ function Item({ playerState, navigation }) {
 }
 
 export default function ContinueListening({ navigation }) {
+  const isFirstRender = useFirstRender()
   const { getRecentPlayerStates } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
   const { clearMedia } = useSelectedMedia()
@@ -74,32 +76,34 @@ export default function ContinueListening({ navigation }) {
     dispatch(actionCreators.loading())
 
     try {
-      const [nextPlayerStates, hasMore] = await getRecentPlayerStates(nextPage)
-      dispatch(actionCreators.success(nextPlayerStates, nextPage, hasMore))
+      const [nextPlayerStates, newHasMore] = await getRecentPlayerStates(
+        nextPage
+      )
+      dispatch(actionCreators.success(nextPlayerStates, nextPage, newHasMore))
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [hasMore, nextPage])
+  }, [getRecentPlayerStates, hasMore, nextPage])
 
   const refreshPlayerStates = useCallback(async () => {
     dispatch(actionCreators.refresh())
 
     try {
-      const [nextPlayerStates, hasMore] = await getRecentPlayerStates(1)
-      dispatch(actionCreators.success(nextPlayerStates, 1, hasMore, true))
+      const [nextPlayerStates, newHasMore] = await getRecentPlayerStates(1)
+      dispatch(actionCreators.success(nextPlayerStates, 1, newHasMore, true))
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [])
+  }, [getRecentPlayerStates])
 
   const clearMediaAndNavigate = useCallback(() => {
     clearMedia()
     navigation.navigate('PlayerScreen')
-  })
+  }, [clearMedia, navigation])
 
-  useEffect(() => {
+  if (isFirstRender) {
     fetchPlayerStates()
-  }, [])
+  }
 
   // We'll show an error only if the first page fails to load
   if (playerStates.length === 0) {

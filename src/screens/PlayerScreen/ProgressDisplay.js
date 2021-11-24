@@ -54,13 +54,9 @@ const ActualProgressDisplay = memo(
     const opacity = useSharedValue(0)
 
     useEffect(() => {
-      const progressDisplay = buildProgressDisplay(
-        duration,
-        position,
-        buffered,
-        playbackRate
+      setProgressDisplay(
+        buildProgressDisplay(duration, position, buffered, playbackRate)
       )
-      setProgressDisplay(progressDisplay)
     }, [position, buffered, duration, playbackRate])
 
     useEffect(() => {
@@ -69,7 +65,7 @@ const ActualProgressDisplay = memo(
       } else {
         opacity.value = 0
       }
-    }, [progressDisplay])
+    }, [opacity, progressDisplay])
 
     const animatedStyle = useAnimatedStyle(() => {
       return {

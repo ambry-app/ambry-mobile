@@ -75,13 +75,19 @@ const ActualPlaybackRate = memo(({ playbackRate, setPlaybackRate }) => {
                 maximumValue={3.0}
                 step={0.05}
                 thumbTintColor={
-                  scheme == 'dark' ? tw.color('lime-400') : tw.color('lime-500')
+                  scheme === 'dark'
+                    ? tw.color('lime-400')
+                    : tw.color('lime-500')
                 }
                 minimumTrackTintColor={
-                  scheme == 'dark' ? tw.color('gray-400') : tw.color('gray-200')
+                  scheme === 'dark'
+                    ? tw.color('gray-400')
+                    : tw.color('gray-200')
                 }
                 maximumTrackTintColor={
-                  scheme == 'dark' ? tw.color('gray-400') : tw.color('gray-200')
+                  scheme === 'dark'
+                    ? tw.color('gray-400')
+                    : tw.color('gray-200')
                 }
                 onValueChange={async value => {
                   setDisplayPlaybackRate(parseFloat(value.toFixed(2)))

@@ -78,7 +78,7 @@ export function BookmarksToggle({ click }) {
         width={30}
         height={30}
         iconColor={
-          scheme == 'dark' ? tw.color('gray-400') : tw.color('gray-500')
+          scheme === 'dark' ? tw.color('gray-400') : tw.color('gray-500')
         }
       />
     </TouchableOpacity>

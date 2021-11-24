@@ -10,7 +10,9 @@ export default function ForwardButton({ width, height }) {
     <Forward
       width={width}
       height={height}
-      iconColor={scheme == 'dark' ? tw.color('gray-200') : tw.color('gray-700')}
+      iconColor={
+        scheme === 'dark' ? tw.color('gray-200') : tw.color('gray-700')
+      }
     />
   )
 }

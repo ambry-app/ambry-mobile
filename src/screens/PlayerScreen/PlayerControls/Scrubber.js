@@ -134,7 +134,7 @@ export default function Scrubber({
   const scheme = useColorScheme()
 
   const theme =
-    scheme == 'dark'
+    scheme === 'dark'
       ? {
           accent: tw.color('lime-400'),
           strong: tw.color('gray-200'),

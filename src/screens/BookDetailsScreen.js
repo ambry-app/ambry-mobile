@@ -20,12 +20,12 @@ import tw from '../lib/tailwind'
 import { durationDisplay } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/book'
 
-function MediaList({ book, media }) {
+function MediaList({ book, media: mediaList }) {
   const navigation = useNavigation()
   const { selectedMedia, loadMedia } = useSelectedMedia()
-  const mediaLength = media.length
+  const mediaLength = mediaList.length
 
-  if (mediaLength == 0) {
+  if (mediaLength === 0) {
     return (
       <Text style={tw`text-gray-700 dark:text-gray-200 my-4 font-bold`}>
         Sorry, there are no recordings uploaded yet for this book.
@@ -36,7 +36,7 @@ function MediaList({ book, media }) {
       <View
         style={tw`rounded-lg bg-white dark:border-0 dark:bg-gray-800 shadow-lg my-4`}
       >
-        {media.map((media, i) => (
+        {mediaList.map((media, i) => (
           <View key={media.id}>
             <View
               style={tw`overflow-hidden rounded-lg bg-white dark:bg-gray-800`}
@@ -47,7 +47,7 @@ function MediaList({ book, media }) {
                   true
                 )}
                 onPress={() => {
-                  if (selectedMedia?.id != media.id) {
+                  if (selectedMedia?.id !== media.id) {
                     loadMedia(media.id, book.imagePath)
                   }
                   setImmediate(() => {
@@ -90,7 +90,7 @@ function MediaList({ book, media }) {
                 </View>
               </TouchableNativeFeedback>
             </View>
-            {i != mediaLength - 1 && (
+            {i !== mediaLength - 1 && (
               <View
                 style={tw`mx-3 border-t border-gray-200 dark:border-gray-700`}
               />
@@ -112,22 +112,22 @@ export default function BookDetailsScreen({ route, navigation }) {
     dispatch(actionCreators.loading())
 
     try {
-      const book = await getBook(route.params.bookId)
-      dispatch(actionCreators.success(book))
+      const loadedBook = await getBook(route.params.bookId)
+      dispatch(actionCreators.success(loadedBook))
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [route.params.bookId])
+  }, [getBook, route.params.bookId])
 
   useEffect(() => {
     fetchBook()
-  }, [route.params.bookId])
+  }, [fetchBook, route.params.bookId])
 
   useEffect(() => {
     if (book) {
       navigation.setOptions({ title: book.title })
     }
-  }, [book])
+  }, [navigation, book])
 
   if (!book) {
     if (loading) {

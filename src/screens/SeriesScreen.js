@@ -19,22 +19,22 @@ export default function SeriesScreen({ navigation, route }) {
     dispatch(actionCreators.loading())
 
     try {
-      const series = await getSeries(route.params.seriesId)
-      dispatch(actionCreators.success(series))
+      const loadedSeries = await getSeries(route.params.seriesId)
+      dispatch(actionCreators.success(loadedSeries))
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [route.params.seriesId])
+  }, [getSeries, route.params.seriesId])
 
   useEffect(() => {
     fetchSeries()
-  }, [route.params.seriesId])
+  }, [fetchSeries, route.params.seriesId])
 
   useEffect(() => {
     if (series) {
       navigation.setOptions({ title: series.name })
     }
-  }, [series])
+  }, [navigation, series])
 
   if (!series) {
     if (loading) {

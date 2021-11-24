@@ -17,7 +17,7 @@ export default function PlaybackStateButton({ onPress }) {
   const [playing, setPlaying] = useState(false)
 
   useEffect(() => {
-    playbackState == State.Playing ? setPlaying(true) : setPlaying(false)
+    playbackState === State.Playing ? setPlaying(true) : setPlaying(false)
   }, [playbackState])
 
   return (

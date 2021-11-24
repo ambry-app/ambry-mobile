@@ -10,7 +10,7 @@ export default function LargeActivityIndicator({ style }) {
       style={style}
       animating={true}
       size="large"
-      color={scheme == 'dark' ? tw.color('gray-200') : tw.color('gray-700')}
+      color={scheme === 'dark' ? tw.color('gray-200') : tw.color('gray-700')}
     />
   )
 }

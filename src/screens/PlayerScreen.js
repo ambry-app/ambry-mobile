@@ -45,7 +45,7 @@ const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
     } else {
       opacity.value = withTiming(1, { duration: 200 })
     }
-  }, [loading])
+  }, [opacity, loading])
 
   const animatedStyle = useAnimatedStyle(() => {
     return { opacity: opacity.value }

@@ -79,7 +79,7 @@ const TabNavigator = () => {
         headerShown: false,
         tabBarLabelPosition: 'beside-icon',
         tabBarInactiveTintColor:
-          scheme == 'dark' ? tw.color('gray-50') : tw.color('gray-700')
+          scheme === 'dark' ? tw.color('gray-50') : tw.color('gray-700')
       }}
     >
       <Tab.Screen
