@@ -12,7 +12,7 @@ import useBackButton from '../../../hooks/backButton'
 import tw from '../../../lib/tailwind'
 import { secondsDisplay } from '../../../lib/utils'
 
-export function useChapters (ref, loading) {
+export function useChapters(ref, loading) {
   const [chaptersOpen, setChaptersOpen] = useState(false)
 
   const onChaptersChange = useCallback(index => {
@@ -57,7 +57,7 @@ export function useChapters (ref, loading) {
   return { chaptersOpen, onChaptersChange, toggleChapters }
 }
 
-export default function ChapterControls ({ toggleChapters }) {
+export default function ChapterControls({ toggleChapters }) {
   const { state } = usePlayer()
   const { currentChapter } = state
 
@@ -86,7 +86,7 @@ const ActualChapterControls = memo(({ currentChapter, toggleChapters }) => {
   )
 })
 
-function ChaptersHeader () {
+function ChaptersHeader() {
   return (
     <Text
       style={tw`text-2xl font-bold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 py-2 bg-white dark:bg-gray-800`}
@@ -114,8 +114,8 @@ const ChapterItem = memo(({ chapter, active, onPress }) => {
         >
           <View>
             {active && (
-              <Svg height='10' width='10' viewBox='0 0 8 10' style={tw`-ml-4`}>
-                <Path d='M 0 0 L 8 5 L 0 10' fill='white' />
+              <Svg height="10" width="10" viewBox="0 0 8 10" style={tw`-ml-4`}>
+                <Path d="M 0 0 L 8 5 L 0 10" fill="white" />
               </Svg>
             )}
           </View>
@@ -140,7 +140,7 @@ const ChapterItem = memo(({ chapter, active, onPress }) => {
   )
 })
 
-function ChaptersList ({ sheetRef, isOpen }) {
+function ChaptersList({ sheetRef, isOpen }) {
   const { state, actions } = usePlayer()
   const { media, currentChapter } = state
   const { chapters } = media
@@ -199,9 +199,7 @@ const ActualChapterList = memo(
         style={tw`px-4`}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        ListFooterComponent={() => (
-          <View style={{ height: tabBarHeight }}></View>
-        )}
+        ListFooterComponent={() => <View style={{ height: tabBarHeight }} />}
         ListHeaderComponent={() => <ChaptersHeader />}
         stickyHeaderIndices={[0]}
       />
@@ -209,7 +207,7 @@ const ActualChapterList = memo(
   }
 )
 
-export function Chapters ({ sheetRef, onChange, isOpen }) {
+export function Chapters({ sheetRef, onChange, isOpen }) {
   // console.log('RENDERING: Chapters')
   return (
     <BottomSheet

@@ -14,7 +14,7 @@ const SelectedMediaContext = createContext({})
 const SelectedMediaProvider = ({ children }) => {
   const [selectedMedia, setSelectedMedia] = useState()
 
-  async function loadStoredState () {
+  async function loadStoredState() {
     try {
       console.debug(
         'SelectedMediaContext: loading selectedMedia from AsyncStorage'
@@ -70,7 +70,7 @@ const SelectedMediaProvider = ({ children }) => {
   )
 }
 
-function useSelectedMedia () {
+function useSelectedMedia() {
   const context = useContext(SelectedMediaContext)
 
   if (!context) {

@@ -2,7 +2,7 @@ import React from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 import tw from '../lib/tailwind'
 
-export default function WrappingListOfLinks ({
+export default function WrappingListOfLinks({
   prefix,
   suffix,
   items,
@@ -30,13 +30,13 @@ export default function WrappingListOfLinks ({
     .slice(1)
 
   const prefixElement = prefix ? (
-    <Text key='prefix' style={style}>
+    <Text key="prefix" style={style}>
       {prefix}{' '}
     </Text>
   ) : null
 
   const suffixElement = suffix ? (
-    <Text key='suffix' style={style}>
+    <Text key="suffix" style={style}>
       {' '}
       {suffix}
     </Text>

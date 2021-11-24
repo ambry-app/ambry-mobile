@@ -43,7 +43,7 @@ const seekRelative = async interval => {
   updateServerPosition()
 }
 
-export default async function setup () {
+export default async function setup() {
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => {
     playerMutex.runExclusive(() => {
       console.debug('Service: playback queue ended')

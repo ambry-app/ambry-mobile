@@ -1,8 +1,8 @@
-function apiUrl (host, path) {
+function apiUrl(host, path) {
   return `${host}/api/${path}`
 }
 
-async function handleResponse (response, withHasMore = false) {
+async function handleResponse(response, withHasMore = false) {
   if (response.ok) {
     const result = await response.json()
     return withHasMore ? [result.data, result.hasMore] : result.data
@@ -11,49 +11,49 @@ async function handleResponse (response, withHasMore = false) {
   }
 }
 
-export async function getRecentBooks ({ host, token }, page = 1) {
+export async function getRecentBooks({ host, token }, page = 1) {
   const response = await fetch(apiUrl(host, `books?page=${page}`), {
     headers: { Authorization: 'Bearer ' + token }
   })
   return handleResponse(response, true)
 }
 
-export async function getRecentPlayerStates ({ host, token }, page = 1) {
+export async function getRecentPlayerStates({ host, token }, page = 1) {
   const response = await fetch(apiUrl(host, `player_states?page=${page}`), {
     headers: { Authorization: 'Bearer ' + token }
   })
   return handleResponse(response, true)
 }
 
-export async function getBook ({ host, token }, bookId) {
+export async function getBook({ host, token }, bookId) {
   const response = await fetch(apiUrl(host, `books/${bookId}`), {
     headers: { Authorization: 'Bearer ' + token }
   })
   return handleResponse(response)
 }
 
-export async function getPerson ({ host, token }, personId) {
+export async function getPerson({ host, token }, personId) {
   const response = await fetch(apiUrl(host, `people/${personId}`), {
     headers: { Authorization: 'Bearer ' + token }
   })
   return handleResponse(response)
 }
 
-export async function getSeries ({ host, token }, seriesId) {
+export async function getSeries({ host, token }, seriesId) {
   const response = await fetch(apiUrl(host, `series/${seriesId}`), {
     headers: { Authorization: 'Bearer ' + token }
   })
   return handleResponse(response)
 }
 
-export async function getPlayerState ({ host, token }, mediaId) {
+export async function getPlayerState({ host, token }, mediaId) {
   const response = await fetch(apiUrl(host, `player_states/${mediaId}`), {
     headers: { Authorization: 'Bearer ' + token }
   })
   return handleResponse(response)
 }
 
-export async function listBookmarks ({ host, token }, mediaId, page = 1) {
+export async function listBookmarks({ host, token }, mediaId, page = 1) {
   const response = await fetch(
     apiUrl(host, `bookmarks/${mediaId}?page=${page}`),
     {
@@ -63,7 +63,7 @@ export async function listBookmarks ({ host, token }, mediaId, page = 1) {
   return handleResponse(response, true)
 }
 
-export async function reportPlayerState (
+export async function reportPlayerState(
   { host, token },
   { id, position, playbackRate }
 ) {
@@ -84,7 +84,7 @@ export async function reportPlayerState (
   return handleResponse(response)
 }
 
-export async function createToken (host, email, password) {
+export async function createToken(host, email, password) {
   const response = await fetch(apiUrl(host, 'log_in'), {
     method: 'POST',
     headers: {
@@ -101,7 +101,7 @@ export async function createToken (host, email, password) {
   return handleResponse(response)
 }
 
-export function uriSource ({ host, token }, path) {
+export function uriSource({ host, token }, path) {
   return {
     uri: `${host}/${path}`,
     headers: {

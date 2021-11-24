@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { BackHandler } from 'react-native'
 
-export default function useBackButton (handler) {
+export default function useBackButton(handler) {
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', handler)
 

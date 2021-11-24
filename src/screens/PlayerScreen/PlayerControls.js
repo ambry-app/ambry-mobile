@@ -11,7 +11,7 @@ import ForwardButton from './PlayerControls/ForwardButton'
 import PlaybackStateButton from './PlayerControls/PlaybackStateButton'
 import Scrubber from './PlayerControls/Scrubber'
 
-function ScrubberWrapper () {
+function ScrubberWrapper() {
   const { state, actions } = usePlayer()
   const { position, media } = state
   const { chapters, duration } = media
@@ -43,7 +43,7 @@ const ActualScrubberWrapper = memo(
   }
 )
 
-export default function PlayerControls ({ toggleChapters }) {
+export default function PlayerControls({ toggleChapters }) {
   const { actions } = usePlayer()
   const { seekRelative, togglePlayback } = actions
 
@@ -94,7 +94,7 @@ const ActualPlayerControls = memo(
             <ScrubberWrapper />
           </View>
         </View>
-        <View style={{ height: tabBarHeight }}></View>
+        <View style={{ height: tabBarHeight }} />
       </View>
     )
   }

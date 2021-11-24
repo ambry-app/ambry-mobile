@@ -19,7 +19,7 @@ export const initialState = {
   book: null
 }
 
-export function reducer (state, action) {
+export function reducer(state, action) {
   switch (action.type) {
     case types.LOADING:
       return { ...state, loading: true, error: false }

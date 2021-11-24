@@ -23,7 +23,7 @@ const HEIGHT = 60
 const HALF_WIDTH = WIDTH / 2
 const NUM_TICKS = Math.ceil(WIDTH / SPACING)
 
-function friction (value) {
+function friction(value) {
   'worklet'
 
   const MAX_FRICTION = 200
@@ -44,16 +44,16 @@ function friction (value) {
   return res
 }
 
-function timeToTranslateX (time) {
+function timeToTranslateX(time) {
   return time * -FACTOR
 }
 
-function translateXToTime (translateX) {
+function translateXToTime(translateX) {
   'worklet'
   return translateX / -FACTOR
 }
 
-function useIsScrubbing () {
+function useIsScrubbing() {
   const [isScrubbing, _setIsScrubbing] = useState(false)
   const timerRef = useRef()
 
@@ -91,7 +91,7 @@ const Ticks = memo(({ theme }) => {
               ? theme.normal
               : theme.dimmed
           }
-          strokeWidth='1'
+          strokeWidth="1"
         />
       ))}
     </Svg>
@@ -106,14 +106,14 @@ const Markers = memo(({ markers, duration, theme }) => {
           <Rect
             key={i}
             x={marker * FACTOR}
-            y='0'
-            rx='2.5'
-            ry='2.5'
-            height='12'
-            width='5'
+            y="0"
+            rx="2.5"
+            ry="2.5"
+            height="12"
+            width="5"
             fill={theme.accent}
             stroke={theme.weak}
-            strokeWidth='2'
+            strokeWidth="2"
           />
         )
       })}
@@ -121,7 +121,7 @@ const Markers = memo(({ markers, duration, theme }) => {
   )
 })
 
-export default function Scrubber ({
+export default function Scrubber({
   position: positionInput,
   duration,
   onChange,
@@ -205,7 +205,7 @@ export default function Scrubber ({
         )
       }
     },
-    onFinish (_event, ctx) {
+    onFinish(_event, ctx) {
       if (!ctx.animating) {
         const newPosition = translateXToTime(translateX.value)
         runOnJS(onChange)(newPosition)
@@ -291,15 +291,15 @@ export default function Scrubber ({
         />
         <Svg
           style={{ left: HALF_WIDTH - 3.75, top: 4, zIndex: 1 }}
-          height='8'
-          width='8'
-          viewBox='0 0 8 8'
+          height="8"
+          width="8"
+          viewBox="0 0 8 8"
         >
           <Path
-            d='m 0.17 0 c -1 -0 2.83 8 3.83 8 c 1 0 4.83 -8 3.83 -8 z'
+            d="m 0.17 0 c -1 -0 2.83 8 3.83 8 c 1 0 4.83 -8 3.83 -8 z"
             fill={theme.strong}
             stroke={theme.weak}
-            strokeWidth='1'
+            strokeWidth="1"
           />
         </Svg>
 

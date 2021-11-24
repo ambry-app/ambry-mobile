@@ -12,7 +12,7 @@ import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 
-export default function SignInScreen () {
+export default function SignInScreen() {
   const { signIn } = useAmbryAPI()
   const [loading, isLoading] = useState(false)
   const [error, isError] = useState(false)
@@ -37,8 +37,8 @@ export default function SignInScreen () {
     <ScrollView style={tw`p-4`}>
       <View style={tw`py-8 items-center`}>
         <Logo
-          height='86'
-          width='352'
+          height="86"
+          width="352"
           brandColor={
             scheme == 'dark' ? tw.color('lime-400') : tw.color('lime-500')
           }
@@ -53,9 +53,9 @@ export default function SignInScreen () {
         </Text>
       </View>
       <TextInput
-        placeholder='Host'
+        placeholder="Host"
         value={host}
-        autoCapitalize='none'
+        autoCapitalize="none"
         onChangeText={setHost}
         style={tw`my-2 text-gray-700 dark:text-gray-200 border-2 border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700 rounded px-3 py-2`}
         placeholderTextColor={
@@ -63,20 +63,20 @@ export default function SignInScreen () {
         }
       />
       <TextInput
-        placeholder='Email'
+        placeholder="Email"
         value={email}
-        autoCapitalize='none'
+        autoCapitalize="none"
         onChangeText={setEmail}
-        textContentType='emailAddress'
-        autoCompleteType='email'
-        keyboardType='email-address'
+        textContentType="emailAddress"
+        autoCompleteType="email"
+        keyboardType="email-address"
         style={tw`my-2 text-gray-700 dark:text-gray-200 border-2 border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700 rounded px-3 py-2`}
         placeholderTextColor={
           scheme == 'dark' ? tw.color('gray-500') : tw.color('gray-300')
         }
       />
       <TextInput
-        placeholder='Password'
+        placeholder="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -86,7 +86,7 @@ export default function SignInScreen () {
         }
       />
       <Button
-        title='Sign in'
+        title="Sign in"
         color={tw.color('lime-500')}
         onPress={() => signInCallback(host, email, password)}
         disabled={loading}

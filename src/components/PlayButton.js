@@ -3,7 +3,7 @@ import { useColorScheme } from 'react-native'
 import Play from '../assets/play.svg'
 import tw from '../lib/tailwind'
 
-export default function PlayButton ({ width, height, iconColor, ringColor }) {
+export default function PlayButton({ width, height, iconColor, ringColor }) {
   const scheme = useColorScheme()
 
   return (

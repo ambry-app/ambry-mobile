@@ -3,7 +3,7 @@ import { StyleSheet, useColorScheme } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 import tw from '../lib/tailwind'
 
-export default function Description ({ description }) {
+export default function Description({ description }) {
   const scheme = useColorScheme()
   const markdownStyles = StyleSheet.create({
     body: {

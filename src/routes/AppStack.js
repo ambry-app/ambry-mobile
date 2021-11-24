@@ -22,21 +22,21 @@ const LibraryStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name='Recent'
+        name="Recent"
         options={{ title: 'Newest books' }}
         component={RecentBooksScreen}
       />
       <Stack.Screen
-        name='Book'
+        name="Book"
         options={{ title: 'Book details' }}
         component={BookDetailsScreen}
       />
       <Stack.Screen
-        name='Person'
+        name="Person"
         options={{ title: 'Person details' }}
         component={PersonDetailsScreen}
       />
-      <Stack.Screen name='Series' component={SeriesScreen} />
+      <Stack.Screen name="Series" component={SeriesScreen} />
     </Stack.Navigator>
   )
 }
@@ -62,7 +62,7 @@ const PlayerDrawer = () => {
       }}
     >
       <Drawer.Screen
-        name='PlayerScreen'
+        name="PlayerScreen"
         options={{ headerShown: false }}
         component={PlayerScreenWithContext}
       />
@@ -83,7 +83,7 @@ const TabNavigator = () => {
       }}
     >
       <Tab.Screen
-        name='PlayerDrawer'
+        name="PlayerDrawer"
         options={{
           title: 'Player',
           tabBarIcon: ({ color, size }) => (
@@ -100,7 +100,7 @@ const TabNavigator = () => {
         component={PlayerDrawer}
       />
       <Tab.Screen
-        name='Library'
+        name="Library"
         options={{
           lazy: false,
           tabBarIcon: ({ color, size }) => (

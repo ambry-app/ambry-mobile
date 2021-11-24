@@ -3,7 +3,7 @@ import { FlatList } from 'react-native'
 import tw from '../lib/tailwind'
 import BookLink from './BookLink'
 
-export default function BookGrid ({
+export default function BookGrid({
   books,
   onEndReached,
   onRefresh,

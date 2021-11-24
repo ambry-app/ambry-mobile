@@ -3,7 +3,7 @@ import { useColorScheme } from 'react-native'
 import Forward10 from '../../../assets/forward_10.svg'
 import tw from '../../../lib/tailwind'
 
-export default function Forward10Button ({ width, height }) {
+export default function Forward10Button({ width, height }) {
   const scheme = useColorScheme()
 
   return (

@@ -9,7 +9,7 @@ import { usePlayer } from '../../contexts/Player'
 import tw from '../../lib/tailwind'
 import { progressPercent, secondsDisplay } from '../../lib/utils'
 
-function buildProgressDisplay (
+function buildProgressDisplay(
   durationSeconds,
   positionSeconds,
   bufferedSeconds,
@@ -32,7 +32,7 @@ function buildProgressDisplay (
   }
 }
 
-export default function ProgressDisplay () {
+export default function ProgressDisplay() {
   const { state } = usePlayer()
   const { position, buffered, media, playbackRate } = state
   const { duration } = media
@@ -87,12 +87,12 @@ const ActualProgressDisplay = memo(
               style={tw.style('absolute h-2 bg-gray-400 dark:bg-gray-500', {
                 width: progressDisplay?.bufferedPercent
               })}
-            ></View>
+            />
             <View
               style={tw.style('h-2 bg-lime-500 dark:bg-lime-400', {
                 width: progressDisplay?.percent
               })}
-            ></View>
+            />
           </View>
         </View>
         <View style={tw`flex-row justify-between`}>

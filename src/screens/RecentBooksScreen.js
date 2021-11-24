@@ -7,7 +7,7 @@ import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 import { actionCreators, initialState, reducer } from '../reducers/books'
 
-export default function RecentBooksScreen () {
+export default function RecentBooksScreen() {
   const { getRecentBooks } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -60,7 +60,7 @@ export default function RecentBooksScreen () {
             Failed to load books!
           </Text>
           <Button
-            title='Retry'
+            title="Retry"
             color={tw.color('lime-500')}
             onPress={fetchBooks}
           />

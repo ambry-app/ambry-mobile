@@ -17,7 +17,7 @@ import { progressPercent } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/playerStates'
 import WrappingList from './WrappingList'
 
-function Item ({ playerState, navigation }) {
+function Item({ playerState, navigation }) {
   const { selectedMedia, loadMedia } = useSelectedMedia()
   const { uriSource } = useAmbryAPI()
 
@@ -59,7 +59,7 @@ function Item ({ playerState, navigation }) {
   )
 }
 
-export default function ContinueListening ({ navigation }) {
+export default function ContinueListening({ navigation }) {
   const { getRecentPlayerStates } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
   const { clearMedia } = useSelectedMedia()
@@ -138,7 +138,7 @@ export default function ContinueListening ({ navigation }) {
           <View style={tw`h-14`}>
             {__DEV__ && (
               <Button
-                title='Clear Selected Media'
+                title="Clear Selected Media"
                 onPress={clearMediaAndNavigate}
               />
             )}

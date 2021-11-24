@@ -6,7 +6,7 @@ import { Header2 } from '../../components/Headers'
 import WrappingListOfLinks from '../../components/WrappingListOfLinks'
 import tw from '../../lib/tailwind'
 
-export default function BookDetails ({ imageSource, media }) {
+export default function BookDetails({ imageSource, media }) {
   const navigation = useNavigation()
 
   return (
@@ -35,7 +35,7 @@ export default function BookDetails ({ imageSource, media }) {
           <Header2>{media.book.title}</Header2>
         </TouchableOpacity>
         <WrappingListOfLinks
-          prefix='by'
+          prefix="by"
           items={media.book.authors}
           onPressLink={author => {
             navigation.dispatch(
@@ -49,7 +49,7 @@ export default function BookDetails ({ imageSource, media }) {
           linkStyle={tw`leading-none text-lg text-lime-500 dark:text-lime-400`}
         />
         <WrappingListOfLinks
-          prefix='Narrated by'
+          prefix="Narrated by"
           suffix={media.fullCast ? 'and a full cast' : null}
           items={media.narrators}
           keyExtractor={narrator => narrator.personId}

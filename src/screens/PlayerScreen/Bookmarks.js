@@ -24,7 +24,7 @@ import tw from '../../lib/tailwind'
 import { secondsDisplay } from '../../lib/utils'
 import { actionCreators, initialState, reducer } from '../../reducers/bookmarks'
 
-export function useBookmarks (ref, loadingMedia) {
+export function useBookmarks(ref, loadingMedia) {
   const [bookmarksOpen, setBookmarksOpen] = useState(false)
 
   const onBookmarksChange = useCallback(index => {
@@ -69,7 +69,7 @@ export function useBookmarks (ref, loadingMedia) {
   return { onBookmarksChange, toggleBookmarks }
 }
 
-export function BookmarksToggle ({ click }) {
+export function BookmarksToggle({ click }) {
   const scheme = useColorScheme()
 
   return (
@@ -85,7 +85,7 @@ export function BookmarksToggle ({ click }) {
   )
 }
 
-function BookmarksHeader ({ click }) {
+function BookmarksHeader({ click }) {
   return (
     <View style={tw`flex-row flex-row-reverse my-2 `}>
       <View
@@ -110,7 +110,7 @@ function BookmarksHeader ({ click }) {
   )
 }
 
-function BookmarkItem ({
+function BookmarkItem({
   bookmark,
   longPressRef,
   sheetRef,
@@ -157,7 +157,7 @@ function BookmarkItem ({
   )
 }
 
-function BookmarksList ({ longPressRef, sheetRef, seek }) {
+function BookmarksList({ longPressRef, sheetRef, seek }) {
   const { listBookmarks } = useAmbryAPI()
   const tabBarHeight = useBottomTabBarHeight()
   const { selectedMedia } = useSelectedMedia()
@@ -231,7 +231,7 @@ function BookmarksList ({ longPressRef, sheetRef, seek }) {
       onEndReached={fetchBookmarks}
       // onRefresh={refreshBookmarks}
       // refreshing={refreshing}
-      ListFooterComponent={() => <View style={{ height: tabBarHeight }}></View>}
+      ListFooterComponent={() => <View style={{ height: tabBarHeight }} />}
       ListHeaderComponent={() => (
         <BookmarksHeader click={() => console.log('new bookmark')} />
       )}
@@ -240,7 +240,7 @@ function BookmarksList ({ longPressRef, sheetRef, seek }) {
   )
 }
 
-export function Bookmarks ({ sheetRef, onChange, seek }) {
+export function Bookmarks({ sheetRef, onChange, seek }) {
   const longPressRef = createRef()
 
   return (

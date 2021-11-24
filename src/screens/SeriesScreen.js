@@ -9,7 +9,7 @@ import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 import { actionCreators, initialState, reducer } from '../reducers/series'
 
-export default function SeriesScreen ({ navigation, route }) {
+export default function SeriesScreen({ navigation, route }) {
   const { getSeries } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -67,7 +67,7 @@ export default function SeriesScreen ({ navigation, route }) {
           <View style={tw`ml-2 mt-2`}>
             <Header1>{series.name}</Header1>
             <WrappingListOfLinks
-              prefix='by'
+              prefix="by"
               items={uniqueAuthors}
               onPressLink={author =>
                 navigation.push('Person', { personId: author.personId })

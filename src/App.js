@@ -9,7 +9,7 @@ import { Router } from './routes/Router'
 
 initTransparentStatusBar()
 
-export default function App () {
+export default function App() {
   const scheme = useColorScheme()
 
   useDeviceContext(tw)
@@ -20,7 +20,7 @@ export default function App () {
         <StatusBar
           translucent={true}
           backgroundColor={'transparent'}
-          barStyle={scheme == 'dark' ? 'light-content' : 'dark-content'}
+          barStyle={scheme === 'dark' ? 'light-content' : 'dark-content'}
         />
         <Router />
       </AmbryAPIProvider>

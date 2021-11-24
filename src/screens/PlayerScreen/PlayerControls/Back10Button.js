@@ -3,7 +3,7 @@ import { useColorScheme } from 'react-native'
 import Back10 from '../../../assets/back_10.svg'
 import tw from '../../../lib/tailwind'
 
-export default function Back10Button ({ width, height }) {
+export default function Back10Button({ width, height }) {
   const scheme = useColorScheme()
 
   return (

@@ -9,7 +9,7 @@ import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 import { actionCreators, initialState, reducer } from '../reducers/person'
 
-function PersonHeader ({ person }) {
+function PersonHeader({ person }) {
   const { uriSource } = useAmbryAPI()
 
   return (
@@ -30,7 +30,7 @@ function PersonHeader ({ person }) {
   )
 }
 
-export default function PersonDetailsScreen ({ route, navigation }) {
+export default function PersonDetailsScreen({ route, navigation }) {
   const { getPerson } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 

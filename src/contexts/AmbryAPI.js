@@ -150,9 +150,10 @@ const AmbryAPIProvider = ({ children }) => {
     [authData]
   )
 
-  const uriSource = useCallback(path => API.uriSource(authData, path), [
-    authData
-  ])
+  const uriSource = useCallback(
+    path => API.uriSource(authData, path),
+    [authData]
+  )
 
   const contextValue = {
     loggedIn,
@@ -183,7 +184,7 @@ const AmbryAPIProvider = ({ children }) => {
   )
 }
 
-function useAmbryAPI () {
+function useAmbryAPI() {
   const context = useContext(AmbryAPIContext)
 
   if (!context) {

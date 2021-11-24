@@ -13,7 +13,7 @@ import ScreenCentered from '../../components/ScreenCentered'
 import { usePlayer } from '../../contexts/Player'
 import tw from '../../lib/tailwind'
 
-function formatPlaybackRate (rate) {
+function formatPlaybackRate(rate) {
   if (!rate) {
     return '1.0'
   }
@@ -24,7 +24,7 @@ function formatPlaybackRate (rate) {
   }
 }
 
-export default function PlaybackRate () {
+export default function PlaybackRate() {
   const { state, actions } = usePlayer()
   const { playbackRate } = state
   const { setPlaybackRate } = actions
@@ -50,7 +50,7 @@ const ActualPlaybackRate = memo(({ playbackRate, setPlaybackRate }) => {
   return (
     <>
       <Modal
-        animationType='fade'
+        animationType="fade"
         transparent={true}
         visible={rateModalVisible}
         onRequestClose={() => {
@@ -130,7 +130,7 @@ const ActualPlaybackRate = memo(({ playbackRate, setPlaybackRate }) => {
             </View>
             <View style={tw`flex-row-reverse bg-gray-100 dark:bg-gray-700 p-4`}>
               <Button
-                title='Ok'
+                title="Ok"
                 color={tw.color('lime-500')}
                 onPress={() => setRateModalVisible(!rateModalVisible)}
               />

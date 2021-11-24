@@ -3,7 +3,7 @@ import { useColorScheme } from 'react-native'
 import PlusCircle from '../assets/plus_circle.svg'
 import tw from '../lib/tailwind'
 
-export default function PlusCircleButton ({ width, height }) {
+export default function PlusCircleButton({ width, height }) {
   const scheme = useColorScheme()
 
   return (

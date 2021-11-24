@@ -2,7 +2,7 @@ import React from 'react'
 import { Text, View } from 'react-native'
 import tw from '../lib/tailwind'
 
-export default function WrappingList ({
+export default function WrappingList({
   prefix,
   items,
   keyExtractor = item => item.id,
@@ -24,7 +24,7 @@ export default function WrappingList ({
     .slice(1)
 
   const prefixElement = prefix ? (
-    <Text key='prefix' style={style}>
+    <Text key="prefix" style={style}>
       {prefix}{' '}
     </Text>
   ) : null

@@ -10,7 +10,7 @@ import {
 import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 
-export default function BookLink ({ book }) {
+export default function BookLink({ book }) {
   const { uriSource } = useAmbryAPI()
   const navigation = useNavigation()
 

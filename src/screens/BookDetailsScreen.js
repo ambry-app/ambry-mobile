@@ -20,7 +20,7 @@ import tw from '../lib/tailwind'
 import { durationDisplay } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/book'
 
-function MediaList ({ book, media }) {
+function MediaList({ book, media }) {
   const navigation = useNavigation()
   const { selectedMedia, loadMedia } = useSelectedMedia()
   const mediaLength = media.length
@@ -62,7 +62,7 @@ function MediaList ({ book, media }) {
                 >
                   <View style={tw`flex-shrink`}>
                     <WrappingListOfLinks
-                      prefix='Narrated by'
+                      prefix="Narrated by"
                       suffix={media.fullCast ? 'and a full cast' : null}
                       items={media.narrators}
                       keyExtractor={narrator => narrator.personId}
@@ -102,7 +102,7 @@ function MediaList ({ book, media }) {
   }
 }
 
-export default function BookDetailsScreen ({ route, navigation }) {
+export default function BookDetailsScreen({ route, navigation }) {
   const { getBook, uriSource } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -153,7 +153,7 @@ export default function BookDetailsScreen ({ route, navigation }) {
         <View style={tw`p-4`}>
           <Header1>{book.title}</Header1>
           <WrappingListOfLinks
-            prefix='by'
+            prefix="by"
             items={book.authors}
             onPressLink={author =>
               navigation.push('Person', { personId: author.personId })

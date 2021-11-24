@@ -34,7 +34,7 @@ const PlayerContext = createContext({})
 
 export const playerMutex = new Mutex()
 
-function mediaTrackForPlatform (uriSource, media) {
+function mediaTrackForPlatform(uriSource, media) {
   const path = Platform.OS === 'ios' ? media.hlsPath : media.mpdPath
   const type = Platform.OS === 'ios' ? TrackType.HLS : TrackType.Dash
   const { uri: url } = uriSource(path)
@@ -42,7 +42,7 @@ function mediaTrackForPlatform (uriSource, media) {
   return { url, type }
 }
 
-function findChapter (position, chapters) {
+function findChapter(position, chapters) {
   const rounded = Math.round(position)
   return chapters.find(
     chapter =>
@@ -51,7 +51,7 @@ function findChapter (position, chapters) {
   )
 }
 
-async function updateServerPositionNoLock (reportPlayerState) {
+async function updateServerPositionNoLock(reportPlayerState) {
   const position = await TrackPlayer.getPosition()
   const track = await TrackPlayer.getTrack(0)
 
@@ -71,7 +71,7 @@ async function updateServerPositionNoLock (reportPlayerState) {
   reportPlayerState(playerStateReport)
 }
 
-async function setTrackPlayerPlaybackRate (
+async function setTrackPlayerPlaybackRate(
   newPlaybackRate,
   reportPlayerState,
   setPlaybackRate
@@ -104,7 +104,7 @@ async function setTrackPlayerPlaybackRate (
   })
 }
 
-async function togglePlaybackNoLock (reportPlayerState) {
+async function togglePlaybackNoLock(reportPlayerState) {
   console.debug('Player: toggling playback')
 
   const playbackState = await TrackPlayer.getState()
@@ -119,11 +119,11 @@ async function togglePlaybackNoLock (reportPlayerState) {
   }
 }
 
-function togglePlayback (reportPlayerState) {
+function togglePlayback(reportPlayerState) {
   playerMutex.runExclusive(() => togglePlaybackNoLock(reportPlayerState))
 }
 
-async function seekRelativeNoLock (interval, reportPlayerState) {
+async function seekRelativeNoLock(interval, reportPlayerState) {
   console.debug('Player: seeking', interval)
 
   const position = await TrackPlayer.getPosition()
@@ -138,7 +138,7 @@ async function seekRelativeNoLock (interval, reportPlayerState) {
   updateServerPositionNoLock(reportPlayerState)
 }
 
-async function seekToNoLock (position, reportPlayerState) {
+async function seekToNoLock(position, reportPlayerState) {
   console.debug('Player: seeking to', position)
 
   await TrackPlayer.seekTo(position)
@@ -146,11 +146,11 @@ async function seekToNoLock (position, reportPlayerState) {
   updateServerPositionNoLock(reportPlayerState)
 }
 
-function seekTo (position, reportPlayerState) {
+function seekTo(position, reportPlayerState) {
   playerMutex.runExclusive(() => seekToNoLock(position, reportPlayerState))
 }
 
-function usePosition (
+function usePosition(
   setPosition,
   trackPlayerReady,
   loading,
@@ -195,7 +195,7 @@ function usePosition (
   ])
 }
 
-export default function PlayerProvider ({ children }) {
+export default function PlayerProvider({ children }) {
   const { getPlayerState, reportPlayerState, uriSource } = useAmbryAPI()
   const { selectedMedia } = useSelectedMedia()
   const [state, updateState] = useImmer(initialState)
@@ -472,7 +472,7 @@ export default function PlayerProvider ({ children }) {
   )
 }
 
-function usePlayer () {
+function usePlayer() {
   const context = useContext(PlayerContext)
 
   if (!context) {

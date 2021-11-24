@@ -21,7 +21,7 @@ import {
 import PlayerHeader from './PlayerScreen/PlayerHeader'
 import ProgressDisplay from './PlayerScreen/ProgressDisplay'
 
-export default function PlayerScreen () {
+export default function PlayerScreen() {
   const { state } = usePlayer()
   const { error, loading, media, imageSource } = state
 

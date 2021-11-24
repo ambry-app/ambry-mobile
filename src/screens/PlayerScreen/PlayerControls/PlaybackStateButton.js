@@ -4,7 +4,7 @@ import { State, usePlaybackState } from 'react-native-track-player'
 import PauseButton from '../../../components/PauseButton'
 import PlayButton from '../../../components/PlayButton'
 
-function Button ({ playing }) {
+function Button({ playing }) {
   return playing ? (
     <PauseButton width={75} height={75} />
   ) : (
@@ -12,7 +12,7 @@ function Button ({ playing }) {
   )
 }
 
-export default function PlaybackStateButton ({ onPress }) {
+export default function PlaybackStateButton({ onPress }) {
   const playbackState = usePlaybackState()
   const [playing, setPlaying] = useState(false)
 

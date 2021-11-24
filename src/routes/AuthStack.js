@@ -8,7 +8,7 @@ export const AuthStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name='SignIn'
+        name="SignIn"
         options={{ title: 'Sign In' }}
         component={SignInScreen}
       />
