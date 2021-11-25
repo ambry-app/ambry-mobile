@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
-import { Dimensions, useColorScheme } from 'react-native'
+import { Dimensions, StyleSheet } from 'react-native'
 import { PanGestureHandler } from 'react-native-gesture-handler'
 import Animated, {
   Easing,
@@ -13,7 +13,6 @@ import Animated, {
 } from 'react-native-reanimated'
 import { clamp, ReText } from 'react-native-redash'
 import Svg, { Line, Path, Rect } from 'react-native-svg'
-import tw from '../../../lib/tailwind'
 
 const SPACING = 10 // pixels between ticks
 const FACTOR = SPACING / 5 // 5 seconds per tick
@@ -69,7 +68,7 @@ function useIsScrubbing() {
         _setIsScrubbing(false)
       }, 1000)
     }
-  })
+  }, [])
 
   return [isScrubbing, setIsScrubbing]
 }
@@ -83,11 +82,11 @@ const Ticks = memo(({ theme }) => {
           x1={0.5 + i * SPACING}
           y1={0}
           x2={0.5 + i * SPACING}
-          y2={i % 12 == 0 ? 40 : i % 6 == 0 ? 32 : 24}
+          y2={i % 12 === 0 ? 40 : i % 6 === 0 ? 32 : 24}
           stroke={
-            i % 12 == 0
+            i % 12 === 0
               ? theme.emphasized
-              : i % 6 == 0
+              : i % 6 === 0
               ? theme.normal
               : theme.dimmed
           }
@@ -125,32 +124,13 @@ export default function Scrubber({
   position: positionInput,
   duration,
   onChange,
-  markers
+  markers,
+  theme
 }) {
   // console.log('RENDERING: Scrubber')
   const translateX = useSharedValue(timeToTranslateX(Math.round(positionInput)))
   const [isScrubbing, setIsScrubbing] = useIsScrubbing()
   const maxTranslateX = timeToTranslateX(duration)
-  const scheme = useColorScheme()
-
-  const theme =
-    scheme === 'dark'
-      ? {
-          accent: tw.color('lime-400'),
-          strong: tw.color('gray-200'),
-          emphasized: tw.color('gray-300'),
-          normal: tw.color('gray-400'),
-          dimmed: tw.color('gray-500'),
-          weak: tw.color('gray-800')
-        }
-      : {
-          accent: tw.color('lime-500'),
-          strong: tw.color('gray-800'),
-          emphasized: tw.color('gray-600'),
-          normal: tw.color('gray-500'),
-          dimmed: tw.color('gray-400'),
-          weak: tw.color('gray-300')
-        }
 
   const onGestureEventHandler = useAnimatedGestureHandler({
     onStart: (_event, ctx) => {
@@ -261,7 +241,7 @@ export default function Scrubber({
     const minutes = Math.floor((total % 3600) / 60).toString()
     const seconds = Math.floor((total % 3600) % 60).toString()
 
-    if (hours == '0') {
+    if (hours === '0') {
       return `${minutes}:${seconds.padStart(2, '0')}`
     } else {
       return `${hours}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`
@@ -272,29 +252,16 @@ export default function Scrubber({
     if (!isScrubbing) {
       translateX.value = timeToTranslateX(Math.round(positionInput))
     }
-  }, [positionInput])
+  }, [translateX, isScrubbing, positionInput])
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEventHandler}>
       <Animated.View>
         <ReText
           text={timecode}
-          style={{
-            fontWeight: '300',
-            fontSize: 16,
-            padding: 0,
-            marginBottom: -6,
-            textAlign: 'center',
-            color: theme.strong,
-            fontVariant: ['tabular-nums']
-          }}
+          style={[styles.timecode, { color: theme.strong }]}
         />
-        <Svg
-          style={{ left: HALF_WIDTH - 3.75, top: 4, zIndex: 1 }}
-          height="8"
-          width="8"
-          viewBox="0 0 8 8"
-        >
+        <Svg style={styles.indicator} height="8" width="8" viewBox="0 0 8 8">
           <Path
             d="m 0.17 0 c -1 -0 2.83 8 3.83 8 c 1 0 4.83 -8 3.83 -8 z"
             fill={theme.strong}
@@ -303,28 +270,45 @@ export default function Scrubber({
           />
         </Svg>
 
-        <Animated.View
-          style={[
-            { height: HEIGHT, width: WIDTH + 12 * SPACING },
-            animatedScrubberStyle
-          ]}
-        >
-          <Animated.View
-            style={[{ height: HEIGHT, overflow: 'hidden' }, animatedMaskStyle]}
-          >
+        <Animated.View style={[styles.scrubber, animatedScrubberStyle]}>
+          <Animated.View style={[styles.mask, animatedMaskStyle]}>
             <Ticks theme={theme} />
           </Animated.View>
         </Animated.View>
 
-        <Animated.View
-          style={[
-            { position: 'absolute', bottom: 42, left: -2 },
-            animatedMarkerStyle
-          ]}
-        >
+        <Animated.View style={[styles.markers, animatedMarkerStyle]}>
           <Markers markers={markers} duration={duration} theme={theme} />
         </Animated.View>
       </Animated.View>
     </PanGestureHandler>
   )
 }
+
+const styles = StyleSheet.create({
+  timecode: {
+    fontWeight: '300',
+    fontSize: 16,
+    padding: 0,
+    marginBottom: -6,
+    textAlign: 'center',
+    fontVariant: ['tabular-nums']
+  },
+  indicator: {
+    left: HALF_WIDTH - 3.75,
+    top: 4,
+    zIndex: 1
+  },
+  scrubber: {
+    height: HEIGHT,
+    width: WIDTH + 12 * SPACING
+  },
+  mask: {
+    height: HEIGHT,
+    overflow: 'hidden'
+  },
+  markers: {
+    position: 'absolute',
+    bottom: 42,
+    left: -2
+  }
+})

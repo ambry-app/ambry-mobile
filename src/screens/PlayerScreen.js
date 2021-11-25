@@ -51,12 +51,6 @@ const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
     return { opacity: opacity.value }
   })
 
-  // const bookmarksRef = useRef()
-  // const { onBookmarksChange, toggleBookmarks } = useBookmarks(
-  //   bookmarksRef,
-  //   loading
-  // )
-
   const chaptersRef = useRef()
   const { chaptersOpen, onChaptersChange, toggleChapters } = useChapters(
     chaptersRef,
@@ -118,7 +112,6 @@ const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
               <BookDetails imageSource={imageSource} media={media} />
               <ProgressDisplay />
               <View style={tw`flex-row`}>
-                {/* <BookmarksToggle click={toggleBookmarks} /> */}
                 <View style={tw`flex-grow`} />
                 <PlaybackRate />
               </View>
@@ -127,11 +120,6 @@ const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
           </View>
         </Animated.View>
       </Background>
-      {/* <Bookmarks
-        sheetRef={bookmarksRef}
-        onChange={onBookmarksChange}
-        seek={seekTo}
-      /> */}
       <Chapters
         sheetRef={chaptersRef}
         onChange={onChaptersChange}

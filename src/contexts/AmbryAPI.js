@@ -24,7 +24,7 @@ const clearSession = state => ({
   loggedIn: false
 })
 
-const ready = state => ({
+const setReady = state => ({
   ...state,
   ready: true
 })
@@ -39,11 +39,11 @@ const loadSessionFromStorage = async setState => {
 
       console.debug('AmbryAPI: Restored session from EncryptedStorage')
 
-      setState(pipe(setSession(authData), ready))
+      setState(pipe(setSession(authData), setReady))
     } else {
       console.debug('AmbryAPI: No session present in EncryptedStorage')
 
-      setState(pipe(clearSession, ready))
+      setState(pipe(clearSession, setReady))
     }
   } catch (error) {
     console.error(
@@ -51,45 +51,21 @@ const loadSessionFromStorage = async setState => {
       error
     )
 
-    setState(pipe(clearSession, ready))
+    setState(pipe(clearSession, setReady))
   }
 }
 
-const doSignIn = setState => async (host, email, password) => {
-  console.debug('AmbryAPI: Signing in with the server')
-
-  const { token } = await createToken(host, email, password)
-  const authData = { host, email, token }
-
-  console.debug(`AmbryAPI: Signed in as ${email} at host ${host}`)
-
-  setState(setSession(authData))
-  EncryptedStorage.setItem('userSession', JSON.stringify(authData))
-}
-
-const doSignOut = setState => () => {
-  console.debug('AmbryAPI: Signing out')
-
-  // TODO: call signOut in API so it also invalidates the session server-side.
-  // TODO: keep email and host and restore them in the sign-in form for
-  // convenience.
-  setState(clearSession)
-  EncryptedStorage.removeItem('userSession')
-}
-
-const useAPICallback = (func, setState, deps) => {
-  return useCallback(async (...args) => {
-    try {
-      return await func(...args)
-    } catch (error) {
-      if (error === 401) {
-        doSignOut(setState)
-      } else {
-        console.warn('AmbryAPI: Unhandled API call error', error)
-      }
-      throw error
+const doAPICall = async (signOut, apiFunc, ...args) => {
+  try {
+    return await apiFunc(...args)
+  } catch (error) {
+    if (error === 401) {
+      signOut()
+    } else {
+      console.warn('AmbryAPI: Unhandled API call error', error)
     }
-  }, deps)
+    throw error
+  }
 }
 
 const AmbryAPIProvider = ({ children }) => {
@@ -98,56 +74,68 @@ const AmbryAPIProvider = ({ children }) => {
   const { authData, loggedIn, ready } = state
 
   // Authentication actions
-  const signIn = useCallback(doSignIn(setState), [])
-  const signOut = useCallback(doSignOut(setState), [])
+  const signIn = useCallback(async (host, email, password) => {
+    console.debug('AmbryAPI: Signing in with the server')
+
+    const { token } = await createToken(host, email, password)
+    const newAuthData = { host, email, token }
+
+    console.debug(`AmbryAPI: Signed in as ${email} at host ${host}`)
+
+    setState(setSession(newAuthData))
+    EncryptedStorage.setItem('userSession', JSON.stringify(newAuthData))
+  }, [])
+
+  const signOut = useCallback(() => {
+    console.debug('AmbryAPI: Signing out')
+
+    // TODO: call signOut in API so it also invalidates the session server-side.
+    // TODO: keep email and host and restore them in the sign-in form for
+    // convenience.
+    setState(clearSession)
+    EncryptedStorage.removeItem('userSession')
+  }, [])
 
   // API calls
-  const getRecentBooks = useAPICallback(
-    page => API.getRecentBooks(authData, page),
-    setState,
-    [authData]
+  const getRecentBooks = useCallback(
+    page => doAPICall(signOut, API.getRecentBooks, authData, page),
+    [authData, signOut]
   )
 
-  const getRecentPlayerStates = useAPICallback(
-    page => API.getRecentPlayerStates(authData, page),
-    setState,
-    [authData]
+  const getRecentPlayerStates = useCallback(
+    page => doAPICall(signOut, API.getRecentPlayerStates, authData, page),
+    [authData, signOut]
   )
 
-  const getBook = useAPICallback(
-    bookId => API.getBook(authData, bookId),
-    setState,
-    [authData]
+  const getBook = useCallback(
+    bookId => doAPICall(signOut, API.getBook, authData, bookId),
+    [authData, signOut]
   )
 
-  const getPerson = useAPICallback(
-    personId => API.getPerson(authData, personId),
-    setState,
-    [authData]
+  const getPerson = useCallback(
+    personId => doAPICall(signOut, API.getPerson, authData, personId),
+    [authData, signOut]
   )
 
-  const getSeries = useAPICallback(
-    seriesId => API.getSeries(authData, seriesId),
-    setState,
-    [authData]
+  const getSeries = useCallback(
+    seriesId => doAPICall(signOut, API.getSeries, authData, seriesId),
+    [authData, signOut]
   )
 
-  const getPlayerState = useAPICallback(
-    mediaId => API.getPlayerState(authData, mediaId),
-    setState,
-    [authData]
+  const getPlayerState = useCallback(
+    mediaId => doAPICall(signOut, API.getPlayerState, authData, mediaId),
+    [authData, signOut]
   )
 
-  const listBookmarks = useAPICallback(
-    page => API.listBookmarks(authData, page),
-    setState,
-    [authData]
+  const listBookmarks = useCallback(
+    page => doAPICall(signOut, API.listBookmarks, authData, page),
+    [authData, signOut]
   )
 
-  const reportPlayerState = useAPICallback(
-    stateReport => API.reportPlayerState(authData, stateReport),
-    setState,
-    [authData]
+  const reportPlayerState = useCallback(
+    stateReport =>
+      doAPICall(signOut, API.reportPlayerState, authData, stateReport),
+    [authData, signOut]
   )
 
   const uriSource = useCallback(

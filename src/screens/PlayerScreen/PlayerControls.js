@@ -1,6 +1,12 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import React, { memo } from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View
+} from 'react-native'
 import { usePlayer } from '../../contexts/Player'
 import tw from '../../lib/tailwind'
 import Back10Button from './PlayerControls/Back10Button'
@@ -12,10 +18,30 @@ import PlaybackStateButton from './PlayerControls/PlaybackStateButton'
 import Scrubber from './PlayerControls/Scrubber'
 
 function ScrubberWrapper() {
+  const scheme = useColorScheme()
   const { state, actions } = usePlayer()
   const { position, media } = state
   const { chapters, duration } = media
   const { seekTo } = actions
+
+  const theme =
+    scheme === 'dark'
+      ? {
+          accent: tw.color('lime-400'),
+          strong: tw.color('gray-200'),
+          emphasized: tw.color('gray-300'),
+          normal: tw.color('gray-400'),
+          dimmed: tw.color('gray-500'),
+          weak: tw.color('gray-800')
+        }
+      : {
+          accent: tw.color('lime-500'),
+          strong: tw.color('gray-800'),
+          emphasized: tw.color('gray-600'),
+          normal: tw.color('gray-500'),
+          dimmed: tw.color('gray-400'),
+          weak: tw.color('gray-300')
+        }
 
   return (
     <ActualScrubberWrapper
@@ -23,12 +49,13 @@ function ScrubberWrapper() {
       duration={duration}
       seekTo={seekTo}
       chapters={chapters}
+      theme={theme}
     />
   )
 }
 
 const ActualScrubberWrapper = memo(
-  ({ position, duration, seekTo, chapters }) => {
+  ({ position, duration, seekTo, chapters, theme }) => {
     const markers = chapters.map(
       chapter => Math.round(chapter.startTime / 5) * 5
     )
@@ -38,6 +65,7 @@ const ActualScrubberWrapper = memo(
         duration={duration}
         onChange={seekTo}
         markers={markers}
+        theme={theme}
       />
     )
   }
@@ -62,12 +90,12 @@ const ActualPlayerControls = memo(
     const tabBarHeight = useBottomTabBarHeight()
 
     return (
-      <View style={[tw`flex-col`, { flex: 1 }]}>
+      <View style={[tw`flex-col`, styles.flex]}>
         <View style={tw`flex-grow bg-gray-100/85 dark:bg-gray-900/85`}>
-          <View style={[tw`flex-col`, { flex: 1 }]}>
+          <View style={[tw`flex-col`, styles.flex]}>
             <ChapterControls toggleChapters={toggleChapters} />
             <View style={tw`flex-grow`}>
-              <View style={[tw`flex-col justify-center`, { flex: 1 }]}>
+              <View style={[tw`flex-col justify-center`, styles.flex]}>
                 <View
                   style={tw`flex-row items-center justify-around px-12 mb-14`}
                 >
@@ -99,3 +127,7 @@ const ActualPlayerControls = memo(
     )
   }
 )
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 }
+})

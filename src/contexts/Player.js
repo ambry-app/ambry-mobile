@@ -14,9 +14,9 @@ import TrackPlayer, {
   State,
   TrackType
 } from 'react-native-track-player'
-import { useImmer } from 'use-immer'
 import { useAmbryAPI } from '../contexts/AmbryAPI'
 import { useSelectedMedia } from '../contexts/SelectedMedia'
+import useFirstRender from '../hooks/firstRender'
 
 const initialState = {
   loading: true,
@@ -29,6 +29,55 @@ const initialState = {
   playbackRate: undefined,
   currentChapter: undefined
 }
+
+const setReady = state => ({
+  ...state,
+  trackPlayerReady: true
+})
+
+const setEmpty = state => ({
+  ...state,
+  loading: false,
+  media: null,
+  imageSource: null,
+  playbackRate: null
+})
+
+const setLoading = imageSource => state => ({
+  ...state,
+  loading: true,
+  media: undefined,
+  imageSource: imageSource,
+  playbackRate: null
+})
+
+const setLoaded = (media, position, playbackRate, chapter) => state => ({
+  ...state,
+  loading: false,
+  media: media,
+  position: position,
+  buffered: 0,
+  currentChapter: chapter,
+  playbackRate: playbackRate
+})
+
+const setPosition = (position, buffered, chapter) => state => ({
+  ...state,
+  position: position,
+  buffered: buffered,
+  currentChapter: chapter
+})
+
+const setPlaybackRate = rate => state => ({
+  ...state,
+  playbackRate: rate
+})
+
+const setError = state => ({
+  ...state,
+  loading: false,
+  error: true
+})
 
 const PlayerContext = createContext({})
 
@@ -74,7 +123,7 @@ async function updateServerPositionNoLock(reportPlayerState) {
 async function setTrackPlayerPlaybackRate(
   newPlaybackRate,
   reportPlayerState,
-  setPlaybackRate
+  setState
 ) {
   playerMutex.runExclusive(async () => {
     console.debug('Player: setting playback rate', newPlaybackRate)
@@ -83,7 +132,7 @@ async function setTrackPlayerPlaybackRate(
     TrackPlayer.setRate(newPlaybackRate)
 
     // set rate state
-    setPlaybackRate(newPlaybackRate)
+    setState(setPlaybackRate(newPlaybackRate))
 
     const track = await TrackPlayer.getTrack(0)
 
@@ -151,7 +200,7 @@ function seekTo(position, reportPlayerState) {
 }
 
 function usePosition(
-  setPosition,
+  setState,
   trackPlayerReady,
   loading,
   playbackRate,
@@ -175,7 +224,7 @@ function usePosition(
       ])
       const chapter = findChapter(position, media.chapters)
 
-      setPosition(position, buffered, chapter)
+      setState(setPosition(position, buffered, chapter))
     }
 
     if (trackPlayerReady && !loading && !isSeeking) {
@@ -186,6 +235,7 @@ function usePosition(
       clearInterval(intervalRef.current)
     }
   }, [
+    setState,
     trackPlayerReady,
     loading,
     playbackRate,
@@ -196,9 +246,10 @@ function usePosition(
 }
 
 export default function PlayerProvider({ children }) {
+  const isFirstRender = useFirstRender()
   const { getPlayerState, reportPlayerState, uriSource } = useAmbryAPI()
   const { selectedMedia } = useSelectedMedia()
-  const [state, updateState] = useImmer(initialState)
+  const [state, setState] = useState(initialState)
 
   const {
     currentChapter,
@@ -209,74 +260,16 @@ export default function PlayerProvider({ children }) {
     position
   } = state
 
-  // state updaters
-
-  const setReady = () => {
-    updateState(draft => {
-      draft.trackPlayerReady = true
-    })
-  }
-
-  const setEmpty = () => {
-    updateState(draft => {
-      draft.loading = false
-      draft.media = null
-      draft.imageSource = null
-      draft.playbackRate = null
-    })
-  }
-
-  const setLoading = imagePath => {
-    updateState(draft => {
-      draft.loading = true
-      draft.media = undefined
-      draft.imageSource = uriSource(imagePath)
-      draft.playbackRate = null
-    })
-  }
-
-  const setLoaded = (media, position, playbackRate, chapter) => {
-    updateState(draft => {
-      draft.loading = false
-      draft.media = media
-      draft.position = position
-      draft.buffered = 0
-      draft.currentChapter = chapter
-      draft.playbackRate = playbackRate
-    })
-  }
-
-  const setPosition = (position, buffered, chapter) => {
-    updateState(draft => {
-      draft.position = position
-      draft.buffered = buffered
-      draft.currentChapter = chapter
-    })
-  }
-
-  const setPlaybackRate = rate => {
-    updateState(draft => {
-      draft.playbackRate = rate
-    })
-  }
-
-  const setError = () => {
-    updateState(draft => {
-      draft.loading = false
-      draft.error = true
-    })
-  }
-
   // effects
 
-  useEffect(() => {
+  if (isFirstRender) {
     const setupTrackPlayer = async () => {
       console.debug('Player: setting up TrackPlayer...')
 
       const track = await TrackPlayer.getTrack(0)
       if (track) {
         console.debug('Player: TrackPlayer already set up')
-        setReady()
+        setState(setReady)
         return
       }
 
@@ -306,11 +299,11 @@ export default function PlayerProvider({ children }) {
       })
 
       console.debug('Player: done setting up TrackPlayer')
-      setReady()
+      setState(setReady)
     }
 
     playerMutex.runExclusive(setupTrackPlayer)
-  }, [])
+  }
 
   useEffect(() => {
     const loadPlayerStateFromServer = async () => {
@@ -321,13 +314,13 @@ export default function PlayerProvider({ children }) {
 
       if (selectedMedia === null) {
         console.debug('Player: no selectedMedia')
-        setEmpty()
+        setState(setEmpty)
         return
       }
 
       try {
         // loading, but image is available
-        setLoading(selectedMedia.imagePath)
+        setState(setLoading(uriSource(selectedMedia.imagePath)))
 
         console.debug(
           `Player: loading playerState ${selectedMedia.id} from server`
@@ -338,18 +331,19 @@ export default function PlayerProvider({ children }) {
         loadTrackIntoPlayer(serverPlayerState)
       } catch (err) {
         console.error('Player: failed to load playerState', err)
-        setError()
+        setState(setError)
       }
     }
 
     const loadTrackIntoPlayer = async playerState => {
-      const { media, position, playbackRate } = playerState
-      const mediaTrack = mediaTrackForPlatform(uriSource, media)
-      const { uri: artworkUrl, headers } = uriSource(media.book.imagePath)
+      const mediaTrack = mediaTrackForPlatform(uriSource, playerState.media)
+      const { uri: artworkUrl, headers } = uriSource(
+        playerState.media.book.imagePath
+      )
 
       const currentTrack = await TrackPlayer.getTrack(0)
 
-      if (currentTrack && currentTrack.description == playerState.id) {
+      if (currentTrack && currentTrack.description === playerState.id) {
         // the current track is already loaded; nothing to do
         console.debug('Player: track already loaded')
 
@@ -358,9 +352,16 @@ export default function PlayerProvider({ children }) {
           TrackPlayer.getRate()
         ])
 
-        const chapter = findChapter(currentPosition, media.chapters)
+        const chapter = findChapter(currentPosition, playerState.media.chapters)
 
-        setLoaded(media, currentPosition, currentPlaybackRate, chapter)
+        setState(
+          setLoaded(
+            playerState.media,
+            currentPosition,
+            currentPlaybackRate,
+            chapter
+          )
+        )
       } else {
         // report previous track position
         if (currentTrack) {
@@ -375,32 +376,50 @@ export default function PlayerProvider({ children }) {
           url: mediaTrack.url,
           type: mediaTrack.type,
           pitchAlgorithm: PitchAlgorithm.Voice,
-          duration: media.duration,
-          title: media.book.title,
-          artist: media.book.authors.map(author => author.name).join(', '),
+          duration: playerState.media.duration,
+          title: playerState.media.book.title,
+          artist: playerState.media.book.authors
+            .map(author => author.name)
+            .join(', '),
           artwork: artworkUrl,
           description: playerState.id,
           headers
         })
 
-        await TrackPlayer.seekTo(position)
-        await TrackPlayer.setRate(playbackRate)
+        await TrackPlayer.seekTo(playerState.position)
+        await TrackPlayer.setRate(playerState.playbackRate)
 
-        const chapter = findChapter(position, media.chapters)
+        const chapter = findChapter(
+          playerState.position,
+          playerState.media.chapters
+        )
 
-        setLoaded(media, position, playbackRate, chapter)
+        setState(
+          setLoaded(
+            playerState.media,
+            playerState.position,
+            playerState.playbackRate,
+            chapter
+          )
+        )
       }
     }
 
     if (trackPlayerReady) {
       loadPlayerStateFromServer()
     }
-  }, [trackPlayerReady, selectedMedia])
+  }, [
+    getPlayerState,
+    reportPlayerState,
+    uriSource,
+    trackPlayerReady,
+    selectedMedia
+  ])
 
   const [isSeeking, setIsSeeking] = useState(false)
 
   usePosition(
-    setPosition,
+    setState,
     trackPlayerReady,
     loading,
     playbackRate,
@@ -412,14 +431,13 @@ export default function PlayerProvider({ children }) {
   // actions
 
   const setPlaybackRateAction = useCallback(
-    rate =>
-      setTrackPlayerPlaybackRate(rate, reportPlayerState, setPlaybackRate),
-    []
+    rate => setTrackPlayerPlaybackRate(rate, reportPlayerState, setState),
+    [reportPlayerState]
   )
 
   const togglePlaybackAction = useCallback(
     () => togglePlayback(reportPlayerState),
-    []
+    [reportPlayerState]
   )
 
   const seekTimerRef = useRef()
@@ -434,7 +452,7 @@ export default function PlayerProvider({ children }) {
       )
       const chapter = findChapter(actualDestination, media.chapters)
 
-      setPosition(actualDestination, 0, chapter)
+      setState(setPosition(actualDestination, 0, chapter))
 
       // throttle actually seeking TrackPlayer
       clearTimeout(seekTimerRef.current)
@@ -443,17 +461,17 @@ export default function PlayerProvider({ children }) {
         seekTo(actualDestination, reportPlayerState)
       }, 500)
     },
-    [position, playbackRate, media]
+    [reportPlayerState, position, playbackRate, media]
   )
 
   const seekToAction = useCallback(
-    position => {
-      const chapter = findChapter(position, media.chapters)
+    newPosition => {
+      const chapter = findChapter(newPosition, media.chapters)
 
-      setPosition(position, 0, chapter)
-      seekTo(position, reportPlayerState)
+      setState(setPosition(newPosition, 0, chapter))
+      seekTo(newPosition, reportPlayerState)
     },
-    [media]
+    [reportPlayerState, media]
   )
 
   // return
