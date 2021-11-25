@@ -1,4 +1,3 @@
-import { pipe } from 'ramda'
 import React, { createContext, useCallback, useContext, useState } from 'react'
 import EncryptedStorage from 'react-native-encrypted-storage'
 import API, { createToken } from '../api/ambry'
@@ -29,6 +28,11 @@ const setReady = state => ({
   ready: true
 })
 
+const setSessionAndReady = authData => state =>
+  setReady(setSession(authData)(state))
+
+const clearSessionAndReady = state => setReady(clearSession(state))
+
 const loadSessionFromStorage = async setState => {
   console.debug('AmbryAPI: Loading session from EncryptedStorage')
   try {
@@ -39,11 +43,11 @@ const loadSessionFromStorage = async setState => {
 
       console.debug('AmbryAPI: Restored session from EncryptedStorage')
 
-      setState(pipe(setSession(authData), setReady))
+      setState(setSessionAndReady(authData))
     } else {
       console.debug('AmbryAPI: No session present in EncryptedStorage')
 
-      setState(pipe(clearSession, setReady))
+      setState(clearSessionAndReady)
     }
   } catch (error) {
     console.error(
@@ -51,7 +55,7 @@ const loadSessionFromStorage = async setState => {
       error
     )
 
-    setState(pipe(clearSession, setReady))
+    setState(clearSessionAndReady)
   }
 }
 
