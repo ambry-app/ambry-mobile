@@ -20,6 +20,7 @@ import {
 } from './PlayerScreen/PlayerControls/ChapterControls'
 import PlayerHeader from './PlayerScreen/PlayerHeader'
 import ProgressDisplay from './PlayerScreen/ProgressDisplay'
+import SleepTimerToggle from './PlayerScreen/SleepTimerToggle'
 
 export default function PlayerScreen() {
   const { state } = usePlayer()
@@ -111,7 +112,8 @@ const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
             <PlayerHeader>
               <BookDetails imageSource={imageSource} media={media} />
               <ProgressDisplay />
-              <View style={tw`flex-row`}>
+              <View style={tw`flex-row items-center`}>
+                <SleepTimerToggle />
                 <View style={tw`flex-grow`} />
                 <PlaybackRate />
               </View>

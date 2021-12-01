@@ -11,6 +11,14 @@ export function secondsDisplay(input) {
   }
 }
 
+export function secondsDisplayMinutesOnly(input) {
+  const total = Number(input)
+  const minutes = String(Math.floor(total / 60))
+  const seconds = String(Math.floor(total % 60))
+
+  return `${minutes}:${seconds.padStart(2, '0')}`
+}
+
 export function durationDisplay(input) {
   const total = Number(input)
   const hours = Math.floor(total / 3600)

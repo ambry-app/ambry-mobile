@@ -7,7 +7,7 @@ import React, {
   useState
 } from 'react'
 
-const SELECTED_MEDIA_KEY = 'selectedMedia'
+const SELECTED_MEDIA_KEY = '@Ambry_selectedMedia'
 
 const SelectedMediaContext = createContext({})
 

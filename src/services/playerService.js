@@ -2,6 +2,7 @@ import EncryptedStorage from 'react-native-encrypted-storage'
 import TrackPlayer, { Event, State } from 'react-native-track-player'
 import { reportPlayerState } from '../api/ambry'
 import { playerMutex } from '../contexts/Player'
+import SleepTimer from '../modules/SleepTimer'
 
 let wasPausedByDuck = false
 
@@ -47,6 +48,8 @@ export default async function setup() {
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => {
     playerMutex.runExclusive(() => {
       console.debug('Service: playback queue ended')
+
+      SleepTimer.stop()
       updateServerPosition()
     })
   })
@@ -54,6 +57,8 @@ export default async function setup() {
   TrackPlayer.addEventListener(Event.RemoteStop, async () => {
     playerMutex.runExclusive(async () => {
       console.debug('Service: stop requested, destroying player')
+
+      SleepTimer.stop()
       await TrackPlayer.pause()
       await seekRelative(-1)
       TrackPlayer.destroy()
@@ -63,6 +68,8 @@ export default async function setup() {
   TrackPlayer.addEventListener(Event.RemotePause, async () => {
     playerMutex.runExclusive(async () => {
       console.debug('Service: pausing')
+
+      SleepTimer.stop()
       await TrackPlayer.pause()
       seekRelative(-1)
     })
@@ -71,21 +78,27 @@ export default async function setup() {
   TrackPlayer.addEventListener(Event.RemotePlay, () => {
     playerMutex.runExclusive(async () => {
       console.debug('Service: playing')
+
       TrackPlayer.play()
+      SleepTimer.start()
     })
   })
 
   TrackPlayer.addEventListener(Event.RemoteJumpBackward, ({ interval }) => {
     playerMutex.runExclusive(async () => {
       console.debug('Service: jump backward', interval)
+
       seekRelative(interval * -1)
+      SleepTimer.reset()
     })
   })
 
   TrackPlayer.addEventListener(Event.RemoteJumpForward, ({ interval }) => {
     playerMutex.runExclusive(async () => {
       console.debug('Service: jump forward', interval)
+
       seekRelative(interval)
+      SleepTimer.reset()
     })
   })
 
