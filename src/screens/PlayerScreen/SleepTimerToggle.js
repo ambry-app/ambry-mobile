@@ -92,16 +92,16 @@ export default function SleepTimerToggle() {
             const nextCountdownSeconds =
               currentState.currentCountdownSeconds - 1
 
-            if (nextCountdownSeconds === -1) {
+            if (nextCountdownSeconds >= 0) {
               return {
                 ...currentState,
-                isRunning: false,
-                currentCountdownSeconds: currentState.countdownSeconds
+                currentCountdownSeconds: nextCountdownSeconds
               }
             } else {
               return {
                 ...currentState,
-                currentCountdownSeconds: nextCountdownSeconds
+                isRunning: false,
+                currentCountdownSeconds: currentState.countdownSeconds
               }
             }
           }),
