@@ -28,6 +28,7 @@
     "react-native-bootsplash": "^3.2.6",
     "react-native-encrypted-storage": "^4.0.2",
     "react-native-gesture-handler": "^1.10.3",
+    "react-native-haptic-feedback": "^1.13.0",
     "react-native-markdown-display": "^7.0.0-alpha.2",
     "react-native-reanimated": "^2.2.3",
     "react-native-redash": "^16.2.2",

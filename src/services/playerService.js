@@ -107,6 +107,7 @@ export default async function setup() {
       if (e.permanent === true) {
         console.debug('Service: duck permanent, pausing')
         TrackPlayer.pause()
+        SleepTimer.stop()
       } else {
         if (e.paused === true) {
           console.debug('Service: duck temporary, pausing')
