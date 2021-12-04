@@ -60,24 +60,24 @@ export default function SleepTimerToggle() {
 
         if (timer.enabled && !timer.targetTime) {
           SleepTimer.start()
-
-          setState(currentState => ({
-            ...currentState,
-            isRunning: true
-          }))
         }
+
+        setState(currentState => ({
+          ...currentState,
+          isRunning: true
+        }))
       } else if (playbackState === State.Paused) {
         const timer = await SleepTimer.get()
 
         if (timer.enabled && timer.targetTime) {
           SleepTimer.stop()
-
-          setState(currentState => ({
-            ...currentState,
-            isRunning: false,
-            currentCountdownSeconds: currentState.countdownSeconds
-          }))
         }
+
+        setState(currentState => ({
+          ...currentState,
+          isRunning: false,
+          currentCountdownSeconds: currentState.countdownSeconds
+        }))
       }
     })()
   }, [playbackState])
