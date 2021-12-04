@@ -1,28 +1,38 @@
 import TrackPlayer from 'react-native-track-player'
+import SleepTimer, { FADE_TIME } from '../modules/SleepTimer'
 
-// task timeout is 30 seconds, so we need to stay under that
-
-const FADE_TIME = 25 // seconds
 const INTERVAL = 500 // milliseconds
 const STEPS = (1000 / INTERVAL) * FADE_TIME
 
-export default function run() {
-  console.debug('SleepTimerTask: running sleep timer task')
+export default async function run() {
+  console.debug('SleepTimerTask: sleep timer fade started')
+
+  const { targetTime } = await SleepTimer.get()
 
   return new Promise((resolve, reject) => {
     let currentStep = STEPS
 
-    const interval = setInterval(() => {
-      console.log(currentStep)
+    const interval = setInterval(async () => {
+      const timer = await SleepTimer.get()
+
+      // if the timer is no longer enabled or the target time has changed since
+      // we started running
+      if (!timer.enabled || timer.targetTime !== targetTime) {
+        console.debug('SleepTimerTask: fade canceled')
+
+        await TrackPlayer.setVolume(1)
+        clearInterval(interval)
+        return resolve()
+      }
 
       if (currentStep > 0) {
         TrackPlayer.setVolume(currentStep / STEPS)
         currentStep -= 1
       } else {
-        console.log('done')
+        console.debug('SleepTimerTask: fade finished')
+
         clearInterval(interval)
-        TrackPlayer.pause()
-        TrackPlayer.setVolume(1)
+        await Promise.all([TrackPlayer.pause(), TrackPlayer.setVolume(1)])
         resolve()
       }
     }, INTERVAL)

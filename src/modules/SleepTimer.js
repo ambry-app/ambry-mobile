@@ -6,6 +6,9 @@ const { SleepTimerModule } = NativeModules
 const SLEEP_TIMER_KEY = '@Ambry_sleepTimer'
 const DEFAULT_COUNTDOWN_SECONDS = 600
 
+// task timeout is 45 seconds, so we need to stay under that
+export const FADE_TIME = 30
+
 const defaultSettings = {
   enabled: false,
   countdownSeconds: DEFAULT_COUNTDOWN_SECONDS,
@@ -65,7 +68,7 @@ const start = async () => {
     const targetTime = Date.now() + timer.countdownSeconds * 1000
 
     console.debug('SleepTimer: starting timer')
-    SleepTimerModule.setSleepTimer(timer.countdownSeconds)
+    SleepTimerModule.setSleepTimer(timer.countdownSeconds - FADE_TIME)
 
     return set({ ...timer, targetTime })
   } else {

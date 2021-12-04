@@ -16,7 +16,7 @@ public class SleepTimerService extends HeadlessJsTaskService {
             return new HeadlessJsTaskConfig(
                     "SleepTimerTask",
                     Arguments.fromBundle(extras),
-                    30000, // timeout for the task
+                    45000, // timeout for the task
                     true // optional: defines whether or not  the task is allowed in foreground. Default is false
             );
         }
