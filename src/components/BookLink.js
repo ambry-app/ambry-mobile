@@ -7,11 +7,10 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
+import { uriSource } from '../stores/AmbryAPI'
 
 export default function BookLink({ book }) {
-  const { uriSource } = useAmbryAPI()
   const navigation = useNavigation()
 
   const authorsList = book.authors.map(author => (

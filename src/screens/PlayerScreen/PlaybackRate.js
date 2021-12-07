@@ -1,5 +1,5 @@
 import Slider from '@react-native-community/slider'
-import React, { memo, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   Modal,
@@ -10,8 +10,8 @@ import {
 } from 'react-native'
 import { Header4 } from '../../components/Headers'
 import ScreenCentered from '../../components/ScreenCentered'
-import { usePlayer } from '../../contexts/Player'
 import tw from '../../lib/tailwind'
+import usePlayer, { setPlaybackRate } from '../../stores/Player'
 
 function formatPlaybackRate(rate) {
   if (!rate) {
@@ -25,20 +25,8 @@ function formatPlaybackRate(rate) {
 }
 
 export default function PlaybackRate() {
-  const { state, actions } = usePlayer()
-  const { playbackRate } = state
-  const { setPlaybackRate } = actions
-
-  return (
-    <ActualPlaybackRate
-      playbackRate={playbackRate}
-      setPlaybackRate={setPlaybackRate}
-    />
-  )
-}
-
-const ActualPlaybackRate = memo(({ playbackRate, setPlaybackRate }) => {
   // console.log('RENDERING: PlaybackRate')
+  const playbackRate = usePlayer(state => state.playbackRate)
   const [rateModalVisible, setRateModalVisible] = useState(false)
   const [displayPlaybackRate, setDisplayPlaybackRate] = useState()
   const scheme = useColorScheme()
@@ -153,4 +141,4 @@ const ActualPlaybackRate = memo(({ playbackRate, setPlaybackRate }) => {
       </TouchableOpacity>
     </>
   )
-})
+}

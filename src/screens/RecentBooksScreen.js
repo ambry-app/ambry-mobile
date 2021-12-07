@@ -3,14 +3,13 @@ import { Button, Text, View } from 'react-native'
 import BookGrid from '../components/BookGrid'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import { useAmbryAPI } from '../contexts/AmbryAPI'
 import useFirstRender from '../hooks/firstRender'
 import tw from '../lib/tailwind'
 import { actionCreators, initialState, reducer } from '../reducers/books'
+import { getRecentBooks } from '../stores/AmbryAPI'
 
 export default function RecentBooksScreen() {
   const isFirstRender = useFirstRender()
-  const { getRecentBooks } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { books, nextPage, hasMore, loading, refreshing, error } = state
@@ -28,7 +27,7 @@ export default function RecentBooksScreen() {
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [getRecentBooks, hasMore, nextPage])
+  }, [hasMore, nextPage])
 
   const refreshBooks = useCallback(async () => {
     dispatch(actionCreators.refresh())
@@ -39,7 +38,7 @@ export default function RecentBooksScreen() {
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [getRecentBooks])
+  }, [])
 
   if (isFirstRender) {
     fetchBooks()

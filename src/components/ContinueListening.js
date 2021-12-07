@@ -10,17 +10,16 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import { useAmbryAPI } from '../contexts/AmbryAPI'
-import { useSelectedMedia } from '../contexts/SelectedMedia'
 import useFirstRender from '../hooks/firstRender'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/playerStates'
+import { getRecentPlayerStates, uriSource } from '../stores/AmbryAPI'
+import usePlayer, { clearMedia, loadMedia } from '../stores/Player'
 import WrappingList from './WrappingList'
 
 function Item({ playerState, navigation }) {
-  const { selectedMedia, loadMedia } = useSelectedMedia()
-  const { uriSource } = useAmbryAPI()
+  const selectedMedia = usePlayer(state => state.selectedMedia)
 
   return (
     <TouchableNativeFeedback
@@ -62,9 +61,7 @@ function Item({ playerState, navigation }) {
 
 export default function ContinueListening({ navigation }) {
   const isFirstRender = useFirstRender()
-  const { getRecentPlayerStates } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { clearMedia } = useSelectedMedia()
 
   const { playerStates, nextPage, hasMore, loading, refreshing, error } = state
 
@@ -83,7 +80,7 @@ export default function ContinueListening({ navigation }) {
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [getRecentPlayerStates, hasMore, nextPage])
+  }, [hasMore, nextPage])
 
   const refreshPlayerStates = useCallback(async () => {
     dispatch(actionCreators.refresh())
@@ -94,12 +91,12 @@ export default function ContinueListening({ navigation }) {
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [getRecentPlayerStates])
+  }, [])
 
   const clearMediaAndNavigate = useCallback(() => {
     clearMedia()
     navigation.navigate('PlayerScreen')
-  }, [clearMedia, navigation])
+  }, [navigation])
 
   if (isFirstRender) {
     fetchPlayerStates()

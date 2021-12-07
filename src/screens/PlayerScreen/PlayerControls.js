@@ -1,5 +1,5 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
-import React, { memo } from 'react'
+import React from 'react'
 import {
   StyleSheet,
   Text,
@@ -7,8 +7,13 @@ import {
   useColorScheme,
   View
 } from 'react-native'
-import { usePlayer } from '../../contexts/Player'
+import shallow from 'zustand/shallow'
 import tw from '../../lib/tailwind'
+import usePlayer, {
+  seekRelative,
+  seekTo,
+  togglePlayback
+} from '../../stores/Player'
 import Back10Button from './PlayerControls/Back10Button'
 import BackButton from './PlayerControls/BackButton'
 import ChapterControls from './PlayerControls/ChapterControls'
@@ -17,12 +22,14 @@ import ForwardButton from './PlayerControls/ForwardButton'
 import PlaybackStateButton from './PlayerControls/PlaybackStateButton'
 import Scrubber from './PlayerControls/Scrubber'
 
-function ScrubberWrapper() {
+const playerSelector = [state => [state.position, state.media], shallow]
+
+const ScrubberWrapper = () => {
   const scheme = useColorScheme()
-  const { state, actions } = usePlayer()
-  const { position, media } = state
+  const [position, media] = usePlayer(...playerSelector)
   const { chapters, duration } = media
-  const { seekTo } = actions
+
+  const markers = chapters.map(chapter => Math.round(chapter.startTime / 5) * 5)
 
   const theme =
     scheme === 'dark'
@@ -44,89 +51,57 @@ function ScrubberWrapper() {
         }
 
   return (
-    <ActualScrubberWrapper
+    <Scrubber
       position={position}
       duration={duration}
-      seekTo={seekTo}
-      chapters={chapters}
+      onChange={seekTo}
+      markers={markers}
       theme={theme}
     />
   )
 }
 
-const ActualScrubberWrapper = memo(
-  ({ position, duration, seekTo, chapters, theme }) => {
-    const markers = chapters.map(
-      chapter => Math.round(chapter.startTime / 5) * 5
-    )
-    return (
-      <Scrubber
-        position={position}
-        duration={duration}
-        onChange={seekTo}
-        markers={markers}
-        theme={theme}
-      />
-    )
-  }
-)
-
 export default function PlayerControls({ toggleChapters }) {
-  const { actions } = usePlayer()
-  const { seekRelative, togglePlayback } = actions
+  // console.log('RENDERING: PlayerControls')
+  const tabBarHeight = useBottomTabBarHeight()
 
   return (
-    <ActualPlayerControls
-      seekRelative={seekRelative}
-      togglePlayback={togglePlayback}
-      toggleChapters={toggleChapters}
-    />
-  )
-}
-
-const ActualPlayerControls = memo(
-  ({ seekRelative, togglePlayback, toggleChapters }) => {
-    // console.log('RENDERING: PlayerControls')
-    const tabBarHeight = useBottomTabBarHeight()
-
-    return (
-      <View style={[tw`flex-col`, styles.flex]}>
-        <View style={tw`flex-grow bg-gray-100/85 dark:bg-gray-900/85`}>
-          <View style={[tw`flex-col`, styles.flex]}>
-            <ChapterControls toggleChapters={toggleChapters} />
-            <View style={tw`flex-grow`}>
-              <View style={[tw`flex-col justify-center`, styles.flex]}>
-                <View
-                  style={tw`flex-row items-center justify-around px-12 mb-14`}
-                >
-                  <TouchableOpacity onPress={() => seekRelative(-10)}>
-                    <Back10Button width={34} height={39} />
-                  </TouchableOpacity>
-                  <PlaybackStateButton onPress={() => togglePlayback()} />
-                  <TouchableOpacity onPress={() => seekRelative(10)}>
-                    <Forward10Button width={34} height={39} />
-                  </TouchableOpacity>
-                </View>
-                <View style={tw`flex-row items-center justify-around px-12`}>
-                  <TouchableOpacity onPress={() => seekRelative(-60)}>
-                    <BackButton width={42} height={27} />
-                    <Text style={tw`text-gray-400 text-center`}>1 min</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => seekRelative(60)}>
-                    <ForwardButton width={42} height={27} />
-                    <Text style={tw`text-gray-400 text-center`}>1 min</Text>
-                  </TouchableOpacity>
-                </View>
+    <View style={[tw`flex-col`, styles.flex]}>
+      <View style={tw`flex-grow bg-gray-100/85 dark:bg-gray-900/85`}>
+        <View style={[tw`flex-col`, styles.flex]}>
+          <ChapterControls toggleChapters={toggleChapters} />
+          <View style={tw`flex-grow`}>
+            <View style={[tw`flex-col justify-center`, styles.flex]}>
+              <View
+                style={tw`flex-row items-center justify-around px-12 mb-14`}
+              >
+                <TouchableOpacity onPress={() => seekRelative(-10)}>
+                  <Back10Button width={34} height={39} />
+                </TouchableOpacity>
+                <PlaybackStateButton onPress={() => togglePlayback()} />
+                <TouchableOpacity onPress={() => seekRelative(10)}>
+                  <Forward10Button width={34} height={39} />
+                </TouchableOpacity>
+              </View>
+              <View style={tw`flex-row items-center justify-around px-12`}>
+                <TouchableOpacity onPress={() => seekRelative(-60)}>
+                  <BackButton width={42} height={27} />
+                  <Text style={tw`text-gray-400 text-center`}>1 min</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => seekRelative(60)}>
+                  <ForwardButton width={42} height={27} />
+                  <Text style={tw`text-gray-400 text-center`}>1 min</Text>
+                </TouchableOpacity>
               </View>
             </View>
-            <ScrubberWrapper />
           </View>
+          <ScrubberWrapper />
         </View>
-        <View style={{ height: tabBarHeight }} />
       </View>
-    )
-  }
-)
+      <View style={{ height: tabBarHeight }} />
+    </View>
+  )
+}
 
 const styles = StyleSheet.create({
   flex: { flex: 1 }

@@ -5,12 +5,11 @@ import { Header1 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
-import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 import { actionCreators, initialState, reducer } from '../reducers/series'
+import { getSeries } from '../stores/AmbryAPI'
 
 export default function SeriesScreen({ navigation, route }) {
-  const { getSeries } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { series, loading, error } = state
@@ -24,7 +23,7 @@ export default function SeriesScreen({ navigation, route }) {
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [getSeries, route.params.seriesId])
+  }, [route.params.seriesId])
 
   useEffect(() => {
     fetchSeries()

@@ -14,15 +14,15 @@ import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import PlayButton from '../components/PlayButton'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
-import { useAmbryAPI } from '../contexts/AmbryAPI'
-import { useSelectedMedia } from '../contexts/SelectedMedia'
 import tw from '../lib/tailwind'
 import { durationDisplay } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/book'
+import { getBook, uriSource } from '../stores/AmbryAPI'
+import usePlayer, { loadMedia } from '../stores/Player'
 
 function MediaList({ book, media: mediaList }) {
   const navigation = useNavigation()
-  const { selectedMedia, loadMedia } = useSelectedMedia()
+  const selectedMedia = usePlayer(state => state.selectedMedia)
   const mediaLength = mediaList.length
 
   if (mediaLength === 0) {
@@ -103,7 +103,6 @@ function MediaList({ book, media: mediaList }) {
 }
 
 export default function BookDetailsScreen({ route, navigation }) {
-  const { getBook, uriSource } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { book, loading, error } = state
@@ -117,7 +116,7 @@ export default function BookDetailsScreen({ route, navigation }) {
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [getBook, route.params.bookId])
+  }, [route.params.bookId])
 
   useEffect(() => {
     fetchBook()

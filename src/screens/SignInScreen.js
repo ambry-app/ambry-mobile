@@ -9,11 +9,10 @@ import {
 } from 'react-native'
 import Logo from '../assets/logo_256x1056.svg'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
-import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
+import { signIn } from '../stores/AmbryAPI'
 
 export default function SignInScreen() {
-  const { signIn } = useAmbryAPI()
   const [loading, isLoading] = useState(false)
   const [error, isError] = useState(false)
   const [email, setEmail] = useState('')

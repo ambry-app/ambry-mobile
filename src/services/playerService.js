@@ -1,14 +1,19 @@
 import EncryptedStorage from 'react-native-encrypted-storage'
 import TrackPlayer, { Event, State } from 'react-native-track-player'
 import { reportPlayerState } from '../api/ambry'
-import { playerMutex } from '../contexts/Player'
 import SleepTimer from '../modules/SleepTimer'
+
+import { AUTH_STORAGE_KEY } from '../stores/AmbryAPI'
 
 let wasPausedByDuck = false
 
 const updateServerPosition = async () => {
-  const position = await TrackPlayer.getPosition()
-  const track = await TrackPlayer.getTrack(0)
+  const [position, track, storeData] = await Promise.all([
+    TrackPlayer.getPosition(),
+    TrackPlayer.getTrack(0),
+    EncryptedStorage.getItem(AUTH_STORAGE_KEY)
+  ])
+  const authData = JSON.parse(storeData).state._authData
 
   if (!track) {
     console.warn('Service: updateServerPosition called while no track loaded')
@@ -22,9 +27,6 @@ const updateServerPosition = async () => {
     position: position.toString()
   }
 
-  const userSession = await EncryptedStorage.getItem('userSession')
-  const authData = JSON.parse(userSession)
-
   console.debug('Service: updating server position', playerStateReport)
   reportPlayerState(authData, playerStateReport)
 }
@@ -32,9 +34,11 @@ const updateServerPosition = async () => {
 const seekRelative = async interval => {
   console.debug('Service: seeking', interval)
 
-  const position = await TrackPlayer.getPosition()
-  const duration = await TrackPlayer.getDuration()
-  const playbackRate = await TrackPlayer.getRate()
+  const [position, duration, playbackRate] = await Promise.all([
+    TrackPlayer.getPosition(),
+    TrackPlayer.getDuration(),
+    TrackPlayer.getRate()
+  ])
   const actualInterval = interval * playbackRate
   const targetDestination = position + actualInterval
   const actualDestination = Math.max(Math.min(targetDestination, duration), 0)
@@ -46,83 +50,69 @@ const seekRelative = async interval => {
 
 export default async function setup() {
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => {
-    playerMutex.runExclusive(() => {
-      console.debug('Service: playback queue ended')
+    console.debug('Service: playback queue ended')
 
-      SleepTimer.stop()
-      updateServerPosition()
-    })
+    SleepTimer.stop()
+    updateServerPosition()
   })
 
   TrackPlayer.addEventListener(Event.RemoteStop, async () => {
-    playerMutex.runExclusive(async () => {
-      console.debug('Service: stop requested, destroying player')
+    console.debug('Service: stop requested, destroying player')
 
-      SleepTimer.stop()
-      await TrackPlayer.pause()
-      await seekRelative(-1)
-      TrackPlayer.destroy()
-    })
+    SleepTimer.stop()
+    await TrackPlayer.pause()
+    await seekRelative(-1)
+    TrackPlayer.destroy()
   })
 
   TrackPlayer.addEventListener(Event.RemotePause, async () => {
-    playerMutex.runExclusive(async () => {
-      console.debug('Service: pausing')
+    console.debug('Service: pausing')
 
-      SleepTimer.stop()
-      await TrackPlayer.pause()
-      seekRelative(-1)
-    })
+    SleepTimer.stop()
+    await TrackPlayer.pause()
+    seekRelative(-1)
   })
 
   TrackPlayer.addEventListener(Event.RemotePlay, () => {
-    playerMutex.runExclusive(async () => {
-      console.debug('Service: playing')
+    console.debug('Service: playing')
 
-      TrackPlayer.play()
-      SleepTimer.start()
-    })
+    TrackPlayer.play()
+    SleepTimer.start()
   })
 
   TrackPlayer.addEventListener(Event.RemoteJumpBackward, ({ interval }) => {
-    playerMutex.runExclusive(async () => {
-      console.debug('Service: jump backward', interval)
+    console.debug('Service: jump backward', interval)
 
-      seekRelative(interval * -1)
-      SleepTimer.reset()
-    })
+    seekRelative(interval * -1)
+    SleepTimer.reset()
   })
 
   TrackPlayer.addEventListener(Event.RemoteJumpForward, ({ interval }) => {
-    playerMutex.runExclusive(async () => {
-      console.debug('Service: jump forward', interval)
+    console.debug('Service: jump forward', interval)
 
-      seekRelative(interval)
-      SleepTimer.reset()
-    })
+    seekRelative(interval)
+    SleepTimer.reset()
   })
 
   TrackPlayer.addEventListener(Event.RemoteDuck, async e => {
-    playerMutex.runExclusive(async () => {
-      if (e.permanent === true) {
-        console.debug('Service: duck permanent, pausing')
-        TrackPlayer.pause()
-        SleepTimer.stop()
+    if (e.permanent === true) {
+      console.debug('Service: duck permanent, pausing')
+      TrackPlayer.pause()
+      SleepTimer.stop()
+    } else {
+      if (e.paused === true) {
+        console.debug('Service: duck temporary, pausing')
+        const playerState = await TrackPlayer.getState()
+        wasPausedByDuck = playerState !== State.Paused
+        await TrackPlayer.pause()
+        await seekRelative(-1)
       } else {
-        if (e.paused === true) {
-          console.debug('Service: duck temporary, pausing')
-          const playerState = await TrackPlayer.getState()
-          wasPausedByDuck = playerState !== State.Paused
-          await TrackPlayer.pause()
-          await seekRelative(-1)
-        } else {
-          if (wasPausedByDuck === true) {
-            console.debug('Service: duck resuming')
-            TrackPlayer.play()
-            wasPausedByDuck = false
-          }
+        if (wasPausedByDuck === true) {
+          console.debug('Service: duck resuming')
+          TrackPlayer.play()
+          wasPausedByDuck = false
         }
       }
-    })
+    }
   })
 }

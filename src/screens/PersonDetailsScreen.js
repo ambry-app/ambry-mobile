@@ -5,13 +5,11 @@ import Description from '../components/Description'
 import { Header1, Header2 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
 import { actionCreators, initialState, reducer } from '../reducers/person'
+import { getPerson, uriSource } from '../stores/AmbryAPI'
 
 function PersonHeader({ person }) {
-  const { uriSource } = useAmbryAPI()
-
   return (
     <View style={tw`p-4`}>
       <Header1 style={tw`text-center`}>{person.name}</Header1>
@@ -31,7 +29,6 @@ function PersonHeader({ person }) {
 }
 
 export default function PersonDetailsScreen({ route, navigation }) {
-  const { getPerson } = useAmbryAPI()
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { person, loading, error } = state
@@ -45,7 +42,7 @@ export default function PersonDetailsScreen({ route, navigation }) {
     } catch {
       dispatch(actionCreators.failure())
     }
-  }, [getPerson, route.params.personId])
+  }, [route.params.personId])
 
   useEffect(() => {
     fetchPerson()

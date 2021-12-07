@@ -2,10 +2,11 @@ import { NavigationContainer } from '@react-navigation/native'
 import React from 'react'
 import { useColorScheme } from 'react-native'
 import RNBootSplash from 'react-native-bootsplash'
+import shallow from 'zustand/shallow'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import { useAmbryAPI } from '../contexts/AmbryAPI'
 import tw from '../lib/tailwind'
+import useAmbryAPI from '../stores/AmbryAPI'
 import { AppStack } from './AppStack'
 import { AuthStack } from './AuthStack'
 
@@ -38,8 +39,10 @@ const linking = {
   config: { screens: { PlayerDrawer: 'notification.click' } }
 }
 
+const apiSelector = [state => [state.loggedIn, state._hasHydrated], shallow]
+
 export const Router = () => {
-  const { loggedIn, ready } = useAmbryAPI()
+  const [loggedIn, ready] = useAmbryAPI(...apiSelector)
   const scheme = useColorScheme()
 
   if (!ready) {

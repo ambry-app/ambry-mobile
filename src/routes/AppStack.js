@@ -6,8 +6,6 @@ import { TouchableOpacity, useColorScheme } from 'react-native'
 import Library from '../assets/library.svg'
 import ContinueListening from '../components/ContinueListening'
 import PlayButton from '../components/PlayButton'
-import PlayerProvider from '../contexts/Player'
-import { SelectedMediaProvider } from '../contexts/SelectedMedia'
 import tw from '../lib/tailwind'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
 import PersonDetailsScreen from '../screens/PersonDetailsScreen'
@@ -44,11 +42,7 @@ const LibraryStack = () => {
 const Drawer = createDrawerNavigator()
 
 const PlayerScreenWithContext = () => {
-  return (
-    <PlayerProvider>
-      <PlayerScreen />
-    </PlayerProvider>
-  )
+  return <PlayerScreen />
 }
 
 const PlayerDrawer = () => {
@@ -115,9 +109,5 @@ const TabNavigator = () => {
 }
 
 export const AppStack = () => {
-  return (
-    <SelectedMediaProvider>
-      <TabNavigator />
-    </SelectedMediaProvider>
-  )
+  return <TabNavigator />
 }

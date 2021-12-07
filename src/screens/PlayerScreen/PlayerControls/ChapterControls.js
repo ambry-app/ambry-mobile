@@ -7,10 +7,11 @@ import {
   TouchableOpacity
 } from 'react-native-gesture-handler'
 import Svg, { Path } from 'react-native-svg'
-import { usePlayer } from '../../../contexts/Player'
+import shallow from 'zustand/shallow'
 import useBackButton from '../../../hooks/backButton'
 import tw from '../../../lib/tailwind'
 import { secondsDisplay } from '../../../lib/utils'
+import usePlayer, { seekTo } from '../../../stores/Player'
 
 export function useChapters(ref, loading) {
   const [chaptersOpen, setChaptersOpen] = useState(false)
@@ -58,19 +59,9 @@ export function useChapters(ref, loading) {
 }
 
 export default function ChapterControls({ toggleChapters }) {
-  const { state } = usePlayer()
-  const { currentChapter } = state
-
-  return (
-    <ActualChapterControls
-      currentChapter={currentChapter}
-      toggleChapters={toggleChapters}
-    />
-  )
-}
-
-const ActualChapterControls = memo(({ currentChapter, toggleChapters }) => {
   // console.log('RENDERING: ChapterControls')
+  const currentChapter = usePlayer(state => state.currentChapter)
+
   return (
     <TouchableOpacity onPress={toggleChapters}>
       <View style={tw`py-4`}>
@@ -84,7 +75,7 @@ const ActualChapterControls = memo(({ currentChapter, toggleChapters }) => {
       </View>
     </TouchableOpacity>
   )
-})
+}
 
 function ChaptersHeader() {
   return (
@@ -140,75 +131,60 @@ const ChapterItem = memo(({ chapter, active, onPress }) => {
   )
 })
 
-function ChaptersList({ sheetRef, isOpen }) {
-  const { state, actions } = usePlayer()
-  const { media, currentChapter } = state
+const playerSelector = [state => [state.media, state.currentChapter], shallow]
+
+const ChaptersList = ({ sheetRef, isOpen }) => {
+  // console.log('RENDERING: ChaptersList')
+  const [media, currentChapter] = usePlayer(...playerSelector)
   const { chapters } = media
-  const { seekTo } = actions
+  const tabBarHeight = useBottomTabBarHeight()
+  const ref = useRef()
+
+  const onPress = useCallback(
+    chapter => {
+      seekTo(chapter.startTime)
+      sheetRef.current.close()
+    },
+    [sheetRef]
+  )
+
+  const renderItem = useCallback(
+    ({ item: chapter }) => {
+      return (
+        <ChapterItem
+          chapter={chapter}
+          active={chapter.id === currentChapter?.id}
+          onPress={onPress}
+        />
+      )
+    },
+    [onPress, currentChapter]
+  )
+
+  useEffect(() => {
+    if (isOpen) {
+      const index = chapters.findIndex(
+        chapter => chapter.id === currentChapter?.id
+      )
+      if (index >= 0 && index < chapters.length) {
+        ref.current.scrollToIndex({ index, viewPosition: 0.5 })
+      }
+    }
+  }, [chapters, currentChapter, isOpen])
 
   return (
-    <ActualChapterList
-      sheetRef={sheetRef}
-      chapters={chapters}
-      currentChapter={currentChapter}
-      seekTo={seekTo}
-      isOpen={isOpen}
+    <BottomSheetFlatList
+      ref={ref}
+      data={chapters}
+      style={tw`px-4`}
+      keyExtractor={item => item.id}
+      renderItem={renderItem}
+      ListFooterComponent={() => <View style={{ height: tabBarHeight }} />}
+      ListHeaderComponent={() => <ChaptersHeader />}
+      stickyHeaderIndices={[0]}
     />
   )
 }
-
-const ActualChapterList = memo(
-  ({ sheetRef, chapters, currentChapter, seekTo, isOpen }) => {
-    // console.log('RENDERING: ChaptersList')
-    const tabBarHeight = useBottomTabBarHeight()
-    const ref = useRef()
-
-    const onPress = useCallback(
-      chapter => {
-        seekTo(chapter.startTime)
-        sheetRef.current.close()
-      },
-      [sheetRef, seekTo]
-    )
-
-    const renderItem = useCallback(
-      ({ item: chapter }) => {
-        return (
-          <ChapterItem
-            chapter={chapter}
-            active={chapter.id === currentChapter?.id}
-            onPress={onPress}
-          />
-        )
-      },
-      [onPress, currentChapter]
-    )
-
-    useEffect(() => {
-      if (isOpen) {
-        const index = chapters.findIndex(
-          chapter => chapter.id === currentChapter?.id
-        )
-        if (index >= 0 && index < chapters.length) {
-          ref.current.scrollToIndex({ index, viewPosition: 0.5 })
-        }
-      }
-    }, [chapters, currentChapter, isOpen])
-
-    return (
-      <BottomSheetFlatList
-        ref={ref}
-        data={chapters}
-        style={tw`px-4`}
-        keyExtractor={item => item.id}
-        renderItem={renderItem}
-        ListFooterComponent={() => <View style={{ height: tabBarHeight }} />}
-        ListHeaderComponent={() => <ChaptersHeader />}
-        stickyHeaderIndices={[0]}
-      />
-    )
-  }
-)
 
 export function Chapters({ sheetRef, onChange, isOpen }) {
   // console.log('RENDERING: Chapters')

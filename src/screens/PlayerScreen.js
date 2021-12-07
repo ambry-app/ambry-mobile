@@ -1,15 +1,16 @@
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
-import React, { memo, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Platform, Text, View } from 'react-native'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming
 } from 'react-native-reanimated'
+import shallow from 'zustand/shallow'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import { usePlayer } from '../contexts/Player'
 import tw from '../lib/tailwind'
+import usePlayer from '../stores/Player'
 import Background from './PlayerScreen/Background'
 import BookDetails from './PlayerScreen/BookDetails'
 import PlaybackRate from './PlayerScreen/PlaybackRate'
@@ -22,22 +23,19 @@ import PlayerHeader from './PlayerScreen/PlayerHeader'
 import ProgressDisplay from './PlayerScreen/ProgressDisplay'
 import SleepTimerToggle from './PlayerScreen/SleepTimerToggle'
 
+const playerSelector = [
+  state => [
+    state.mediaError,
+    state.mediaLoading,
+    state.media,
+    state.imageSource
+  ],
+  shallow
+]
+
 export default function PlayerScreen() {
-  const { state } = usePlayer()
-  const { error, loading, media, imageSource } = state
-
-  return (
-    <ActualPlayerScreen
-      error={error}
-      loading={loading}
-      media={media}
-      imageSource={imageSource}
-    />
-  )
-}
-
-const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
   // console.log('RENDERING: PlayerScreen')
+  const [error, loading, media, imageSource] = usePlayer(...playerSelector)
   const opacity = useSharedValue(0)
 
   useEffect(() => {
@@ -129,4 +127,4 @@ const ActualPlayerScreen = memo(({ error, loading, media, imageSource }) => {
       />
     </BottomSheetModalProvider>
   )
-})
+}
