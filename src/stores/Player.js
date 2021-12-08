@@ -93,7 +93,7 @@ useStore.subscribe(
 
 // Support:
 
-const setupTrackPlayer = async () => {
+export const setupTrackPlayer = async () => {
   console.debug('Player: setting up TrackPlayer...')
 
   const track = await TrackPlayer.getTrack(0)
@@ -132,6 +132,37 @@ const setupTrackPlayer = async () => {
   useStore.setState({ trackPlayerReady: true })
 }
 
+const calculateSeekPosition = (interval, playbackRate, position, media) => {
+  const actualInterval = interval * playbackRate
+  const targetDestination = position + actualInterval
+  const actualDestination = Math.max(
+    Math.min(targetDestination, media.duration),
+    0
+  )
+  const chapter = findChapter(actualDestination, media.chapters)
+
+  return [actualDestination, chapter]
+}
+
+const seekRelativeState = interval => {
+  const { playbackRate, position, media } = useStore.getState()
+
+  const [destination, chapter] = calculateSeekPosition(
+    interval,
+    playbackRate,
+    position,
+    media
+  )
+
+  useStore.setState({
+    position: destination,
+    buffered: 0,
+    currentChapter: chapter
+  })
+
+  return [destination, chapter]
+}
+
 const updatePosition = async media => {
   const [position, buffered] = await Promise.all([
     TrackPlayer.getPosition(),
@@ -146,28 +177,30 @@ const updatePosition = async media => {
   })
 }
 
-let positionTimerRef
+const positionTimer = (() => {
+  let positionTimerRef
 
-const positionTimer = state => {
-  const { media, trackPlayerReady, mediaLoading, isSeeking, playbackRate } =
-    state
+  return state => {
+    const { media, trackPlayerReady, mediaLoading, isSeeking, playbackRate } =
+      state
 
-  if (!media) {
-    clearInterval(positionTimerRef)
-    return
+    if (!media) {
+      clearInterval(positionTimerRef)
+      return
+    }
+
+    if (trackPlayerReady && !mediaLoading && !isSeeking) {
+      clearInterval(positionTimerRef)
+
+      positionTimerRef = setInterval(
+        () => updatePosition(media),
+        1000 / playbackRate
+      )
+    } else {
+      clearInterval(positionTimerRef)
+    }
   }
-
-  if (trackPlayerReady && !mediaLoading && !isSeeking) {
-    clearInterval(positionTimerRef)
-
-    positionTimerRef = setInterval(
-      () => updatePosition(media),
-      1000 / playbackRate
-    )
-  } else {
-    clearInterval(positionTimerRef)
-  }
-}
+})()
 
 const loadPlayerStateFromServer = async selectedMedia => {
   if (selectedMedia === undefined) {
@@ -310,24 +343,7 @@ const updateServerPosition = async () => {
   }
 
   console.debug('Player: updating server position', playerStateReport)
-  reportPlayerState(playerStateReport)
-}
-
-const seekRelativeInternal = async interval => {
-  console.debug('Player: seeking', interval)
-
-  const [position, duration, playbackRate] = await Promise.all([
-    TrackPlayer.getPosition(),
-    TrackPlayer.getDuration(),
-    TrackPlayer.getRate()
-  ])
-  const actualInterval = interval * playbackRate
-  const targetDestination = position + actualInterval
-  const actualDestination = Math.max(Math.min(targetDestination, duration), 0)
-
-  await TrackPlayer.seekTo(actualDestination)
-
-  updateServerPosition()
+  return reportPlayerState(playerStateReport)
 }
 
 // Actions:
@@ -376,7 +392,7 @@ export const setPlaybackRate = async newPlaybackRate => {
   }
 
   console.debug('Player: updating server playback rate', playerStateReport)
-  reportPlayerState(playerStateReport)
+  return reportPlayerState(playerStateReport)
 }
 
 export const togglePlayback = async () => {
@@ -385,57 +401,58 @@ export const togglePlayback = async () => {
   const playbackState = await TrackPlayer.getState()
 
   if (playbackState !== State.Playing) {
-    console.debug('Player: playing')
-    await TrackPlayer.play()
+    return play()
   } else {
-    console.debug('Player: pausing')
-    await TrackPlayer.pause()
-    seekRelativeInternal(-1)
+    return pause()
   }
 }
 
-export const seekTo = async position => {
-  console.debug('Player: seeking to', position)
+export const play = () => {
+  console.debug('Player: playing')
+  return TrackPlayer.play()
+}
 
-  const { media } = useStore.getState()
-  const chapter = findChapter(position, media.chapters)
+export const pause = async () => {
+  console.debug('Player: pausing')
+  await TrackPlayer.pause()
+  return seekRelative(-1)
+}
+
+export const seekTo = async (position, chapter) => {
+  console.debug('Player: seeking to', position)
 
   useStore.setState({
     position: position,
     buffered: 0,
-    currentChapter: chapter
+    currentChapter:
+      chapter || findChapter(position, useStore.getState().media.chapters)
   })
   await TrackPlayer.seekTo(position)
 
-  updateServerPosition()
+  return updateServerPosition()
 }
 
-let seekTimerRef
+export const seekRelativeThrottled = (() => {
+  let seekTimerRef
 
-export const seekRelative = interval => {
-  useStore.setState({ isSeeking: true })
+  return interval => {
+    useStore.setState({ isSeeking: true })
 
-  const { playbackRate, position, media } = useStore.getState()
+    // seek and update state
+    const [destination, chapter] = seekRelativeState(interval)
 
-  const actualInterval = interval * playbackRate
-  const targetDestination = position + actualInterval
-  const actualDestination = Math.max(
-    Math.min(targetDestination, media.duration),
-    0
-  )
-  const chapter = findChapter(actualDestination, media.chapters)
+    // throttle actually seeking TrackPlayer
+    clearTimeout(seekTimerRef)
+    seekTimerRef = setTimeout(() => {
+      useStore.setState({ isSeeking: false })
+      seekTo(destination, chapter)
+    }, 500)
+  }
+})()
 
-  useStore.setState({
-    position: actualDestination,
-    buffered: 0,
-    currentChapter: chapter
-  })
+export const seekRelative = interval => seekTo(...seekRelativeState(interval))
 
-  // throttle actually seeking TrackPlayer
-  clearTimeout(seekTimerRef)
-  seekTimerRef = setTimeout(() => {
-    useStore.setState({ isSeeking: false })
-    // FIXME: recalculates chapter when it doesn't need to
-    seekTo(actualDestination)
-  }, 500)
+export const destroy = () => {
+  useStore.setState({ trackPlayerReady: false })
+  return TrackPlayer.destroy()
 }

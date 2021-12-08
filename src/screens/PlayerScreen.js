@@ -9,8 +9,9 @@ import Animated, {
 import shallow from 'zustand/shallow'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
+import useFirstRender from '../hooks/firstRender'
 import tw from '../lib/tailwind'
-import usePlayer from '../stores/Player'
+import usePlayer, { setupTrackPlayer } from '../stores/Player'
 import Background from './PlayerScreen/Background'
 import BookDetails from './PlayerScreen/BookDetails'
 import PlaybackRate from './PlayerScreen/PlaybackRate'
@@ -28,15 +29,23 @@ const playerSelector = [
     state.mediaError,
     state.mediaLoading,
     state.media,
-    state.imageSource
+    state.imageSource,
+    state.trackPlayerReady,
+    state._hasHydrated
   ],
   shallow
 ]
 
 export default function PlayerScreen() {
   // console.log('RENDERING: PlayerScreen')
-  const [error, loading, media, imageSource] = usePlayer(...playerSelector)
+  const isFirstRender = useFirstRender()
+  const [error, loading, media, imageSource, trackPlayerReady, hydrated] =
+    usePlayer(...playerSelector)
   const opacity = useSharedValue(0)
+
+  if (isFirstRender && hydrated) {
+    setupTrackPlayer()
+  }
 
   useEffect(() => {
     if (loading) {
@@ -91,7 +100,7 @@ export default function PlayerScreen() {
     )
   }
 
-  if (loading || !media) {
+  if (loading || !media || !trackPlayerReady) {
     return (
       <ScreenCentered>
         <LargeActivityIndicator />
