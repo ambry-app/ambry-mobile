@@ -13,98 +13,41 @@ import Animated, {
 } from 'react-native-reanimated'
 import Svg, { Path } from 'react-native-svg'
 import { State, usePlaybackState } from 'react-native-track-player'
-import useFirstRender from '../../hooks/firstRender'
 import tw from '../../lib/tailwind'
 import { secondsDisplayMinutesOnly } from '../../lib/utils'
-import SleepTimer from '../../modules/SleepTimer'
+import SleepTimer, { useSleepTimer } from '../../stores/SleepTimer'
 import SecondsModal from './SleepTimerToggle/SecondsModal'
 
-const initialState = {
-  enabled: false,
-  isRunning: false,
-  countdownSeconds: undefined,
-  currentCountdownSeconds: undefined,
-  modalVisible: false
-}
-
 export default function SleepTimerToggle() {
-  const isFirstRender = useFirstRender()
+  const { enabled, countdownSeconds, isRunning, targetTime } = useSleepTimer()
   const playbackState = usePlaybackState()
-  const [state, setState] = useState(initialState)
-  const isActive = useSharedValue(0)
-
-  if (isFirstRender) {
-    ;(async () => {
-      const timer = await SleepTimer.get()
-
-      if (timer.enabled) {
-        isActive.value = 1
-      }
-
-      setState(currentState => ({
-        ...currentState,
-        enabled: timer.enabled,
-        isRunning: !!timer.targetTime,
-        countdownSeconds: timer.countdownSeconds,
-        currentCountdownSeconds: timer.targetTime
-          ? Math.round((timer.targetTime - Date.now()) / 1000)
-          : timer.countdownSeconds
-      }))
-    })()
-  }
+  const [modalVisible, setModalVisible] = useState(false)
+  const [currentCountdownSeconds, setCurrentCountdownSeconds] =
+    useState(countdownSeconds)
+  const isActive = useSharedValue(enabled ? 1 : 0)
 
   useEffect(() => {
-    ;(async () => {
-      if (playbackState === State.Playing) {
-        const timer = await SleepTimer.get()
+    if (enabled) {
+      isActive.value = withTiming(1, { duration: 200 })
+    } else {
+      isActive.value = withTiming(0, { duration: 200 })
+    }
+  }, [isActive, enabled])
 
-        if (timer.enabled && !timer.targetTime) {
-          SleepTimer.start()
-        }
-
-        setState(currentState => ({
-          ...currentState,
-          isRunning: true
-        }))
-      } else if (playbackState === State.Paused) {
-        const timer = await SleepTimer.get()
-
-        if (timer.enabled && timer.targetTime) {
-          SleepTimer.stop()
-        }
-
-        setState(currentState => ({
-          ...currentState,
-          isRunning: false,
-          currentCountdownSeconds: currentState.countdownSeconds
-        }))
-      }
-    })()
-  }, [playbackState])
+  useEffect(() => {
+    if (targetTime) {
+      setCurrentCountdownSeconds(Math.round((targetTime - Date.now()) / 1000))
+    } else {
+      setCurrentCountdownSeconds(countdownSeconds)
+    }
+  }, [countdownSeconds, targetTime])
 
   useEffect(() => {
     let interval
 
-    if (state.isRunning) {
+    if (isRunning) {
       interval = setInterval(
-        () =>
-          setState(currentState => {
-            const nextCountdownSeconds =
-              currentState.currentCountdownSeconds - 1
-
-            if (nextCountdownSeconds >= 0) {
-              return {
-                ...currentState,
-                currentCountdownSeconds: nextCountdownSeconds
-              }
-            } else {
-              return {
-                ...currentState,
-                isRunning: false,
-                currentCountdownSeconds: currentState.countdownSeconds
-              }
-            }
-          }),
+        () => setCurrentCountdownSeconds(current => current - 1),
         1000
       )
     }
@@ -112,28 +55,11 @@ export default function SleepTimerToggle() {
     return () => {
       clearInterval(interval)
     }
-  }, [state.isRunning])
+  }, [isRunning])
 
   const toggleSleepTimer = useCallback(async () => {
-    const timer = await SleepTimer.toggleEnabled(
-      playbackState === State.Playing
-    )
-
-    setState(currentState => ({
-      ...currentState,
-      enabled: timer.enabled,
-      isRunning: !!timer.targetTime,
-      currentCountdownSeconds: timer.enabled
-        ? currentState.countdownSeconds
-        : currentState.currentCountdownSeconds
-    }))
-
-    if (timer.enabled) {
-      isActive.value = withTiming(1, { duration: 200 })
-    } else {
-      isActive.value = withTiming(0, { duration: 200 })
-    }
-  }, [isActive, playbackState])
+    SleepTimer.toggleEnabled(playbackState === State.Playing)
+  }, [playbackState])
 
   const animatedViewStyle = useAnimatedStyle(() => ({
     paddingTop: interpolate(isActive.value, [1, 0], [0, 8])
@@ -145,32 +71,22 @@ export default function SleepTimerToggle() {
 
   const onLongPress = useCallback(() => {
     ReactNativeHapticFeedback.trigger('soft')
-    setState(currentState => ({ ...currentState, modalVisible: true }))
+    setModalVisible(true)
   }, [])
 
   const onRequestModalClose = useCallback(() => {
-    setState(currentState => ({ ...currentState, modalVisible: false }))
+    setModalVisible(false)
   }, [])
 
   const onNewCountdownSeconds = useCallback(async value => {
-    const timer = await SleepTimer.setCountdown(value)
-
-    if (timer.targetTime) {
-      SleepTimer.reset()
-    }
-
-    setState(currentState => ({
-      ...currentState,
-      countdownSeconds: value,
-      currentCountdownSeconds: value
-    }))
+    SleepTimer.setCountdown(value)
   }, [])
 
   return (
     <>
       <SecondsModal
-        visible={state.modalVisible}
-        countdownSeconds={state.countdownSeconds}
+        visible={modalVisible}
+        countdownSeconds={countdownSeconds}
         onNewValue={onNewCountdownSeconds}
         onRequestClose={onRequestModalClose}
       />
@@ -192,9 +108,7 @@ export default function SleepTimerToggle() {
               height="30"
               width="30"
               viewBox="0 0 24 24"
-              stroke={
-                state.enabled ? tw.color('lime-400') : tw.color('gray-400')
-              }
+              stroke={enabled ? tw.color('lime-400') : tw.color('gray-400')}
             >
               <Path
                 strokeLinecap="round"
@@ -207,11 +121,11 @@ export default function SleepTimerToggle() {
               <Text
                 style={[
                   tw`text-xs`,
-                  state.enabled ? tw`text-lime-400` : tw`text-gray-400`,
+                  enabled ? tw`text-lime-400` : tw`text-gray-400`,
                   styles.textSize
                 ]}
               >
-                {secondsDisplayMinutesOnly(state.currentCountdownSeconds)}
+                {secondsDisplayMinutesOnly(currentCountdownSeconds)}
               </Text>
             </Animated.View>
           </Animated.View>

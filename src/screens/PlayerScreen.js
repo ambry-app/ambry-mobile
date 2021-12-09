@@ -100,6 +100,7 @@ export default function PlayerScreen() {
     )
   }
 
+  // FIXME: on fresh app boot (no store) this is displayed
   if (loading || !media || !trackPlayerReady) {
     return (
       <ScreenCentered>

@@ -9,6 +9,7 @@ import TrackPlayer, {
 import create from 'zustand'
 import { persist, subscribeWithSelector } from 'zustand/middleware'
 import shallow from 'zustand/shallow'
+import SleepTimer from '../stores/SleepTimer'
 import { getPlayerState, reportPlayerState, uriSource } from './AmbryAPI'
 
 // Store:
@@ -93,6 +94,7 @@ useStore.subscribe(
 
 // Support:
 
+// FIXME: figure out a better way to handle re-starts after destroy
 export const setupTrackPlayer = async () => {
   console.debug('Player: setting up TrackPlayer...')
 
@@ -144,8 +146,36 @@ const calculateSeekPosition = (interval, playbackRate, position, media) => {
   return [actualDestination, chapter]
 }
 
+// Calculate relative seek position based on current state
+// NOTE: this assumes the state is up-to-date (it won't be if calling from a
+// background service)
 const seekRelativeState = interval => {
   const { playbackRate, position, media } = useStore.getState()
+
+  const [destination, chapter] = calculateSeekPosition(
+    interval,
+    playbackRate,
+    position,
+    media
+  )
+
+  useStore.setState({
+    position: destination,
+    buffered: 0,
+    currentChapter: chapter
+  })
+
+  return [destination, chapter]
+}
+
+// Calculate relative seek position based on fresh position information from
+// TrackPlayer. Use this when the state might not be up-to-date.
+const seekRelativeFresh = async interval => {
+  const [playbackRate, position] = await Promise.all([
+    TrackPlayer.getRate(),
+    TrackPlayer.getPosition()
+  ])
+  const { media } = useStore.getState()
 
   const [destination, chapter] = calculateSeekPosition(
     interval,
@@ -331,7 +361,7 @@ const updateServerPosition = async () => {
   ])
 
   if (!track) {
-    console.warn('Player: updateServerPosition called while no track loaded')
+    console.debug('Player: updateServerPosition called while no track loaded')
     return
   }
 
@@ -407,13 +437,17 @@ export const togglePlayback = async () => {
   }
 }
 
-export const play = () => {
+export const play = async () => {
   console.debug('Player: playing')
+
+  SleepTimer.startIfEnabled()
   return TrackPlayer.play()
 }
 
 export const pause = async () => {
   console.debug('Player: pausing')
+
+  SleepTimer.stopIfRunning()
   await TrackPlayer.pause()
   return seekRelative(-1)
 }
@@ -427,6 +461,7 @@ export const seekTo = async (position, chapter) => {
     currentChapter:
       chapter || findChapter(position, useStore.getState().media.chapters)
   })
+  SleepTimer.resetIfRunning()
   await TrackPlayer.seekTo(position)
 
   return updateServerPosition()
@@ -450,7 +485,8 @@ export const seekRelativeThrottled = (() => {
   }
 })()
 
-export const seekRelative = interval => seekTo(...seekRelativeState(interval))
+export const seekRelative = async interval =>
+  seekTo(...(await seekRelativeFresh(interval)))
 
 export const destroy = () => {
   useStore.setState({ trackPlayerReady: false })
