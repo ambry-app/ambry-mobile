@@ -10,9 +10,13 @@ import {
 import Logo from '../assets/logo_256x1056.svg'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import tw from '../lib/tailwind'
-import { signIn } from '../stores/AmbryAPI'
+import useAmbryAPI, { signIn } from '../stores/AmbryAPI'
+
+import { Picker } from '@react-native-picker/picker'
 
 export default function SignInScreen() {
+  const knownHosts = useAmbryAPI(state => state.knownHosts)
+  const [showHostInput, setShowHostInput] = useState()
   const [loading, isLoading] = useState(false)
   const [error, isError] = useState(false)
   const [email, setEmail] = useState('')
@@ -51,16 +55,44 @@ export default function SignInScreen() {
           Personal Audiobook Streaming
         </Text>
       </View>
-      <TextInput
-        placeholder="Host"
-        value={host}
-        autoCapitalize="none"
-        onChangeText={setHost}
-        style={tw`my-2 text-gray-700 dark:text-gray-200 border-2 border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700 rounded px-3 py-2`}
-        placeholderTextColor={
-          scheme === 'dark' ? tw.color('gray-500') : tw.color('gray-300')
-        }
-      />
+      {knownHosts.length === 0 || showHostInput ? (
+        <TextInput
+          placeholder="Host"
+          value={host}
+          autoCapitalize="none"
+          onChangeText={setHost}
+          style={tw`my-2 text-gray-700 dark:text-gray-200 border-2 border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700 rounded px-3 py-2`}
+          placeholderTextColor={
+            scheme === 'dark' ? tw.color('gray-500') : tw.color('gray-300')
+          }
+        />
+      ) : (
+        <View
+          style={tw`my-2 border-2 border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700 rounded`}
+        >
+          <Picker
+            selectedValue={host}
+            onValueChange={(itemValue, _itemIndex) =>
+              itemValue === 'new'
+                ? setShowHostInput(true) && setHost('')
+                : setHost(itemValue)
+            }
+            style={tw`text-gray-700 dark:text-gray-200`}
+            dropdownIconColor={
+              scheme === 'dark' ? tw.color('gray-200') : tw.color('gray-700')
+            }
+          >
+            {knownHosts.map(selectableHost => (
+              <Picker.Item
+                key={selectableHost}
+                label={selectableHost}
+                value={selectableHost}
+              />
+            ))}
+            <Picker.Item label="New Host" value="new" />
+          </Picker>
+        </View>
+      )}
       <TextInput
         placeholder="Email"
         value={email}

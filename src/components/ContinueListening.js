@@ -14,7 +14,7 @@ import useFirstRender from '../hooks/firstRender'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/playerStates'
-import { getRecentPlayerStates, uriSource } from '../stores/AmbryAPI'
+import { signOut, getRecentPlayerStates, uriSource } from '../stores/AmbryAPI'
 import usePlayer, { clearMedia, loadMedia } from '../stores/Player'
 import WrappingList from './WrappingList'
 
@@ -136,12 +136,17 @@ export default function ContinueListening({ navigation }) {
           <Item playerState={item} navigation={navigation} />
         )}
         ListFooterComponent={
-          <View style={tw`h-14`}>
+          <View style={tw`h-22`}>
             {__DEV__ && (
-              <Button
-                title="Clear Selected Media"
-                onPress={clearMediaAndNavigate}
-              />
+              <>
+                <View style={tw`mb-2`}>
+                  <Button
+                    title="Clear Selected Media"
+                    onPress={clearMediaAndNavigate}
+                  />
+                </View>
+                <Button title="Sign Out" onPress={signOut} />
+              </>
             )}
             {loading && <LargeActivityIndicator />}
           </View>

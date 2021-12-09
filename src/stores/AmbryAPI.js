@@ -3,7 +3,7 @@ import create from 'zustand'
 import { persist } from 'zustand/middleware'
 import API, { createToken } from '../api/ambry'
 
-export const AUTH_STORAGE_KEY = '@Ambry_userSession'
+const AUTH_STORAGE_KEY = '@Ambry_userSession'
 
 // Store:
 
@@ -11,6 +11,7 @@ const useStore = create(
   persist(
     () => ({
       loggedIn: false,
+      knownHosts: [],
       _authData: undefined,
       _hasHydrated: false
     }),
@@ -20,6 +21,7 @@ const useStore = create(
       // only persist these values:
       partialize: state => ({
         loggedIn: state.loggedIn,
+        knownHosts: state.knownHosts,
         _authData: state._authData
       }),
       onRehydrateStorage: _initialState => {
@@ -45,6 +47,7 @@ export default useStore
 export const signIn = async (host, email, password) => {
   console.debug('AmbryAPI: Signing in with the server')
 
+  const { knownHosts } = useStore.getState()
   const { token } = await createToken(host, email, password)
   const newAuthData = { host, email, token }
 
@@ -52,7 +55,8 @@ export const signIn = async (host, email, password) => {
 
   useStore.setState({
     _authData: newAuthData,
-    loggedIn: true
+    loggedIn: true,
+    knownHosts: [...new Set([host, ...knownHosts])]
   })
 }
 
