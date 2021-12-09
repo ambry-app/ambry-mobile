@@ -14,8 +14,8 @@ import useFirstRender from '../hooks/firstRender'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/playerStates'
-import { signOut, getRecentPlayerStates, uriSource } from '../stores/AmbryAPI'
-import usePlayer, { clearMedia, loadMedia } from '../stores/Player'
+import { getRecentPlayerStates, signOut, uriSource } from '../stores/AmbryAPI'
+import usePlayer, { destroy, loadMedia } from '../stores/Player'
 import WrappingList from './WrappingList'
 
 function Item({ playerState, navigation }) {
@@ -94,9 +94,14 @@ export default function ContinueListening({ navigation }) {
   }, [])
 
   const clearMediaAndNavigate = useCallback(() => {
-    clearMedia()
+    destroy()
     navigation.navigate('PlayerScreen')
   }, [navigation])
+
+  const clearMediaAndSignOut = useCallback(() => {
+    destroy()
+    signOut()
+  }, [])
 
   if (isFirstRender) {
     fetchPlayerStates()
@@ -145,7 +150,7 @@ export default function ContinueListening({ navigation }) {
                     onPress={clearMediaAndNavigate}
                   />
                 </View>
-                <Button title="Sign Out" onPress={signOut} />
+                <Button title="Sign Out" onPress={clearMediaAndSignOut} />
               </>
             )}
             {loading && <LargeActivityIndicator />}

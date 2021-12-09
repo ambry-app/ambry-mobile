@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import { Picker } from '@react-native-picker/picker'
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   ScrollView,
@@ -12,8 +13,6 @@ import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import tw from '../lib/tailwind'
 import useAmbryAPI, { signIn } from '../stores/AmbryAPI'
 
-import { Picker } from '@react-native-picker/picker'
-
 export default function SignInScreen() {
   const knownHosts = useAmbryAPI(state => state.knownHosts)
   const [showHostInput, setShowHostInput] = useState()
@@ -23,6 +22,13 @@ export default function SignInScreen() {
   const [host, setHost] = useState('')
   const [password, setPassword] = useState('')
   const scheme = useColorScheme()
+
+  useEffect(() => {
+    console.log(knownHosts)
+    if (knownHosts[0]) {
+      setHost(knownHosts[0])
+    }
+  }, [knownHosts])
 
   const signInCallback = async (...args) => {
     isError(false)
@@ -74,7 +80,10 @@ export default function SignInScreen() {
             selectedValue={host}
             onValueChange={(itemValue, _itemIndex) =>
               itemValue === 'new'
-                ? setShowHostInput(true) && setHost('')
+                ? (() => {
+                    setShowHostInput(true)
+                    setHost('')
+                  })()
                 : setHost(itemValue)
             }
             style={tw`text-gray-700 dark:text-gray-200`}

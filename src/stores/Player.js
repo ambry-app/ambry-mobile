@@ -60,18 +60,9 @@ export default useStore
 // Subscriptions:
 
 useStore.subscribe(
-  state => state._hasHydrated,
-  hydrated => {
+  state => [state._hasHydrated, state.selectedMedia],
+  ([hydrated, selectedMedia]) => {
     if (hydrated) {
-      setupTrackPlayer()
-    }
-  }
-)
-
-useStore.subscribe(
-  state => [state.trackPlayerReady, state.selectedMedia],
-  ([trackPlayerReady, selectedMedia]) => {
-    if (trackPlayerReady) {
       loadPlayerStateFromServer(selectedMedia)
     }
   },
@@ -94,8 +85,7 @@ useStore.subscribe(
 
 // Support:
 
-// FIXME: figure out a better way to handle re-starts after destroy
-export const setupTrackPlayer = async () => {
+const setupTrackPlayer = async () => {
   console.debug('Player: setting up TrackPlayer...')
 
   const track = await TrackPlayer.getTrack(0)
@@ -233,12 +223,7 @@ const positionTimer = (() => {
 })()
 
 const loadPlayerStateFromServer = async selectedMedia => {
-  if (selectedMedia === undefined) {
-    console.debug('Player: selectedMedia is undefined')
-    return
-  }
-
-  if (selectedMedia === null) {
+  if (!selectedMedia) {
     console.debug('Player: no selectedMedia')
     useStore.setState({
       mediaLoading: false,
@@ -273,6 +258,8 @@ const loadPlayerStateFromServer = async selectedMedia => {
 }
 
 const loadTrackIntoPlayer = async playerState => {
+  await setupTrackPlayer()
+
   const mediaTrack = mediaTrackForPlatform(playerState.media)
   const { uri: artworkUrl, headers } = uriSource(
     playerState.media.book.imagePath
@@ -390,14 +377,6 @@ export const loadMedia = async (id, imagePath) => {
   })
 }
 
-export const clearMedia = () => {
-  console.debug(`Player: clearing`)
-
-  useStore.setState({
-    selectedMedia: null
-  })
-}
-
 export const setPlaybackRate = async newPlaybackRate => {
   console.debug('Player: setting playback rate', newPlaybackRate)
 
@@ -489,6 +468,11 @@ export const seekRelative = async interval =>
   seekTo(...(await seekRelativeFresh(interval)))
 
 export const destroy = () => {
-  useStore.setState({ trackPlayerReady: false })
+  console.debug('Player: clearing selected media and destroying player')
+
+  useStore.setState({
+    selectedMedia: null,
+    trackPlayerReady: false
+  })
   return TrackPlayer.destroy()
 }

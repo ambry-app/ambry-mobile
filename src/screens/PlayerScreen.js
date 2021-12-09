@@ -9,9 +9,8 @@ import Animated, {
 import shallow from 'zustand/shallow'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
-import useFirstRender from '../hooks/firstRender'
 import tw from '../lib/tailwind'
-import usePlayer, { setupTrackPlayer } from '../stores/Player'
+import usePlayer from '../stores/Player'
 import Background from './PlayerScreen/Background'
 import BookDetails from './PlayerScreen/BookDetails'
 import PlaybackRate from './PlayerScreen/PlaybackRate'
@@ -30,7 +29,6 @@ const playerSelector = [
     state.mediaLoading,
     state.media,
     state.imageSource,
-    state.trackPlayerReady,
     state._hasHydrated
   ],
   shallow
@@ -38,14 +36,10 @@ const playerSelector = [
 
 export default function PlayerScreen() {
   // console.log('RENDERING: PlayerScreen')
-  const isFirstRender = useFirstRender()
-  const [error, loading, media, imageSource, trackPlayerReady, hydrated] =
-    usePlayer(...playerSelector)
+  const [error, loading, media, imageSource, hydrated] = usePlayer(
+    ...playerSelector
+  )
   const opacity = useSharedValue(0)
-
-  if (isFirstRender && hydrated) {
-    setupTrackPlayer()
-  }
 
   useEffect(() => {
     if (loading) {
@@ -75,17 +69,6 @@ export default function PlayerScreen() {
     )
   }
 
-  // it was explicitly set to null; this means there is no current player state
-  if (media === null) {
-    return (
-      <ScreenCentered>
-        <Text style={tw`text-gray-700 dark:text-gray-200`}>
-          No audiobook selected. Visit the Library to choose a book.
-        </Text>
-      </ScreenCentered>
-    )
-  }
-
   if (loading && imageSource) {
     return (
       <Background loading={loading} imageSource={imageSource} blur={0}>
@@ -100,11 +83,20 @@ export default function PlayerScreen() {
     )
   }
 
-  // FIXME: on fresh app boot (no store) this is displayed
-  if (loading || !media || !trackPlayerReady) {
+  if (loading || !hydrated) {
     return (
       <ScreenCentered>
         <LargeActivityIndicator />
+      </ScreenCentered>
+    )
+  }
+
+  if (!media) {
+    return (
+      <ScreenCentered>
+        <Text style={tw`text-gray-700 dark:text-gray-200`}>
+          No audiobook selected. Visit the Library to choose a book.
+        </Text>
       </ScreenCentered>
     )
   }
