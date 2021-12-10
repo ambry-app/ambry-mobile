@@ -1,11 +1,13 @@
-import TrackPlayer, { Event, State } from 'react-native-track-player'
-import { destroy, pause, play, seekRelative } from '../stores/Player'
+import TrackPlayer, { Event } from 'react-native-track-player'
+import { isPlaying } from '../lib/utils'
+import { destroy, pause, play, seekRelative, stop } from '../stores/Player'
 
 let wasPausedByDuck = false
 
 // This is a hack to work around a bug in track player:
 // Event listeners are NOT cleared when the player is destroyed. So we only fire
 // the listeners when the timecode of last setup matches.
+// FIXME: 2.2 beta fixes this I think
 let validId
 
 export default async function setup() {
@@ -19,7 +21,7 @@ export default async function setup() {
     }
     console.debug('Service: playback queue ended')
 
-    seekRelative(0)
+    stop()
   })
 
   TrackPlayer.addEventListener(Event.RemoteStop, async () => {
@@ -72,15 +74,19 @@ export default async function setup() {
     if (id !== validId) {
       return
     }
-    if (e.permanent === true) {
+
+    const playerState = await TrackPlayer.getState()
+
+    if (e.permanent === true && isPlaying(playerState)) {
       console.debug('Service: duck permanent, pausing')
       pause()
     } else {
       if (e.paused === true) {
-        console.debug('Service: duck temporary, pausing')
-        const playerState = await TrackPlayer.getState()
-        wasPausedByDuck = playerState !== State.Paused
-        await pause()
+        if (isPlaying(playerState)) {
+          console.debug('Service: duck temporary, pausing')
+          wasPausedByDuck = true
+          pause()
+        }
       } else {
         if (wasPausedByDuck === true) {
           console.debug('Service: duck resuming')

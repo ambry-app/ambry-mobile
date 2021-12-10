@@ -3,12 +3,12 @@ import { Platform } from 'react-native'
 import TrackPlayer, {
   Capability,
   PitchAlgorithm,
-  State,
   TrackType
 } from 'react-native-track-player'
 import create from 'zustand'
 import { persist, subscribeWithSelector } from 'zustand/middleware'
 import shallow from 'zustand/shallow'
+import { isPlaying } from '../lib/utils'
 import SleepTimer from '../stores/SleepTimer'
 import { getPlayerState, reportPlayerState, uriSource } from './AmbryAPI'
 
@@ -409,10 +409,10 @@ export const togglePlayback = async () => {
 
   const playbackState = await TrackPlayer.getState()
 
-  if (playbackState !== State.Playing) {
-    return play()
-  } else {
+  if (isPlaying(playbackState)) {
     return pause()
+  } else {
+    return play()
   }
 }
 
@@ -429,6 +429,14 @@ export const pause = async () => {
   SleepTimer.stopIfRunning()
   await TrackPlayer.pause()
   return seekRelative(-1)
+}
+
+export const stop = async () => {
+  console.debug('Player: stopping')
+
+  SleepTimer.stopIfRunning()
+  await TrackPlayer.pause()
+  return updateServerPosition()
 }
 
 export const seekTo = async (position, chapter) => {
