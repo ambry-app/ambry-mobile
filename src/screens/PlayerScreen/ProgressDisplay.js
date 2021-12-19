@@ -16,6 +16,8 @@ function buildProgressDisplay(
   bufferedSeconds,
   playbackRate
 ) {
+  if (!durationSeconds) return
+
   const percent = progressPercent(durationSeconds, positionSeconds)
   const bufferedPercent = progressPercent(durationSeconds, bufferedSeconds)
   const position = secondsDisplay(positionSeconds)
@@ -41,15 +43,14 @@ const playerSelector = [
 export default function ProgressDisplay() {
   // console.log('RENDERING: ProgressDisplay')
   const [position, buffered, media, playbackRate] = usePlayer(...playerSelector)
-  const { duration } = media
   const [progressDisplay, setProgressDisplay] = useState()
   const opacity = useSharedValue(0)
 
   useEffect(() => {
     setProgressDisplay(
-      buildProgressDisplay(duration, position, buffered, playbackRate)
+      buildProgressDisplay(media?.duration, position, buffered, playbackRate)
     )
-  }, [position, buffered, duration, playbackRate])
+  }, [position, buffered, media, playbackRate])
 
   useEffect(() => {
     if (progressDisplay) {

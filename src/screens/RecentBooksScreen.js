@@ -15,9 +15,7 @@ export default function RecentBooksScreen() {
   const { books, nextPage, hasMore, loading, refreshing, error } = state
 
   const fetchBooks = useCallback(async () => {
-    if (!hasMore) {
-      return
-    }
+    if (!hasMore) return
 
     dispatch(actionCreators.loading())
 

@@ -25,9 +25,7 @@ export function useChapters(ref, loading) {
   }, [])
 
   const toggleChapters = useCallback(() => {
-    if (!ref.current) {
-      return
-    }
+    if (!ref.current) return
 
     if (chaptersOpen) {
       ref.current.close()
@@ -136,7 +134,6 @@ const playerSelector = [state => [state.media, state.currentChapter], shallow]
 const ChaptersList = ({ sheetRef, isOpen }) => {
   // console.log('RENDERING: ChaptersList')
   const [media, currentChapter] = usePlayer(...playerSelector)
-  const { chapters } = media
   const tabBarHeight = useBottomTabBarHeight()
   const ref = useRef()
 
@@ -162,20 +159,20 @@ const ChaptersList = ({ sheetRef, isOpen }) => {
   )
 
   useEffect(() => {
-    if (isOpen) {
-      const index = chapters.findIndex(
-        chapter => chapter.id === currentChapter?.id
-      )
-      if (index >= 0 && index < chapters.length) {
-        ref.current.scrollToIndex({ index, viewPosition: 0.5 })
-      }
+    if (!media || !isOpen) return
+
+    const index = media.chapters.findIndex(
+      chapter => chapter.id === currentChapter?.id
+    )
+    if (index >= 0 && index < media.chapters.length) {
+      ref.current.scrollToIndex({ index, viewPosition: 0.5 })
     }
-  }, [chapters, currentChapter, isOpen])
+  }, [media, currentChapter, isOpen])
 
   return (
     <BottomSheetFlatList
       ref={ref}
-      data={chapters}
+      data={media?.chapters || []}
       style={tw`px-4`}
       keyExtractor={item => item.id}
       renderItem={renderItem}

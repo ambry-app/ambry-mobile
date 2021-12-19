@@ -26,7 +26,7 @@ function Item({ playerState, navigation }) {
       onPress={() => {
         navigation.navigate('PlayerScreen')
 
-        if (!selectedMedia || selectedMedia.id !== playerState.media.id) {
+        if (selectedMedia?.id !== playerState.media.id) {
           loadMedia(playerState.media.id, playerState.media.book.imagePath)
         }
       }}
@@ -66,9 +66,7 @@ export default function ContinueListening({ navigation }) {
   const { playerStates, nextPage, hasMore, loading, refreshing, error } = state
 
   const fetchPlayerStates = useCallback(async () => {
-    if (!hasMore) {
-      return
-    }
+    if (!hasMore) return
 
     dispatch(actionCreators.loading())
 

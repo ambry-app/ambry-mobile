@@ -16,18 +16,16 @@ export default async function setup() {
   console.debug('Service: setting up event listeners', id)
 
   TrackPlayer.addEventListener(Event.PlaybackQueueEnded, () => {
-    if (id !== validId) {
-      return
-    }
+    if (id !== validId) return
+
     console.debug('Service: playback queue ended')
 
     stop()
   })
 
   TrackPlayer.addEventListener(Event.RemoteStop, async () => {
-    if (id !== validId) {
-      return
-    }
+    if (id !== validId) return
+
     console.debug('Service: stop requested, destroying player')
 
     await pause()
@@ -35,45 +33,39 @@ export default async function setup() {
   })
 
   TrackPlayer.addEventListener(Event.RemotePause, () => {
-    if (id !== validId) {
-      return
-    }
+    if (id !== validId) return
+
     console.debug('Service: pausing')
 
     pause()
   })
 
   TrackPlayer.addEventListener(Event.RemotePlay, () => {
-    if (id !== validId) {
-      return
-    }
+    if (id !== validId) return
+
     console.debug('Service: playing')
 
     play()
   })
 
   TrackPlayer.addEventListener(Event.RemoteJumpBackward, ({ interval }) => {
-    if (id !== validId) {
-      return
-    }
+    if (id !== validId) return
+
     console.debug('Service: jump backward', interval)
 
     seekRelative(interval * -1)
   })
 
   TrackPlayer.addEventListener(Event.RemoteJumpForward, ({ interval }) => {
-    if (id !== validId) {
-      return
-    }
+    if (id !== validId) return
+
     console.debug('Service: jump forward', interval)
 
     seekRelative(interval)
   })
 
   TrackPlayer.addEventListener(Event.RemoteDuck, async e => {
-    if (id !== validId) {
-      return
-    }
+    if (id !== validId) return
 
     const playerState = await TrackPlayer.getState()
 

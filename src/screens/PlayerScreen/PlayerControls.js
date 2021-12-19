@@ -27,6 +27,9 @@ const playerSelector = [state => [state.position, state.media], shallow]
 const ScrubberWrapper = () => {
   const scheme = useColorScheme()
   const [position, media] = usePlayer(...playerSelector)
+
+  if (!media) return null
+
   const { chapters, duration } = media
 
   const markers = chapters.map(chapter => Math.round(chapter.startTime / 5) * 5)

@@ -24,7 +24,6 @@ export default function SignInScreen() {
   const scheme = useColorScheme()
 
   useEffect(() => {
-    console.log(knownHosts)
     if (knownHosts[0]) {
       setHost(knownHosts[0])
     }
