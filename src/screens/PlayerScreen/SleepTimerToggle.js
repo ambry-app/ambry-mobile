@@ -47,7 +47,10 @@ export default function SleepTimerToggle() {
 
     if (isRunning) {
       interval = setInterval(
-        () => setCurrentCountdownSeconds(current => current - 1),
+        () =>
+          setCurrentCountdownSeconds(
+            Math.round((targetTime - Date.now()) / 1000)
+          ),
         1000
       )
     }
@@ -55,7 +58,7 @@ export default function SleepTimerToggle() {
     return () => {
       clearInterval(interval)
     }
-  }, [isRunning])
+  }, [isRunning, targetTime])
 
   const toggleSleepTimer = useCallback(async () => {
     SleepTimer.toggleEnabled(playbackState === State.Playing)
