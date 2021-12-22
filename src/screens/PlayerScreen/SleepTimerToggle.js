@@ -18,6 +18,10 @@ import { secondsDisplayMinutesOnly } from '../../lib/utils'
 import SleepTimer, { useSleepTimer } from '../../stores/SleepTimer'
 import SecondsModal from './SleepTimerToggle/SecondsModal'
 
+function calcCountdownSeconds(targetTime) {
+  return Math.max(0, Math.round((targetTime - Date.now()) / 1000))
+}
+
 export default function SleepTimerToggle() {
   const { enabled, countdownSeconds, isRunning, targetTime } = useSleepTimer()
   const playbackState = usePlaybackState()
@@ -36,7 +40,7 @@ export default function SleepTimerToggle() {
 
   useEffect(() => {
     if (targetTime) {
-      setCurrentCountdownSeconds(Math.round((targetTime - Date.now()) / 1000))
+      setCurrentCountdownSeconds(calcCountdownSeconds(targetTime))
     } else {
       setCurrentCountdownSeconds(countdownSeconds)
     }
@@ -47,10 +51,7 @@ export default function SleepTimerToggle() {
 
     if (isRunning) {
       interval = setInterval(
-        () =>
-          setCurrentCountdownSeconds(
-            Math.round((targetTime - Date.now()) / 1000)
-          ),
+        () => setCurrentCountdownSeconds(calcCountdownSeconds(targetTime)),
         1000
       )
     }
