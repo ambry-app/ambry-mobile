@@ -4,6 +4,8 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -28,13 +30,17 @@ public class SleepTimerModule extends ReactContextBaseJavaModule {
     public void setSleepTimer(Integer seconds) {
         Log.d("SleepTimerModule", "Set sleep timer called with seconds: " + seconds);
 
-        long targetTime = System.currentTimeMillis() + (seconds * 1000);
+        long targetTime = SystemClock.elapsedRealtime() + (seconds * 1000);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, SleepTimerService.class);
         PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, targetTime, pendingIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, targetTime, pendingIntent);
+        } else {
+            alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, targetTime, pendingIntent);
+        }
     }
 
     @ReactMethod
