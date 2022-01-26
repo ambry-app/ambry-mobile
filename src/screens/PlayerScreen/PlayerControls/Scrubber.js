@@ -99,26 +99,28 @@ const Ticks = memo(({ theme }) => {
 })
 
 const Markers = memo(({ markers, duration, theme }) => {
-  return (
-    <Svg height={12} width={duration * FACTOR}>
-      {markers.map((marker, i) => {
-        return (
-          <Rect
-            key={i}
-            x={marker * FACTOR}
-            y="0"
-            rx="2.5"
-            ry="2.5"
-            height="12"
-            width="5"
-            fill={theme.accent}
-            stroke={theme.weak}
-            strokeWidth="2"
-          />
-        )
-      })}
-    </Svg>
-  )
+  return markers.map((marker, i) => {
+    return (
+      <Svg
+        height={12}
+        width={5}
+        key={i}
+        style={[styles.marker, { left: marker * FACTOR }]}
+      >
+        <Rect
+          x="0"
+          y="0"
+          rx="2.5"
+          ry="2.5"
+          height="12"
+          width="5"
+          fill={theme.accent}
+          stroke={theme.weak}
+          strokeWidth="2"
+        />
+      </Svg>
+    )
+  })
 })
 
 export default function Scrubber({
@@ -311,5 +313,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 42,
     left: -2
+  },
+  marker: {
+    position: 'absolute',
+    top: -12
   }
 })
