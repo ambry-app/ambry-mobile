@@ -7,26 +7,28 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "check-dependencies": "rnx-dep-check",
+    "fix-dependencies": "rnx-dep-check --write"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^4",
     "@react-hook/debounce": "^4.0.0",
     "@react-hook/previous": "^1.0.1",
     "@react-hook/throttle": "^2.2.0",
-    "@react-native-async-storage/async-storage": "^1.15.9",
+    "@react-native-async-storage/async-storage": "^1.15.8",
     "@react-native-community/slider": "^4.1.9",
     "@react-native-picker/picker": "^2.2.1",
     "@react-navigation/bottom-tabs": "^6.0.9",
     "@react-navigation/drawer": "^6.1.8",
-    "@react-navigation/native": "^6.0.5",
+    "@react-navigation/native": "^6.0.8",
     "@react-navigation/native-stack": "^6.2.3",
     "async-mutex": "^0.3.2",
     "immer": "^9.0.7",
     "moment": "^2.29.1",
     "punycode": "^2.1.1",
     "react": "17.0.2",
-    "react-native": "0.66.4",
+    "react-native": "^0.66.0-0",
     "react-native-bootsplash": "^3.2.6",
     "react-native-encrypted-storage": "^4.0.2",
     "react-native-gesture-handler": "^1.10.3",
@@ -34,8 +36,8 @@
     "react-native-markdown-display": "^7.0.0-alpha.2",
     "react-native-reanimated": "^2.2.3",
     "react-native-redash": "^16.2.2",
-    "react-native-safe-area-context": "^3.3.2",
-    "react-native-screens": "^3.8.0",
+    "react-native-safe-area-context": "^3.2.0",
+    "react-native-screens": "^3.9.0",
     "react-native-svg": "^12.1.1",
     "react-native-track-player": "^2.1.1",
     "react-native-transparent-status-and-navigation-bar": "^1.0.3",
@@ -47,6 +49,7 @@
     "@babel/core": "^7.12.9",
     "@babel/runtime": "^7.12.5",
     "@react-native-community/eslint-config": "^3.0.0",
+    "@rnx-kit/dep-check": "^1.12.16",
     "babel-jest": "^26.6.3",
     "eslint": "7.32.0",
     "eslint-config-prettier": "^8.3.0",
@@ -60,5 +63,25 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "rnx-kit": {
+    "reactNativeVersion": "^0.66",
+    "kitType": "app",
+    "capabilities": [
+      "animation",
+      "babel-preset-react-native",
+      "core",
+      "core-android",
+      "core-ios",
+      "gestures",
+      "jest",
+      "navigation/native",
+      "react",
+      "react-test-renderer",
+      "safe-area",
+      "screens",
+      "storage",
+      "svg"
+    ]
   }
 }
