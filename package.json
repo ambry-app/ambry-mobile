@@ -9,7 +9,8 @@
     "test": "jest",
     "lint": "eslint .",
     "check-dependencies": "rnx-dep-check",
-    "fix-dependencies": "rnx-dep-check --write"
+    "fix-dependencies": "rnx-dep-check --write",
+    "clean": "react-native-clean-project"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^4",
@@ -58,6 +59,7 @@
     "metro-react-native-babel-preset": "^0.66.2",
     "prettier": "^2.4.1",
     "prettier-eslint": "^13.0.0",
+    "react-native-clean-project": "^4.0.1",
     "react-native-svg-transformer": "^0.14.3",
     "react-test-renderer": "17.0.2"
   },
