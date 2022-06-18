@@ -8,6 +8,7 @@ import tw from '../lib/tailwind'
 import useAmbryAPI from '../stores/AmbryAPI'
 import { AppStack } from './AppStack'
 import { AuthStack } from './AuthStack'
+import RNBootSplash from 'react-native-bootsplash'
 
 const LightTheme = {
   dark: false,
@@ -56,6 +57,7 @@ export const Router = () => {
     <NavigationContainer
       linking={linking}
       theme={scheme === 'dark' ? DarkTheme : LightTheme}
+      onReady={() => RNBootSplash.hide()}
     >
       {loggedIn ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
