@@ -88,40 +88,40 @@ useStore.subscribe(
 const setupTrackPlayer = async () => {
   console.debug('Player: setting up TrackPlayer...')
 
-  const track = await TrackPlayer.getTrack(0)
-  if (track) {
+  try {
+    await TrackPlayer.getCurrentTrack()
+
     console.debug('Player: TrackPlayer already set up')
     useStore.setState({ trackPlayerReady: true })
-    return
+  } catch {
+    await TrackPlayer.setupPlayer({
+      minBuffer: 180,
+      maxBuffer: 300,
+      backBuffer: 120
+    })
+    await TrackPlayer.updateOptions({
+      stopWithApp: false,
+      alwaysPauseOnInterruption: true,
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.JumpForward,
+        Capability.JumpBackward,
+        Capability.Stop
+      ],
+      compactCapabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.JumpBackward,
+        Capability.JumpForward
+      ],
+      forwardJumpInterval: 10,
+      backwardJumpInterval: 10
+    })
+
+    console.debug('Player: done setting up TrackPlayer')
+    useStore.setState({ trackPlayerReady: true })
   }
-
-  await TrackPlayer.setupPlayer({
-    minBuffer: 180,
-    maxBuffer: 300,
-    backBuffer: 120
-  })
-  await TrackPlayer.updateOptions({
-    stopWithApp: false,
-    alwaysPauseOnInterruption: true,
-    capabilities: [
-      Capability.Play,
-      Capability.Pause,
-      Capability.JumpForward,
-      Capability.JumpBackward,
-      Capability.Stop
-    ],
-    compactCapabilities: [
-      Capability.Play,
-      Capability.Pause,
-      Capability.JumpBackward,
-      Capability.JumpForward
-    ],
-    forwardJumpInterval: 10,
-    backwardJumpInterval: 10
-  })
-
-  console.debug('Player: done setting up TrackPlayer')
-  useStore.setState({ trackPlayerReady: true })
 }
 
 const calculateSeekPosition = (interval, playbackRate, position, media) => {
