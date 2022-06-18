@@ -2,7 +2,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
-import { TouchableOpacity, useColorScheme } from 'react-native'
+import {
+  TouchableOpacity,
+  useColorScheme,
+  useWindowDimensions
+} from 'react-native'
 import Library from '../assets/library.svg'
 import ContinueListening from '../components/ContinueListening'
 import PlayButton from '../components/PlayButton'
@@ -46,13 +50,19 @@ const PlayerScreenWithContext = () => {
 }
 
 const PlayerDrawer = () => {
+  const { width } = useWindowDimensions()
+
   return (
     <Drawer.Navigator
       drawerContent={({ navigation }) => (
         <ContinueListening navigation={navigation} />
       )}
       screenOptions={{
-        drawerType: 'back'
+        drawerType: 'back',
+        drawerStyle: {
+          width: '90%'
+        },
+        gestureHandlerProps: { hitSlop: { bottom: -250, right: width / -2 } }
       }}
     >
       <Drawer.Screen
