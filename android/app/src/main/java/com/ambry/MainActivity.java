@@ -4,9 +4,6 @@ import android.os.Bundle;
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;
-import com.zoontek.rnbootsplash.RNBootSplash;
-
-import io.moox.rntransparentstatusandnavigationbar.RNTransparentStatusAndNavigationBar;
 
 public class MainActivity extends ReactActivity {
 
@@ -17,13 +14,6 @@ public class MainActivity extends ReactActivity {
   @Override
   protected String getMainComponentName() {
     return "Ambry";
-  }
-
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    RNBootSplash.init(R.drawable.bootsplash, MainActivity.this);
-    RNTransparentStatusAndNavigationBar.init(MainActivity.this);
   }
 
   /**

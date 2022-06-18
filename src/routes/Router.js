@@ -1,7 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native'
 import React from 'react'
 import { useColorScheme } from 'react-native'
-import RNBootSplash from 'react-native-bootsplash'
 import shallow from 'zustand/shallow'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
@@ -57,7 +56,6 @@ export const Router = () => {
     <NavigationContainer
       linking={linking}
       theme={scheme === 'dark' ? DarkTheme : LightTheme}
-      onReady={() => RNBootSplash.hide()}
     >
       {loggedIn ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
