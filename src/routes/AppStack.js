@@ -59,9 +59,7 @@ const PlayerDrawer = () => {
       )}
       screenOptions={{
         drawerType: 'back',
-        drawerStyle: {
-          width: '90%'
-        },
+        drawerStyle: tw`bg-gray-100 dark:bg-gray-900 w-5/6`,
         gestureHandlerProps: { hitSlop: { bottom: -250, right: width / -2 } }
       }}
     >

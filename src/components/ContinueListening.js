@@ -129,7 +129,7 @@ export default function ContinueListening({ navigation }) {
   return (
     <SafeAreaView>
       <FlatList
-        style={tw`py-2 mb-12`}
+        style={tw`mx-2 py-2 mb-12 rounded-t-xl bg-gray-200 dark:bg-gray-800`}
         data={playerStates}
         keyExtractor={item => item.id}
         onEndReached={fetchPlayerStates}
