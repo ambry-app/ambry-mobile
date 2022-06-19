@@ -1,7 +1,7 @@
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
-import ContinueListening from '../components/ContinueListening'
+import DrawerContents from '../components/DrawerContents'
 import tw from '../lib/tailwind'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
 import PersonDetailsScreen from '../screens/PersonDetailsScreen'
@@ -45,7 +45,7 @@ const NavDrawer = () => {
   return (
     <Drawer.Navigator
       drawerContent={({ navigation }) => (
-        <ContinueListening navigation={navigation} />
+        <DrawerContents navigation={navigation} />
       )}
       screenOptions={{
         drawerType: 'back',

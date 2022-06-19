@@ -3,8 +3,8 @@ import React, { useCallback, useReducer } from 'react'
 import { Button, FlatList, Image, Text, View } from 'react-native'
 import { TouchableNativeFeedback } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import LargeActivityIndicator from '../components/LargeActivityIndicator'
-import ScreenCentered from '../components/ScreenCentered'
+import LargeActivityIndicator from './LargeActivityIndicator'
+import ScreenCentered from './ScreenCentered'
 import useFirstRender from '../hooks/firstRender'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
@@ -54,7 +54,7 @@ function Item({ playerState, navigation }) {
   )
 }
 
-export default function ContinueListening({ navigation }) {
+export default function DrawerContents({ navigation }) {
   const isFirstRender = useFirstRender()
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -126,16 +126,33 @@ export default function ContinueListening({ navigation }) {
       <View style={tw`flex-row`}>
         <View style={tw`p-4`}>
           <NavigationIcon
-            navigation={navigation}
+            onPress={() => {
+              navigation.navigate('Player')
+            }}
             icon="circle-play"
             active={true}
           />
           <View style={tw`h-4`} />
-          <NavigationIcon navigation={navigation} icon="book-open" />
+          <NavigationIcon
+            onPress={() => {
+              navigation.navigate('Recent')
+            }}
+            icon="book-open"
+          />
           <View style={tw`h-4`} />
-          <NavigationIcon navigation={navigation} icon="magnifying-glass" />
+          <NavigationIcon
+            onPress={() => {
+              navigation.navigate('Search')
+            }}
+            icon="magnifying-glass"
+          />
           <View style={tw`h-4`} />
-          <NavigationIcon navigation={navigation} icon="gear" />
+          <NavigationIcon
+            onPress={() => {
+              navigation.navigate('Settings')
+            }}
+            icon="gear"
+          />
         </View>
         <FlatList
           style={tw`mr-2 py-2 rounded-xl bg-gray-200 dark:bg-gray-800`}
@@ -169,10 +186,10 @@ export default function ContinueListening({ navigation }) {
   )
 }
 
-function NavigationIcon({ navigation, icon, active = false }) {
+function NavigationIcon({ onPress, icon, active = false }) {
   return (
     <TouchableNativeFeedback
-      onPress={() => navigation.navigate('Player')}
+      onPress={onPress}
       background={TouchableNativeFeedback.Ripple(tw.color('gray-400'), true)}
     >
       <FontAwesomeIcon

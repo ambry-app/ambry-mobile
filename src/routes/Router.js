@@ -36,7 +36,9 @@ const DarkTheme = {
 
 const linking = {
   prefixes: ['trackplayer://'],
-  config: { screens: { PlayerDrawer: 'notification.click' } }
+  config: {
+    screens: { MainStack: { screens: { Player: 'notification.click' } } }
+  }
 }
 
 const apiSelector = [state => [state.loggedIn, state._hasHydrated], shallow]
