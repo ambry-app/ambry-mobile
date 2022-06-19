@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { useNavigation } from '@react-navigation/core'
-import { StackActions } from '@react-navigation/native'
 import React from 'react'
 import { Image, Text, View } from 'react-native'
 import { TouchableNativeFeedback } from 'react-native-gesture-handler'
@@ -24,12 +23,12 @@ export default function BookDetails({ imageSource, media }) {
         </TouchableNativeFeedback>
         <Text
           numberOfLines={1}
-          style={tw`ml-2 text-xl font-bold text-gray-700 dark:text-gray-200`}
+          style={tw`ml-6 text-xl font-bold text-gray-700 dark:text-gray-200`}
         >
           {media.book.title}
         </Text>
       </View>
-      <View style={tw`mt-2 flex-row`}>
+      <View style={tw`mt-3 flex-row`}>
         <View style={tw`flex-none`}>
           <View style={tw`w-28 rounded-md bg-gray-200 dark:bg-gray-800`}>
             <Image
@@ -45,12 +44,9 @@ export default function BookDetails({ imageSource, media }) {
             prefix="by"
             items={media.book.authors}
             onPressLink={author => {
-              navigation.dispatch(
-                StackActions.push('Person', {
-                  personId: author.personId
-                })
-              )
-              navigation.navigate('Library')
+              navigation.push('Person', {
+                personId: author.personId
+              })
             }}
             style={tw`leading-none text-lg text-gray-500 dark:text-gray-400`}
             linkStyle={tw`leading-none text-lg text-lime-500 dark:text-lime-400`}
@@ -61,12 +57,9 @@ export default function BookDetails({ imageSource, media }) {
             items={media.narrators}
             keyExtractor={narrator => narrator.personId}
             onPressLink={narrator => {
-              navigation.dispatch(
-                StackActions.push('Person', {
-                  personId: narrator.personId
-                })
-              )
-              navigation.navigate('Library')
+              navigation.push('Person', {
+                personId: narrator.personId
+              })
             }}
             style={tw`text-gray-500 dark:text-gray-400`}
             linkStyle={tw`text-lime-500 dark:text-lime-400`}
@@ -74,12 +67,9 @@ export default function BookDetails({ imageSource, media }) {
           <WrappingListOfLinks
             items={media.book.series}
             onPressLink={series => {
-              navigation.dispatch(
-                StackActions.push('Series', {
-                  seriesId: series.id
-                })
-              )
-              navigation.navigate('Library')
+              navigation.push('Series', {
+                seriesId: series.id
+              })
             }}
             nameExtractor={series => `${series.name} #${series.bookNumber}`}
             style={tw`text-gray-400 dark:text-gray-500`}

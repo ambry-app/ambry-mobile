@@ -51,9 +51,7 @@ function MediaList({ book, media: mediaList }) {
                     loadMedia(media.id, book.imagePath)
                   }
                   setImmediate(() => {
-                    navigation.navigate('PlayerDrawer', {
-                      screen: 'PlayerScreen'
-                    })
+                    navigation.navigate('Player')
                   })
                 }}
               >
@@ -67,9 +65,8 @@ function MediaList({ book, media: mediaList }) {
                       items={media.narrators}
                       keyExtractor={narrator => narrator.personId}
                       onPressLink={narrator =>
-                        navigation.navigate('Library', {
-                          screen: 'Person',
-                          params: { personId: narrator.personId }
+                        navigation.push('Person', {
+                          personId: narrator.personId
                         })
                       }
                       style={tw`text-lg text-gray-700 dark:text-gray-200`}

@@ -1,12 +1,7 @@
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import React, { useCallback, useReducer } from 'react'
-import {
-  Button,
-  FlatList,
-  Image,
-  Text,
-  TouchableNativeFeedback,
-  View
-} from 'react-native'
+import { Button, FlatList, Image, Text, View } from 'react-native'
+import { TouchableNativeFeedback } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
@@ -24,7 +19,7 @@ function Item({ playerState, navigation }) {
   return (
     <TouchableNativeFeedback
       onPress={() => {
-        navigation.navigate('PlayerScreen')
+        navigation.navigate('Player')
 
         if (selectedMedia?.id !== playerState.media.id) {
           loadMedia(playerState.media.id, playerState.media.book.imagePath)
@@ -93,7 +88,7 @@ export default function ContinueListening({ navigation }) {
 
   const clearMediaAndNavigate = useCallback(() => {
     destroy()
-    navigation.navigate('PlayerScreen')
+    navigation.navigate('Player')
   }, [navigation])
 
   const clearMediaAndSignOut = useCallback(() => {
@@ -128,33 +123,63 @@ export default function ContinueListening({ navigation }) {
 
   return (
     <SafeAreaView>
-      <FlatList
-        style={tw`mx-2 py-2 rounded-t-xl bg-gray-200 dark:bg-gray-800`}
-        data={playerStates}
-        keyExtractor={item => item.id}
-        onEndReached={fetchPlayerStates}
-        onRefresh={refreshPlayerStates}
-        refreshing={refreshing}
-        renderItem={({ item }) => (
-          <Item playerState={item} navigation={navigation} />
-        )}
-        ListFooterComponent={
-          <View style={tw`h-22`}>
-            {__DEV__ && (
-              <>
-                <View style={tw`mb-2`}>
-                  <Button
-                    title="Clear Selected Media"
-                    onPress={clearMediaAndNavigate}
-                  />
-                </View>
-                <Button title="Sign Out" onPress={clearMediaAndSignOut} />
-              </>
-            )}
-            {loading && <LargeActivityIndicator />}
-          </View>
-        }
-      />
+      <View style={tw`flex-row`}>
+        <View style={tw`p-4`}>
+          <NavigationIcon
+            navigation={navigation}
+            icon="circle-play"
+            active={true}
+          />
+          <View style={tw`h-4`} />
+          <NavigationIcon navigation={navigation} icon="book-open" />
+          <View style={tw`h-4`} />
+          <NavigationIcon navigation={navigation} icon="magnifying-glass" />
+          <View style={tw`h-4`} />
+          <NavigationIcon navigation={navigation} icon="gear" />
+        </View>
+        <FlatList
+          style={tw`mr-2 py-2 rounded-xl bg-gray-200 dark:bg-gray-800`}
+          data={playerStates}
+          keyExtractor={item => item.id}
+          onEndReached={fetchPlayerStates}
+          onRefresh={refreshPlayerStates}
+          refreshing={refreshing}
+          renderItem={({ item }) => (
+            <Item playerState={item} navigation={navigation} />
+          )}
+          ListFooterComponent={
+            <View style={tw`h-22`}>
+              {__DEV__ && (
+                <>
+                  <View style={tw`mb-2`}>
+                    <Button
+                      title="Clear Selected Media"
+                      onPress={clearMediaAndNavigate}
+                    />
+                  </View>
+                  <Button title="Sign Out" onPress={clearMediaAndSignOut} />
+                </>
+              )}
+              {loading && <LargeActivityIndicator />}
+            </View>
+          }
+        />
+      </View>
     </SafeAreaView>
+  )
+}
+
+function NavigationIcon({ navigation, icon, active = false }) {
+  return (
+    <TouchableNativeFeedback
+      onPress={() => navigation.navigate('Player')}
+      background={TouchableNativeFeedback.Ripple(tw.color('gray-400'), true)}
+    >
+      <FontAwesomeIcon
+        icon={icon}
+        size={32}
+        color={active ? tw.color('lime-400') : 'white'}
+      />
+    </TouchableNativeFeedback>
   )
 }

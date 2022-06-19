@@ -1,15 +1,7 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
-import {
-  TouchableOpacity,
-  useColorScheme,
-  useWindowDimensions
-} from 'react-native'
-import Library from '../assets/library.svg'
 import ContinueListening from '../components/ContinueListening'
-import PlayButton from '../components/PlayButton'
 import tw from '../lib/tailwind'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
 import PersonDetailsScreen from '../screens/PersonDetailsScreen'
@@ -18,11 +10,15 @@ import RecentBooksScreen from '../screens/RecentBooksScreen'
 import SeriesScreen from '../screens/SeriesScreen'
 
 const Stack = createNativeStackNavigator()
-const Tab = createBottomTabNavigator()
 
-const LibraryStack = () => {
+const MainStack = () => {
   return (
     <Stack.Navigator>
+      <Stack.Screen
+        name="Player"
+        options={{ headerShown: false }}
+        component={PlayerScreen}
+      />
       <Stack.Screen
         name="Recent"
         options={{ title: 'Newest books' }}
@@ -45,9 +41,7 @@ const LibraryStack = () => {
 
 const Drawer = createDrawerNavigator()
 
-const PlayerDrawer = () => {
-  const { width } = useWindowDimensions()
-
+const NavDrawer = () => {
   return (
     <Drawer.Navigator
       drawerContent={({ navigation }) => (
@@ -57,62 +51,18 @@ const PlayerDrawer = () => {
         drawerType: 'back',
         drawerStyle: tw`bg-gray-100 dark:bg-gray-900 w-5/6`,
         // NOTE: -150 is a rough guess of the height of the scrubber
-        gestureHandlerProps: { hitSlop: { bottom: -150, right: width / -2 } }
+        gestureHandlerProps: { hitSlop: { bottom: -150 } }
       }}
     >
       <Drawer.Screen
-        name="PlayerScreen"
+        name="MainStack"
         options={{ headerShown: false }}
-        component={PlayerScreen}
+        component={MainStack}
       />
     </Drawer.Navigator>
   )
 }
 
-// const TabNavigator = () => {
-//   const scheme = useColorScheme()
-
-//   return (
-//     <Tab.Navigator
-//       screenOptions={{
-//         headerShown: false,
-//         tabBarLabelPosition: 'beside-icon',
-//         tabBarInactiveTintColor:
-//           scheme === 'dark' ? tw.color('gray-50') : tw.color('gray-700')
-//       }}
-//     >
-//       <Tab.Screen
-//         name="PlayerDrawer"
-//         options={{
-//           title: 'Player',
-//           tabBarIcon: ({ color, size }) => (
-//             <PlayButton
-//               width={size}
-//               height={size}
-//               iconColor={color}
-//               ringColor={color}
-//             />
-//           ),
-//           tabBarStyle: tw`absolute shadow-none bg-white/85 dark:bg-gray-800/85`,
-//           tabBarButton: props => <TouchableOpacity {...props} />
-//         }}
-//         component={PlayerDrawer}
-//       />
-//       <Tab.Screen
-//         name="Library"
-//         options={{
-//           lazy: false,
-//           tabBarIcon: ({ color, size }) => (
-//             <Library width={size} height={size} iconColor={color} />
-//           ),
-//           tabBarButton: props => <TouchableOpacity {...props} />
-//         }}
-//         component={LibraryStack}
-//       />
-//     </Tab.Navigator>
-//   )
-// }
-
 export const AppStack = () => {
-  return <PlayerDrawer />
+  return <NavDrawer />
 }
