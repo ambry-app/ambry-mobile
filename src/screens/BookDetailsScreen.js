@@ -171,7 +171,7 @@ export default function BookDetailsScreen({ route, navigation }) {
           />
           <MediaList book={book} media={book.media} />
           <View
-            style={tw`mt-4 rounded-2xl border-gray-200 bg-gray-200 shadow-lg`}
+            style={tw`mt-4 rounded-2xl bg-gray-200 dark:bg-gray-800 shadow-lg`}
           >
             <Image
               source={uriSource(book.imagePath)}

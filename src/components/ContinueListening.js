@@ -33,7 +33,7 @@ function Item({ playerState, navigation }) {
     >
       <View style={tw`p-4 py-2 flex-row items-center`}>
         <View
-          style={tw`w-1/4 rounded-xl border-gray-200 bg-gray-200 shadow-md`}
+          style={tw`w-1/4 rounded-xl bg-gray-200 dark:bg-gray-800 shadow-md`}
         >
           <Image
             source={uriSource(playerState.media.book.imagePath)}
@@ -129,7 +129,7 @@ export default function ContinueListening({ navigation }) {
   return (
     <SafeAreaView>
       <FlatList
-        style={tw`mx-2 py-2 mb-12 rounded-t-xl bg-gray-200 dark:bg-gray-800`}
+        style={tw`mx-2 py-2 rounded-t-xl bg-gray-200 dark:bg-gray-800`}
         data={playerStates}
         keyExtractor={item => item.id}
         onEndReached={fetchPlayerStates}

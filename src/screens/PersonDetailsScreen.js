@@ -14,7 +14,7 @@ function PersonHeader({ person }) {
     <View style={tw`p-4`}>
       <Header1 style={tw`text-center`}>{person.name}</Header1>
       <View
-        style={tw`mx-12 my-8 rounded-full border-gray-200 bg-gray-200 shadow-lg`}
+        style={tw`mx-12 my-8 rounded-full bg-gray-200 dark:bg-gray-800 shadow-lg`}
       >
         <Image
           source={uriSource(person.imagePath)}

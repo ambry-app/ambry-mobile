@@ -45,10 +45,6 @@ const LibraryStack = () => {
 
 const Drawer = createDrawerNavigator()
 
-const PlayerScreenWithContext = () => {
-  return <PlayerScreen />
-}
-
 const PlayerDrawer = () => {
   const { width } = useWindowDimensions()
 
@@ -60,13 +56,14 @@ const PlayerDrawer = () => {
       screenOptions={{
         drawerType: 'back',
         drawerStyle: tw`bg-gray-100 dark:bg-gray-900 w-5/6`,
+        // NOTE: -150 is a rough guess of the height of the scrubber
         gestureHandlerProps: { hitSlop: { bottom: -150, right: width / -2 } }
       }}
     >
       <Drawer.Screen
         name="PlayerScreen"
         options={{ headerShown: false }}
-        component={PlayerScreenWithContext}
+        component={PlayerScreen}
       />
     </Drawer.Navigator>
   )

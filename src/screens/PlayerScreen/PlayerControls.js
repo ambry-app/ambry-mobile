@@ -53,13 +53,7 @@ const ScrubberWrapper = () => {
         }
 
   return (
-    <View
-      style={tw`pb-12 pt-2 bg-white/85 dark:bg-gray-800/85`}
-      onLayout={event => {
-        const { height } = event.nativeEvent.layout
-        console.log('HEIGHT!', height)
-      }}
-    >
+    <View style={tw`pb-12 pt-2 bg-white/85 dark:bg-gray-800/85`}>
       <Scrubber
         position={position}
         duration={duration}
