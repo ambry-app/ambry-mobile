@@ -2,7 +2,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { useNavigation } from '@react-navigation/core'
 import { StackActions } from '@react-navigation/native'
 import React from 'react'
-import { Image, Text, TouchableOpacity, View } from 'react-native'
+import { Image, Text, View } from 'react-native'
+import { TouchableNativeFeedback } from 'react-native-gesture-handler'
 import WrappingListOfLinks from '../../components/WrappingListOfLinks'
 import tw from '../../lib/tailwind'
 
@@ -12,9 +13,15 @@ export default function BookDetails({ imageSource, media }) {
   return (
     <>
       <View style={tw`flex-row items-center`}>
-        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+        <TouchableNativeFeedback
+          onPress={() => navigation.openDrawer()}
+          background={TouchableNativeFeedback.Ripple(
+            tw.color('gray-400'),
+            true
+          )}
+        >
           <FontAwesomeIcon icon="bars" color="white" size={24} />
-        </TouchableOpacity>
+        </TouchableNativeFeedback>
         <Text
           numberOfLines={1}
           style={tw`ml-2 text-xl font-bold text-gray-700 dark:text-gray-200`}
