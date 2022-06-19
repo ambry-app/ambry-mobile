@@ -1,4 +1,3 @@
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import React from 'react'
 import {
   StyleSheet,
@@ -54,19 +53,26 @@ const ScrubberWrapper = () => {
         }
 
   return (
-    <Scrubber
-      position={position}
-      duration={duration}
-      onChange={seekTo}
-      markers={markers}
-      theme={theme}
-    />
+    <View
+      style={tw`pb-12 pt-2 bg-white/85 dark:bg-gray-800/85`}
+      onLayout={event => {
+        const { height } = event.nativeEvent.layout
+        console.log('HEIGHT!', height)
+      }}
+    >
+      <Scrubber
+        position={position}
+        duration={duration}
+        onChange={seekTo}
+        markers={markers}
+        theme={theme}
+      />
+    </View>
   )
 }
 
 export default function PlayerControls({ toggleChapters }) {
   // console.log('RENDERING: PlayerControls')
-  const tabBarHeight = useBottomTabBarHeight()
 
   return (
     <View style={[tw`flex-col`, styles.flex]}>
@@ -98,10 +104,9 @@ export default function PlayerControls({ toggleChapters }) {
               </View>
             </View>
           </View>
-          <ScrubberWrapper />
         </View>
       </View>
-      <View style={{ height: tabBarHeight }} />
+      <ScrubberWrapper />
     </View>
   )
 }

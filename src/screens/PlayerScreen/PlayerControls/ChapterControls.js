@@ -1,5 +1,4 @@
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet'
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { Text, View } from 'react-native'
 import {
@@ -134,7 +133,6 @@ const playerSelector = [state => [state.media, state.currentChapter], shallow]
 const ChaptersList = ({ sheetRef, isOpen }) => {
   // console.log('RENDERING: ChaptersList')
   const [media, currentChapter] = usePlayer(...playerSelector)
-  const tabBarHeight = useBottomTabBarHeight()
   const ref = useRef()
 
   const onPress = useCallback(
@@ -176,7 +174,6 @@ const ChaptersList = ({ sheetRef, isOpen }) => {
       style={tw`px-4`}
       keyExtractor={item => item.id}
       renderItem={renderItem}
-      ListFooterComponent={() => <View style={{ height: tabBarHeight }} />}
       ListHeaderComponent={() => <ChaptersHeader />}
       stickyHeaderIndices={[0]}
     />

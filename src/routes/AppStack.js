@@ -60,7 +60,7 @@ const PlayerDrawer = () => {
       screenOptions={{
         drawerType: 'back',
         drawerStyle: tw`bg-gray-100 dark:bg-gray-900 w-5/6`,
-        gestureHandlerProps: { hitSlop: { bottom: -250, right: width / -2 } }
+        gestureHandlerProps: { hitSlop: { bottom: -150, right: width / -2 } }
       }}
     >
       <Drawer.Screen
@@ -72,50 +72,50 @@ const PlayerDrawer = () => {
   )
 }
 
-const TabNavigator = () => {
-  const scheme = useColorScheme()
+// const TabNavigator = () => {
+//   const scheme = useColorScheme()
 
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarLabelPosition: 'beside-icon',
-        tabBarInactiveTintColor:
-          scheme === 'dark' ? tw.color('gray-50') : tw.color('gray-700')
-      }}
-    >
-      <Tab.Screen
-        name="PlayerDrawer"
-        options={{
-          title: 'Player',
-          tabBarIcon: ({ color, size }) => (
-            <PlayButton
-              width={size}
-              height={size}
-              iconColor={color}
-              ringColor={color}
-            />
-          ),
-          tabBarStyle: tw`absolute shadow-none bg-white/85 dark:bg-gray-800/85`,
-          tabBarButton: props => <TouchableOpacity {...props} />
-        }}
-        component={PlayerDrawer}
-      />
-      <Tab.Screen
-        name="Library"
-        options={{
-          lazy: false,
-          tabBarIcon: ({ color, size }) => (
-            <Library width={size} height={size} iconColor={color} />
-          ),
-          tabBarButton: props => <TouchableOpacity {...props} />
-        }}
-        component={LibraryStack}
-      />
-    </Tab.Navigator>
-  )
-}
+//   return (
+//     <Tab.Navigator
+//       screenOptions={{
+//         headerShown: false,
+//         tabBarLabelPosition: 'beside-icon',
+//         tabBarInactiveTintColor:
+//           scheme === 'dark' ? tw.color('gray-50') : tw.color('gray-700')
+//       }}
+//     >
+//       <Tab.Screen
+//         name="PlayerDrawer"
+//         options={{
+//           title: 'Player',
+//           tabBarIcon: ({ color, size }) => (
+//             <PlayButton
+//               width={size}
+//               height={size}
+//               iconColor={color}
+//               ringColor={color}
+//             />
+//           ),
+//           tabBarStyle: tw`absolute shadow-none bg-white/85 dark:bg-gray-800/85`,
+//           tabBarButton: props => <TouchableOpacity {...props} />
+//         }}
+//         component={PlayerDrawer}
+//       />
+//       <Tab.Screen
+//         name="Library"
+//         options={{
+//           lazy: false,
+//           tabBarIcon: ({ color, size }) => (
+//             <Library width={size} height={size} iconColor={color} />
+//           ),
+//           tabBarButton: props => <TouchableOpacity {...props} />
+//         }}
+//         component={LibraryStack}
+//       />
+//     </Tab.Navigator>
+//   )
+// }
 
 export const AppStack = () => {
-  return <TabNavigator />
+  return <PlayerDrawer />
 }
