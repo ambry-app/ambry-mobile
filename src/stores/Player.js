@@ -342,25 +342,24 @@ const findChapter = (position, chapters) => {
 }
 
 const updateServerPosition = async () => {
-  const [position, track] = await Promise.all([
-    TrackPlayer.getPosition(),
-    TrackPlayer.getTrack(0)
-  ])
+  try {
+    const [position, track] = await Promise.all([
+      TrackPlayer.getPosition(),
+      TrackPlayer.getTrack(0)
+    ])
 
-  if (!track) {
+    const playerStateID = track.description
+
+    const playerStateReport = {
+      id: playerStateID,
+      position: position.toString()
+    }
+
+    console.debug('Player: updating server position', playerStateReport)
+    return reportPlayerState(playerStateReport)
+  } catch {
     console.debug('Player: updateServerPosition called while no track loaded')
-    return
   }
-
-  const playerStateID = track.description
-
-  const playerStateReport = {
-    id: playerStateID,
-    position: position.toString()
-  }
-
-  console.debug('Player: updating server position', playerStateReport)
-  return reportPlayerState(playerStateReport)
 }
 
 // Actions:
