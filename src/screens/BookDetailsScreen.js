@@ -12,6 +12,7 @@ import Description from '../components/Description'
 import { Header1 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import PlayButton from '../components/PlayButton'
+import SafeBottomBorder from '../components/SafeBottomBorder'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
 import tw from '../lib/tailwind'
@@ -145,44 +146,48 @@ export default function BookDetailsScreen({ route, navigation }) {
     }
   } else {
     return (
-      <ScrollView>
-        <View style={tw`p-4`}>
-          <Header1>{book.title}</Header1>
-          <WrappingListOfLinks
-            prefix="by"
-            items={book.authors}
-            onPressLink={author =>
-              navigation.push('Person', { personId: author.personId })
-            }
-            style={tw`text-xl text-gray-500 dark:text-gray-400`}
-            linkStyle={tw`text-xl text-lime-500 dark:text-lime-400`}
-          />
-          <WrappingListOfLinks
-            items={book.series}
-            onPressLink={series =>
-              navigation.push('Series', { seriesId: series.id })
-            }
-            nameExtractor={series => `${series.name} #${series.bookNumber}`}
-            style={tw`text-lg text-gray-400 dark:text-gray-500`}
-            linkStyle={tw`text-lg text-gray-400 dark:text-gray-500`}
-          />
-          <MediaList book={book} media={book.media} />
-          <View
-            style={tw`mt-4 rounded-2xl bg-gray-200 dark:bg-gray-800 shadow-lg`}
-          >
-            <Image
-              source={uriSource(book.imagePath)}
-              style={tw.style('rounded-2xl', 'w-full', {
-                aspectRatio: 10 / 15.5
-              })}
+      <SafeBottomBorder>
+        <ScrollView>
+          <View style={tw`p-4`}>
+            <Header1>{book.title}</Header1>
+            <WrappingListOfLinks
+              prefix="by"
+              items={book.authors}
+              onPressLink={author =>
+                navigation.push('Person', { personId: author.personId })
+              }
+              style={tw`text-xl text-gray-500 dark:text-gray-400`}
+              linkStyle={tw`text-xl text-lime-500 dark:text-lime-400`}
             />
+            <WrappingListOfLinks
+              items={book.series}
+              onPressLink={series =>
+                navigation.push('Series', { seriesId: series.id })
+              }
+              nameExtractor={series => `${series.name} #${series.bookNumber}`}
+              style={tw`text-lg text-gray-400 dark:text-gray-500`}
+              linkStyle={tw`text-lg text-gray-400 dark:text-gray-500`}
+            />
+            <MediaList book={book} media={book.media} />
+            <View
+              style={tw`mt-4 rounded-2xl bg-gray-200 dark:bg-gray-800 shadow-lg`}
+            >
+              <Image
+                source={uriSource(book.imagePath)}
+                style={tw.style('rounded-2xl', 'w-full', {
+                  aspectRatio: 10 / 15.5
+                })}
+              />
+            </View>
+            <Text
+              style={tw`text-gray-400 dark:text-gray-500 text-sm mt-1 mb-4`}
+            >
+              Published {Moment(book.published).format('MMMM Do, YYYY')}
+            </Text>
+            <Description description={book.description} />
           </View>
-          <Text style={tw`text-gray-400 dark:text-gray-500 text-sm mt-1 mb-4`}>
-            Published {Moment(book.published).format('MMMM Do, YYYY')}
-          </Text>
-          <Description description={book.description} />
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </SafeBottomBorder>
     )
   }
 

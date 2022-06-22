@@ -4,6 +4,7 @@ import BookGrid from '../components/BookGrid'
 import Description from '../components/Description'
 import { Header1, Header2 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
+import SafeBottomBorder from '../components/SafeBottomBorder'
 import ScreenCentered from '../components/ScreenCentered'
 import tw from '../lib/tailwind'
 import { actionCreators, initialState, reducer } from '../reducers/person'
@@ -93,15 +94,17 @@ export default function PersonDetailsScreen({ route, navigation }) {
       }
     })
     return (
-      <SectionList
-        sections={[...authorSections, ...narratorSections]}
-        keyExtractor={({ id }) => id}
-        renderItem={({ item: { books } }) => <BookGrid books={books} />}
-        renderSectionHeader={({ section: { title } }) => (
-          <Header2 style={tw`px-4 pt-8 pb-0`}>{title}</Header2>
-        )}
-        ListHeaderComponent={<PersonHeader person={person} />}
-      />
+      <SafeBottomBorder>
+        <SectionList
+          sections={[...authorSections, ...narratorSections]}
+          keyExtractor={({ id }) => id}
+          renderItem={({ item: { books } }) => <BookGrid books={books} />}
+          renderSectionHeader={({ section: { title } }) => (
+            <Header2 style={tw`px-4 pt-8 pb-0`}>{title}</Header2>
+          )}
+          ListHeaderComponent={<PersonHeader person={person} />}
+        />
+      </SafeBottomBorder>
     )
   }
 

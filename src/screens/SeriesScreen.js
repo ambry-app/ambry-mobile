@@ -3,6 +3,7 @@ import { Text, View } from 'react-native'
 import BookGrid from '../components/BookGrid'
 import { Header1 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
+import SafeBottomBorder from '../components/SafeBottomBorder'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
 import tw from '../lib/tailwind'
@@ -60,23 +61,25 @@ export default function SeriesScreen({ navigation, route }) {
     ]
 
     return (
-      <BookGrid
-        books={series.books}
-        ListHeaderComponent={
-          <View style={tw`ml-2 mt-2`}>
-            <Header1>{series.name}</Header1>
-            <WrappingListOfLinks
-              prefix="by"
-              items={uniqueAuthors}
-              onPressLink={author =>
-                navigation.push('Person', { personId: author.personId })
-              }
-              style={tw`text-xl text-gray-500 dark:text-gray-400`}
-              linkStyle={tw`text-xl text-lime-500 dark:text-lime-400`}
-            />
-          </View>
-        }
-      />
+      <SafeBottomBorder>
+        <BookGrid
+          books={series.books}
+          ListHeaderComponent={
+            <View style={tw`ml-2 mt-2`}>
+              <Header1>{series.name}</Header1>
+              <WrappingListOfLinks
+                prefix="by"
+                items={uniqueAuthors}
+                onPressLink={author =>
+                  navigation.push('Person', { personId: author.personId })
+                }
+                style={tw`text-xl text-gray-500 dark:text-gray-400`}
+                linkStyle={tw`text-xl text-lime-500 dark:text-lime-400`}
+              />
+            </View>
+          }
+        />
+      </SafeBottomBorder>
     )
   }
 
