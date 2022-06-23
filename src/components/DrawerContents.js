@@ -10,7 +10,11 @@ import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/playerStates'
 import { getRecentPlayerStates, signOut, uriSource } from '../stores/AmbryAPI'
-import usePlayer, { destroy, loadMedia } from '../stores/Player'
+import usePlayer, {
+  destroy,
+  loadMedia,
+  setLoadingImage
+} from '../stores/Player'
 import WrappingList from './WrappingList'
 
 function Item({ playerState, navigation }) {
@@ -22,7 +26,10 @@ function Item({ playerState, navigation }) {
         navigation.navigate('Player')
 
         if (selectedMedia?.id !== playerState.media.id) {
-          loadMedia(playerState.media.id, playerState.media.book.imagePath)
+          setLoadingImage(playerState.media.book.imagePath)
+          setTimeout(() => {
+            loadMedia(playerState.media.id, playerState.media.book.imagePath)
+          }, 500)
         }
       }}
     >

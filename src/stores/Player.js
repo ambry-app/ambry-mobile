@@ -376,6 +376,15 @@ export const loadMedia = async (id, imagePath) => {
   })
 }
 
+export const setLoadingImage = async imagePath => {
+  useStore.setState({
+    mediaLoading: true,
+    media: undefined,
+    imageSource: uriSource(imagePath),
+    playbackRate: null
+  })
+}
+
 export const setPlaybackRate = async newPlaybackRate => {
   console.debug('Player: setting playback rate', newPlaybackRate)
 

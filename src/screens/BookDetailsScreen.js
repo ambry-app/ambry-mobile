@@ -19,7 +19,7 @@ import tw from '../lib/tailwind'
 import { durationDisplay } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/book'
 import { getBook, uriSource } from '../stores/AmbryAPI'
-import usePlayer, { loadMedia } from '../stores/Player'
+import usePlayer, { loadMedia, setLoadingImage } from '../stores/Player'
 
 function MediaList({ book, media: mediaList }) {
   const navigation = useNavigation()
@@ -48,12 +48,14 @@ function MediaList({ book, media: mediaList }) {
                   true
                 )}
                 onPress={() => {
+                  navigation.navigate('Player')
+
                   if (selectedMedia?.id !== media.id) {
-                    loadMedia(media.id, book.imagePath)
+                    setLoadingImage(book.imagePath)
+                    setTimeout(() => {
+                      loadMedia(media.id, book.imagePath)
+                    }, 500)
                   }
-                  setImmediate(() => {
-                    navigation.navigate('Player')
-                  })
                 }}
               >
                 <View
