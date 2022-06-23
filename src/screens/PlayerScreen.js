@@ -1,6 +1,9 @@
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { useNavigation } from '@react-navigation/native'
 import React, { useEffect, useRef } from 'react'
 import { Platform, Text, View } from 'react-native'
+import { TouchableNativeFeedback } from 'react-native-gesture-handler'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -36,6 +39,7 @@ const playerSelector = [
 
 export default function PlayerScreen() {
   // console.log('RENDERING: PlayerScreen')
+  const navigation = useNavigation()
   const [error, loading, media, imageSource, hydrated] = usePlayer(
     ...playerSelector
   )
@@ -94,9 +98,22 @@ export default function PlayerScreen() {
   if (!media) {
     return (
       <ScreenCentered>
-        <Text style={tw`text-gray-700 dark:text-gray-200`}>
-          No audiobook selected. Visit the Library to choose a book.
+        <Text style={tw`text-gray-700 dark:text-gray-200 mb-4`}>
+          No audiobook selected. Visit the library to choose a book:
         </Text>
+        <TouchableNativeFeedback
+          onPress={() => navigation.navigate('Recent')}
+          background={TouchableNativeFeedback.Ripple(
+            tw.color('gray-400'),
+            true
+          )}
+        >
+          <FontAwesomeIcon
+            icon="book-open"
+            size={48}
+            color={tw.color('lime-400')}
+          />
+        </TouchableNativeFeedback>
       </ScreenCentered>
     )
   }
