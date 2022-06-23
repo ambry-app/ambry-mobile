@@ -26,9 +26,9 @@ const DarkTheme = {
   dark: true,
   colors: {
     primary: tw.color('lime-400'),
-    background: tw.color('gray-900'),
-    card: tw.color('gray-800'),
-    text: tw.color('gray-50'),
+    background: tw.color('black'),
+    card: tw.color('gray-900'),
+    text: tw.color('gray-100'),
     border: tw.color('gray-600'),
     notification: tw.color('red-400')
   }

@@ -84,7 +84,7 @@ function MediaList({ book, media: mediaList }) {
                       {durationDisplay(media.duration)}
                     </Text>
                   </View>
-                  <PlayButton width={50} height={50} />
+                  <PlayButton size={48} />
                 </View>
               </TouchableNativeFeedback>
             </View>

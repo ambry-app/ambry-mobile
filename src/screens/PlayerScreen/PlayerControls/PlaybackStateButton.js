@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { TouchableOpacity } from 'react-native'
+import { TouchableNativeFeedback } from 'react-native-gesture-handler'
 import { State, usePlaybackState } from 'react-native-track-player'
 import PauseButton from '../../../components/PauseButton'
 import PlayButton from '../../../components/PlayButton'
+import tw from '../../../lib/tailwind'
 
 function Button({ playing }) {
-  return playing ? (
-    <PauseButton width={75} height={75} />
-  ) : (
-    <PlayButton width={75} height={75} />
-  )
+  return playing ? <PauseButton /> : <PlayButton size={64} />
 }
 
 export default function PlaybackStateButton({ onPress }) {
@@ -21,8 +18,11 @@ export default function PlaybackStateButton({ onPress }) {
   }, [playbackState])
 
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableNativeFeedback
+      onPress={onPress}
+      background={TouchableNativeFeedback.Ripple(tw.color('gray-400'), true)}
+    >
       <Button playing={playing} />
-    </TouchableOpacity>
+    </TouchableNativeFeedback>
   )
 }

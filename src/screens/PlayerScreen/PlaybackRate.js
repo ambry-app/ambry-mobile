@@ -1,3 +1,4 @@
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import Slider from '@react-native-community/slider'
 import React, { useEffect, useState } from 'react'
 import {
@@ -8,7 +9,7 @@ import {
   useColorScheme,
   View
 } from 'react-native'
-import { Header4 } from '../../components/Headers'
+import { TouchableNativeFeedback } from 'react-native-gesture-handler'
 import ScreenCentered from '../../components/ScreenCentered'
 import tw from '../../lib/tailwind'
 import usePlayer, { setPlaybackRate } from '../../stores/Player'
@@ -50,9 +51,13 @@ export default function PlaybackRate() {
             style={tw`shadow-lg bg-white dark:bg-gray-800 rounded-lg w-11/12 overflow-hidden`}
           >
             <View style={tw`p-4`}>
-              <Header4>Playback Speed</Header4>
               <Text
-                style={tw`m-4 text-gray-700 dark:text-gray-200 text-lg text-center`}
+                style={tw`text-xl text-gray-700 dark:text-gray-100 font-bold`}
+              >
+                Sleep Timer
+              </Text>
+              <Text
+                style={tw`m-4 text-gray-700 dark:text-gray-100 text-lg text-center`}
               >
                 {formatPlaybackRate(displayPlaybackRate)}x
               </Text>
@@ -87,35 +92,35 @@ export default function PlaybackRate() {
               <View style={tw`flex-row justify-between my-4`}>
                 <TouchableOpacity onPress={() => setPlaybackRate(1.0)}>
                   <Text
-                    style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-400 rounded-md`}
+                    style={tw`text-gray-700 dark:text-gray-100 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-500 rounded-md`}
                   >
                     1.0x
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setPlaybackRate(1.25)}>
                   <Text
-                    style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-400 rounded-md`}
+                    style={tw`text-gray-700 dark:text-gray-100 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-500 rounded-md`}
                   >
                     1.25x
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setPlaybackRate(1.5)}>
                   <Text
-                    style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-400 rounded-md`}
+                    style={tw`text-gray-700 dark:text-gray-100 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-500 rounded-md`}
                   >
                     1.5x
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setPlaybackRate(1.75)}>
                   <Text
-                    style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-400 rounded-md`}
+                    style={tw`text-gray-700 dark:text-gray-100 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-500 rounded-md`}
                   >
                     1.75x
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setPlaybackRate(2.0)}>
                   <Text
-                    style={tw`text-gray-700 dark:text-gray-200 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-400 rounded-md`}
+                    style={tw`text-gray-700 dark:text-gray-100 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-500 rounded-md`}
                   >
                     2.0x
                   </Text>
@@ -132,13 +137,23 @@ export default function PlaybackRate() {
           </View>
         </ScreenCentered>
       </Modal>
-      <TouchableOpacity onPress={() => setRateModalVisible(true)}>
-        <Text
-          style={tw`py-1 px-2 text-gray-700 dark:text-gray-400 text-sm tabular-nums border border-gray-400 dark:border-gray-400 rounded-lg`}
-        >
-          {formatPlaybackRate(playbackRate)}x
-        </Text>
-      </TouchableOpacity>
+      <TouchableNativeFeedback
+        onPress={() => setRateModalVisible(true)}
+        background={TouchableNativeFeedback.Ripple(tw.color('gray-400'), true)}
+      >
+        <View style={tw`flex-row items-center`}>
+          <Text
+            style={tw`py-1 px-2 text-gray-700 dark:text-gray-400 text-sm tabular-nums`}
+          >
+            {formatPlaybackRate(playbackRate)}x
+          </Text>
+          <FontAwesomeIcon
+            icon="gauge-high"
+            size={24}
+            color={tw.color('gray-100')}
+          />
+        </View>
+      </TouchableNativeFeedback>
     </>
   )
 }

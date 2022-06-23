@@ -19,11 +19,11 @@ export default function BookDetails({ imageSource, media }) {
             true
           )}
         >
-          <FontAwesomeIcon icon="bars" color="white" size={24} />
+          <FontAwesomeIcon icon="bars" color={tw.color('gray-100')} size={24} />
         </TouchableNativeFeedback>
         <Text
           numberOfLines={1}
-          style={tw`ml-6 text-xl font-bold text-gray-700 dark:text-gray-200`}
+          style={tw`ml-6 text-xl font-bold text-gray-700 dark:text-gray-100`}
         >
           {media.book.title}
         </Text>
@@ -48,8 +48,8 @@ export default function BookDetails({ imageSource, media }) {
                 personId: author.personId
               })
             }}
-            style={tw`leading-none text-lg text-gray-500 dark:text-gray-400`}
-            linkStyle={tw`leading-none text-lg text-lime-500 dark:text-lime-400`}
+            style={tw`leading-none text-lg text-gray-500 dark:text-gray-200`}
+            linkStyle={tw`leading-none text-lg text-lime-500 dark:text-gray-200`}
           />
           <WrappingListOfLinks
             prefix="Narrated by"
@@ -61,8 +61,8 @@ export default function BookDetails({ imageSource, media }) {
                 personId: narrator.personId
               })
             }}
-            style={tw`text-gray-500 dark:text-gray-400`}
-            linkStyle={tw`text-lime-500 dark:text-lime-400`}
+            style={tw`text-gray-500 dark:text-gray-200`}
+            linkStyle={tw`text-lime-500 dark:text-gray-200`}
           />
           <WrappingListOfLinks
             items={media.book.series}
@@ -72,8 +72,8 @@ export default function BookDetails({ imageSource, media }) {
               })
             }}
             nameExtractor={series => `${series.name} #${series.bookNumber}`}
-            style={tw`text-gray-400 dark:text-gray-500`}
-            linkStyle={tw`text-gray-400 dark:text-gray-500`}
+            style={tw`text-gray-400 dark:text-gray-400`}
+            linkStyle={tw`text-gray-400 dark:text-gray-400`}
           />
         </View>
       </View>

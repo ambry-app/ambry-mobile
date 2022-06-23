@@ -1,11 +1,5 @@
 import React from 'react'
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useColorScheme,
-  View
-} from 'react-native'
+import { StyleSheet, useColorScheme, View } from 'react-native'
 import shallow from 'zustand/shallow'
 import tw from '../../lib/tailwind'
 import usePlayer, {
@@ -37,8 +31,8 @@ const ScrubberWrapper = () => {
     scheme === 'dark'
       ? {
           accent: tw.color('lime-400'),
-          strong: tw.color('gray-200'),
-          emphasized: tw.color('gray-300'),
+          strong: tw.color('gray-100'),
+          emphasized: tw.color('gray-200'),
           normal: tw.color('gray-400'),
           dimmed: tw.color('gray-500'),
           weak: tw.color('gray-800')
@@ -53,7 +47,7 @@ const ScrubberWrapper = () => {
         }
 
   return (
-    <View style={tw`pb-12 pt-2 bg-white/85 dark:bg-gray-800/85`}>
+    <View style={tw`pb-12 pt-2 bg-white/85 dark:bg-gray-900/85`}>
       <Scrubber
         position={position}
         duration={duration}
@@ -70,7 +64,7 @@ export default function PlayerControls({ toggleChapters }) {
 
   return (
     <View style={[tw`flex-col`, styles.flex]}>
-      <View style={tw`flex-grow bg-gray-100/85 dark:bg-gray-900/85`}>
+      <View style={tw`flex-grow bg-gray-100/85 dark:bg-black/85`}>
         <View style={[tw`flex-col`, styles.flex]}>
           <ChapterControls toggleChapters={toggleChapters} />
           <View style={tw`flex-grow`}>
@@ -78,23 +72,13 @@ export default function PlayerControls({ toggleChapters }) {
               <View
                 style={tw`flex-row items-center justify-around px-12 mb-14`}
               >
-                <TouchableOpacity onPress={() => seekRelativeThrottled(-10)}>
-                  <Back10Button width={34} height={39} />
-                </TouchableOpacity>
+                <Back10Button onPress={() => seekRelativeThrottled(-10)} />
                 <PlaybackStateButton onPress={() => togglePlayback()} />
-                <TouchableOpacity onPress={() => seekRelativeThrottled(10)}>
-                  <Forward10Button width={34} height={39} />
-                </TouchableOpacity>
+                <Forward10Button onPress={() => seekRelativeThrottled(10)} />
               </View>
               <View style={tw`flex-row items-center justify-around px-12`}>
-                <TouchableOpacity onPress={() => seekRelativeThrottled(-60)}>
-                  <BackButton width={42} height={27} />
-                  <Text style={tw`text-gray-400 text-center`}>1 min</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => seekRelativeThrottled(60)}>
-                  <ForwardButton width={42} height={27} />
-                  <Text style={tw`text-gray-400 text-center`}>1 min</Text>
-                </TouchableOpacity>
+                <BackButton onPress={() => seekRelativeThrottled(-60)} />
+                <ForwardButton onPress={() => seekRelativeThrottled(60)} />
               </View>
             </View>
           </View>

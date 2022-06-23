@@ -9,7 +9,7 @@ export default function SafeBottomBorder({ children }) {
   return (
     <View
       style={[
-        tw`border-white dark:border-gray-800`,
+        tw`border-white dark:border-gray-900`,
         { borderBottomWidth: bottom }
       ]}
     >

@@ -64,7 +64,7 @@ export default function ChapterControls({ toggleChapters }) {
       <View style={tw`py-4`}>
         {currentChapter && (
           <Text
-            style={tw`text-center text-lg text-gray-700 dark:text-gray-200`}
+            style={tw`text-center text-lg text-gray-700 dark:text-gray-100`}
           >
             {currentChapter.title}
           </Text>
