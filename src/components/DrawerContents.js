@@ -130,7 +130,7 @@ export default function DrawerContents({ navigation }) {
 
   return (
     <SafeAreaView>
-      <View style={tw`flex-row`}>
+      <View style={tw`flex-row h-full`}>
         <View style={tw`p-4`}>
           <NavigationIcon
             onPress={() => {
@@ -172,7 +172,7 @@ export default function DrawerContents({ navigation }) {
             <Item playerState={item} navigation={navigation} />
           )}
           ListFooterComponent={
-            <View style={tw`h-22`}>
+            <View style={__DEV__ ? tw`h-22` : tw`h-2`}>
               {__DEV__ && (
                 <>
                   <View style={tw`mb-2`}>
