@@ -1,5 +1,4 @@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { useNavigation } from '@react-navigation/native'
 import React, { useEffect, useRef } from 'react'
 import { Platform, Text, View } from 'react-native'
@@ -18,10 +17,10 @@ import Background from './PlayerScreen/Background'
 import BookDetails from './PlayerScreen/BookDetails'
 import PlaybackRate from './PlayerScreen/PlaybackRate'
 import PlayerControls from './PlayerScreen/PlayerControls'
-import {
-  Chapters,
-  useChapters
-} from './PlayerScreen/PlayerControls/ChapterControls'
+// import {
+//   Chapters,
+//   useChapters
+// } from './PlayerScreen/PlayerControls/ChapterControls'
 import PlayerHeader from './PlayerScreen/PlayerHeader'
 import ProgressDisplay from './PlayerScreen/ProgressDisplay'
 import SleepTimerToggle from './PlayerScreen/SleepTimerToggle'
@@ -57,11 +56,11 @@ export default function PlayerScreen() {
     return { opacity: opacity.value }
   })
 
-  const chaptersRef = useRef()
-  const { chaptersOpen, onChaptersChange, toggleChapters } = useChapters(
-    chaptersRef,
-    loading
-  )
+  // const chaptersRef = useRef()
+  // const { chaptersOpen, onChaptersChange, toggleChapters } = useChapters(
+  //   chaptersRef,
+  //   loading
+  // )
 
   if (error) {
     return (
@@ -119,7 +118,7 @@ export default function PlayerScreen() {
   }
 
   return (
-    <BottomSheetModalProvider>
+    <>
       <Background
         imageSource={imageSource}
         blur={Platform.OS === 'ios' ? 25 : 10}
@@ -135,15 +134,15 @@ export default function PlayerScreen() {
                 <PlaybackRate />
               </View>
             </PlayerHeader>
-            <PlayerControls toggleChapters={toggleChapters} />
+            <PlayerControls />
           </View>
         </Animated.View>
       </Background>
-      <Chapters
+      {/* <Chapters
         sheetRef={chaptersRef}
         onChange={onChaptersChange}
         isOpen={chaptersOpen}
-      />
-    </BottomSheetModalProvider>
+      /> */}
+    </>
   )
 }

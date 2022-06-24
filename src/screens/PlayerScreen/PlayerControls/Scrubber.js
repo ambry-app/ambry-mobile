@@ -12,8 +12,8 @@ import Animated, {
   withDecay,
   withTiming
 } from 'react-native-reanimated'
-import { clamp, ReText } from 'react-native-redash'
 import Svg, { Line, Path, Rect } from 'react-native-svg'
+import AnimatedText from '../../../components/AnimatedText'
 
 const SPACING = 10 // pixels between ticks
 const FACTOR = SPACING / 5 // 5 seconds per tick
@@ -22,6 +22,11 @@ const WIDTH = Dimensions.get('window').width
 const HEIGHT = 60
 const HALF_WIDTH = WIDTH / 2
 const NUM_TICKS = Math.ceil(WIDTH / SPACING)
+
+const clamp = (value, lowerBound, upperBound) => {
+  'worklet'
+  return Math.min(Math.max(lowerBound, value), upperBound)
+}
 
 function friction(value) {
   'worklet'
@@ -260,7 +265,7 @@ export default function Scrubber({
   return (
     <PanGestureHandler onGestureEvent={onGestureEventHandler}>
       <Animated.View>
-        <ReText
+        <AnimatedText
           text={timecode}
           style={[styles.timecode, { color: theme.strong }]}
         />

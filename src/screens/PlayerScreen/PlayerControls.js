@@ -9,7 +9,7 @@ import usePlayer, {
 } from '../../stores/Player'
 import Back10Button from './PlayerControls/Back10Button'
 import BackButton from './PlayerControls/BackButton'
-import ChapterControls from './PlayerControls/ChapterControls'
+// import ChapterControls from './PlayerControls/ChapterControls'
 import Forward10Button from './PlayerControls/Forward10Button'
 import ForwardButton from './PlayerControls/ForwardButton'
 import PlaybackStateButton from './PlayerControls/PlaybackStateButton'
@@ -66,7 +66,7 @@ export default function PlayerControls({ toggleChapters }) {
     <View style={[tw`flex-col`, styles.flex]}>
       <View style={tw`flex-grow bg-gray-100/85 dark:bg-black/85`}>
         <View style={[tw`flex-col`, styles.flex]}>
-          <ChapterControls toggleChapters={toggleChapters} />
+          {/* <ChapterControls toggleChapters={toggleChapters} /> */}
           <View style={tw`flex-grow`}>
             <View style={[tw`flex-col justify-center`, styles.flex]}>
               <View
