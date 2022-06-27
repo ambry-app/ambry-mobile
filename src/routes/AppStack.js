@@ -1,7 +1,11 @@
-import { createDrawerNavigator } from '@react-navigation/drawer'
+import {
+  createDrawerNavigator,
+  useDrawerStatus
+} from '@react-navigation/drawer'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import React from 'react'
-import DrawerContents from '../components/DrawerContents'
+import React, { useEffect } from 'react'
+import { Text, useWindowDimensions, View } from 'react-native'
+import LeftDrawerContents from '../components/LeftDrawerContents'
 import tw from '../lib/tailwind'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
 import PersonDetailsScreen from '../screens/PersonDetailsScreen'
@@ -11,7 +15,23 @@ import SeriesScreen from '../screens/SeriesScreen'
 
 const Stack = createNativeStackNavigator()
 
-const MainStack = () => {
+const MainStack = ({ navigation }) => {
+  const { width } = useWindowDimensions()
+  const isDrawerOpen = useDrawerStatus() === 'open'
+
+  useEffect(() => {
+    navigation.setOptions({
+      gestureHandlerProps: {
+        // NOTE: -150 is a rough guess of the height of the scrubber
+        hitSlop: {
+          left: 0,
+          bottom: isDrawerOpen ? undefined : -150,
+          width: isDrawerOpen ? undefined : width / 2
+        }
+      }
+    })
+  }, [navigation, width, isDrawerOpen])
+
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -39,30 +59,71 @@ const MainStack = () => {
   )
 }
 
-const Drawer = createDrawerNavigator()
+const LeftDrawer = createDrawerNavigator()
 
-const NavDrawer = () => {
-  return (
-    <Drawer.Navigator
-      drawerContent={({ navigation }) => (
-        <DrawerContents navigation={navigation} />
-      )}
-      screenOptions={{
-        drawerType: 'back',
-        drawerStyle: tw`bg-gray-100 dark:bg-gray-900 w-5/6`,
+const LeftDrawerScreen = ({ navigation }) => {
+  const { width } = useWindowDimensions()
+  const isDrawerOpen = useDrawerStatus() === 'open'
+
+  useEffect(() => {
+    navigation.setOptions({
+      gestureHandlerProps: {
         // NOTE: -150 is a rough guess of the height of the scrubber
-        gestureHandlerProps: { hitSlop: { bottom: -150 } }
+        hitSlop: {
+          right: 0,
+          bottom: isDrawerOpen ? undefined : -150,
+          width: isDrawerOpen ? undefined : width / 2
+        }
+      }
+    })
+  }, [navigation, width, isDrawerOpen])
+
+  return (
+    <LeftDrawer.Navigator
+      id="LeftDrawer"
+      drawerContent={LeftDrawerContents}
+      screenOptions={{
+        drawerPosition: 'left',
+        drawerType: 'back',
+        drawerStyle: tw`bg-gray-100 dark:bg-gray-900 w-5/6`
       }}
     >
-      <Drawer.Screen
+      <LeftDrawer.Screen
         name="MainStack"
         options={{ headerShown: false }}
         component={MainStack}
       />
-    </Drawer.Navigator>
+    </LeftDrawer.Navigator>
+  )
+}
+
+function RightDrawerContent() {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>This is the right drawer</Text>
+    </View>
+  )
+}
+
+const RightDrawer = createDrawerNavigator()
+
+const RightDrawerScreen = () => {
+  return (
+    <RightDrawer.Navigator
+      id="RightDrawer"
+      drawerContent={RightDrawerContent}
+      screenOptions={{
+        drawerPosition: 'right',
+        headerShown: false,
+        drawerType: 'back',
+        drawerStyle: tw`bg-gray-100 dark:bg-gray-900 w-5/6`
+      }}
+    >
+      <RightDrawer.Screen name="HomeDrawer" component={LeftDrawerScreen} />
+    </RightDrawer.Navigator>
   )
 }
 
 export const AppStack = () => {
-  return <NavDrawer />
+  return <RightDrawerScreen />
 }

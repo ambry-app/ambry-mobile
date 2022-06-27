@@ -13,7 +13,7 @@ export default function BookDetails({ imageSource, media }) {
     <>
       <View style={tw`flex-row items-center`}>
         <TouchableNativeFeedback
-          onPress={() => navigation.openDrawer()}
+          onPress={() => navigation.getParent('LeftDrawer').openDrawer()}
           background={TouchableNativeFeedback.Ripple(
             tw.color('gray-400'),
             true

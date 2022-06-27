@@ -61,7 +61,7 @@ function Item({ playerState, navigation }) {
   )
 }
 
-export default function DrawerContents({ navigation }) {
+export default function LeftDrawerContents({ navigation }) {
   const isFirstRender = useFirstRender()
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -162,7 +162,7 @@ export default function DrawerContents({ navigation }) {
           />
         </View>
         <FlatList
-          style={tw`mr-2 py-2 rounded-xl bg-gray-200 dark:bg-gray-800`}
+          style={tw`mr-2 pb-2 rounded-xl bg-gray-200 dark:bg-gray-800`}
           data={playerStates}
           keyExtractor={item => item.id}
           onEndReached={fetchPlayerStates}
@@ -171,6 +171,19 @@ export default function DrawerContents({ navigation }) {
           renderItem={({ item }) => (
             <Item playerState={item} navigation={navigation} />
           )}
+          stickyHeaderIndices={[0]}
+          ListHeaderComponent={
+            <View
+              style={tw`px-4 pt-2 rounded-t-xl bg-gray-200 dark:bg-gray-800 shadow-lg`}
+            >
+              <Text
+                numberOfLines={1}
+                style={tw`mb-1 text-xl font-bold text-gray-700 dark:text-gray-100`}
+              >
+                Recent
+              </Text>
+            </View>
+          }
           ListFooterComponent={
             <View style={__DEV__ ? tw`h-22` : tw`h-2`}>
               {__DEV__ && (

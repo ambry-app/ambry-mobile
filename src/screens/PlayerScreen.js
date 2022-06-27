@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { useNavigation } from '@react-navigation/native'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { Platform, Text, View } from 'react-native'
 import { TouchableNativeFeedback } from 'react-native-gesture-handler'
 import Animated, {
