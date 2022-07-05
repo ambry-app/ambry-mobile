@@ -45,7 +45,7 @@ public class MainActivity extends ReactActivity {
     protected void loadApp(String appKey) {
       RNBootSplash.init(getPlainActivity());
       super.loadApp(appKey);
-      RNBars.init(getPlainActivity(), "dark-content");
+      RNBars.init(getPlainActivity(), "light-content");
     }
 
     @Override
