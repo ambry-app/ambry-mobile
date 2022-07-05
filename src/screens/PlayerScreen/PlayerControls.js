@@ -15,11 +15,14 @@ import ForwardButton from './PlayerControls/ForwardButton'
 import PlaybackStateButton from './PlayerControls/PlaybackStateButton'
 import Scrubber from './PlayerControls/Scrubber'
 
-const playerSelector = [state => [state.position, state.media], shallow]
+const playerSelector = [
+  state => [state.position, state.media, state.playbackRate],
+  shallow
+]
 
 const ScrubberWrapper = () => {
   const scheme = useColorScheme()
-  const [position, media] = usePlayer(...playerSelector)
+  const [position, media, playbackRate] = usePlayer(...playerSelector)
 
   if (!media) return null
 
@@ -51,6 +54,7 @@ const ScrubberWrapper = () => {
       <Scrubber
         position={position}
         duration={duration}
+        playbackRate={playbackRate}
         onChange={seekTo}
         markers={markers}
         theme={theme}

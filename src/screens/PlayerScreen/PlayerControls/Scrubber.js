@@ -1,3 +1,4 @@
+import usePrevious from '@react-hook/previous'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { memo } from 'react'
 import { Dimensions, StyleSheet } from 'react-native'
@@ -10,6 +11,7 @@ import Animated, {
   useDerivedValue,
   useSharedValue,
   withDecay,
+  withSpring,
   withTiming
 } from 'react-native-reanimated'
 import Svg, { Line, Path, Rect } from 'react-native-svg'
@@ -131,6 +133,7 @@ const Markers = memo(({ markers, duration, theme }) => {
 export default function Scrubber({
   position: positionInput,
   duration,
+  playbackRate,
   onChange,
   markers,
   theme
@@ -139,6 +142,7 @@ export default function Scrubber({
   const translateX = useSharedValue(timeToTranslateX(Math.round(positionInput)))
   const [isScrubbing, setIsScrubbing] = useIsScrubbing()
   const maxTranslateX = timeToTranslateX(duration)
+  const previousPosition = usePrevious(positionInput)
 
   const onGestureEventHandler = useAnimatedGestureHandler({
     onStart: (_event, ctx) => {
@@ -258,9 +262,16 @@ export default function Scrubber({
 
   useEffect(() => {
     if (!isScrubbing) {
-      translateX.value = timeToTranslateX(Math.round(positionInput))
+      if (Math.abs(positionInput - previousPosition) > 5) {
+        translateX.value = withSpring(timeToTranslateX(positionInput))
+      } else {
+        translateX.value = withTiming(timeToTranslateX(positionInput), {
+          duration: 1000 / playbackRate,
+          easing: Easing.linear
+        })
+      }
     }
-  }, [translateX, isScrubbing, positionInput])
+  }, [translateX, isScrubbing, positionInput, previousPosition, playbackRate])
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEventHandler}>
