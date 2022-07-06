@@ -11,7 +11,6 @@ import Animated, {
   useDerivedValue,
   useSharedValue,
   withDecay,
-  withSpring,
   withTiming
 } from 'react-native-reanimated'
 import Svg, { Line, Path, Rect } from 'react-native-svg'
@@ -263,7 +262,9 @@ export default function Scrubber({
   useEffect(() => {
     if (!isScrubbing) {
       if (Math.abs(positionInput - previousPosition) > 5) {
-        translateX.value = withSpring(timeToTranslateX(positionInput))
+        translateX.value = withTiming(timeToTranslateX(positionInput), {
+          easing: Easing.out(Easing.exp)
+        })
       } else {
         translateX.value = withTiming(timeToTranslateX(positionInput), {
           duration: 1000 / playbackRate,
