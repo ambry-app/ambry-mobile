@@ -2,7 +2,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { useNavigation } from '@react-navigation/core'
 import React from 'react'
 import { Image, Text, View } from 'react-native'
-import { TouchableNativeFeedback } from 'react-native-gesture-handler'
+import {
+  TouchableNativeFeedback,
+  TouchableOpacity
+} from 'react-native-gesture-handler'
 import WrappingListOfLinks from '../../components/WrappingListOfLinks'
 import tw from '../../lib/tailwind'
 
@@ -21,25 +24,37 @@ export default function BookDetails({ imageSource, media }) {
         >
           <FontAwesomeIcon icon="bars" color={tw.color('gray-100')} size={24} />
         </TouchableNativeFeedback>
-        <Text
-          numberOfLines={1}
-          style={tw`ml-6 text-xl font-bold text-gray-700 dark:text-gray-100`}
+        <TouchableOpacity
+          onPress={() => navigation.push('Book', { bookId: media.book.id })}
         >
-          {media.book.title}
-        </Text>
+          <Text
+            numberOfLines={1}
+            style={tw`ml-6 text-xl font-bold text-gray-100`}
+          >
+            {media.book.title}
+          </Text>
+        </TouchableOpacity>
       </View>
       <View style={tw`mt-3 flex-row`}>
-        <View style={tw`flex-none`}>
-          <View style={tw`w-28 rounded-md bg-gray-200 dark:bg-gray-800`}>
-            <Image
-              source={imageSource}
-              style={tw.style('rounded-md', 'w-full', {
-                aspectRatio: 10 / 15
-              })}
-            />
+        <View style={tw`w-1/3`}>
+          <View style={tw`w-full rounded-md bg-gray-800`}>
+            <TouchableNativeFeedback
+              onPress={() => navigation.push('Book', { bookId: media.book.id })}
+              background={TouchableNativeFeedback.Ripple(
+                tw.color('gray-400'),
+                true
+              )}
+            >
+              <Image
+                source={imageSource}
+                style={tw.style('rounded-md', 'w-full', {
+                  aspectRatio: 10 / 15
+                })}
+              />
+            </TouchableNativeFeedback>
           </View>
         </View>
-        <View style={tw`mt-2 pl-4 flex-grow`}>
+        <View style={tw`w-2/3 pl-3`}>
           <WrappingListOfLinks
             prefix="by"
             items={media.book.authors}
@@ -48,8 +63,8 @@ export default function BookDetails({ imageSource, media }) {
                 personId: author.personId
               })
             }}
-            style={tw`leading-none text-lg text-gray-500 dark:text-gray-200`}
-            linkStyle={tw`leading-none text-lg text-lime-500 dark:text-gray-200`}
+            style={tw`leading-none text-lg text-gray-200`}
+            linkStyle={tw`leading-none text-lg text-gray-200`}
           />
           <WrappingListOfLinks
             prefix="Narrated by"
@@ -61,8 +76,8 @@ export default function BookDetails({ imageSource, media }) {
                 personId: narrator.personId
               })
             }}
-            style={tw`text-gray-500 dark:text-gray-200`}
-            linkStyle={tw`text-lime-500 dark:text-gray-200`}
+            style={tw`text-gray-200`}
+            linkStyle={tw`text-gray-200`}
           />
           <WrappingListOfLinks
             items={media.book.series}
@@ -72,8 +87,8 @@ export default function BookDetails({ imageSource, media }) {
               })
             }}
             nameExtractor={series => `${series.name} #${series.bookNumber}`}
-            style={tw`text-gray-400 dark:text-gray-400`}
-            linkStyle={tw`text-gray-400 dark:text-gray-400`}
+            style={tw`text-gray-400`}
+            linkStyle={tw`text-gray-400`}
           />
         </View>
       </View>

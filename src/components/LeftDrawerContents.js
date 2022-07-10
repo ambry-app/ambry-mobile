@@ -33,10 +33,8 @@ function Item({ playerState, navigation }) {
         }
       }}
     >
-      <View style={tw`p-4 py-2 flex-row items-center`}>
-        <View
-          style={tw`w-1/4 rounded-xl bg-gray-200 dark:bg-gray-800 shadow-md`}
-        >
+      <View style={tw`p-4 py-2 flex-row`}>
+        <View style={tw`w-1/4 bg-gray-800`}>
           <Image
             source={uriSource(playerState.media.book.imagePath)}
             style={tw.style('rounded-md', 'w-full', {
@@ -45,14 +43,14 @@ function Item({ playerState, navigation }) {
           />
         </View>
         <View style={tw`pl-2 w-3/4`}>
-          <Text style={tw`text-lg text-gray-700 dark:text-gray-200`}>
+          <Text style={tw`text-lg leading-tight font-bold text-gray-100`}>
             {playerState.media.book.title}
           </Text>
           <WrappingList
             items={playerState.media.book.authors}
-            style={tw`leading-none text-sm text-gray-500 dark:text-gray-400`}
+            style={tw`leading-tight text-sm text-gray-400`}
           />
-          <Text style={tw`text-lg text-lime-500 dark:text-lime-400`}>
+          <Text style={tw`text-lime-400`}>
             {progressPercent(playerState.media.duration, playerState.position)}
           </Text>
         </View>
@@ -120,9 +118,7 @@ export default function LeftDrawerContents({ navigation }) {
     if (error) {
       return (
         <ScreenCentered>
-          <Text style={tw`text-gray-700 dark:text-gray-200`}>
-            Failed to load recent books!
-          </Text>
+          <Text style={tw`text-gray-200`}>Failed to load recent books!</Text>
         </ScreenCentered>
       )
     }
@@ -162,7 +158,7 @@ export default function LeftDrawerContents({ navigation }) {
           />
         </View>
         <FlatList
-          style={tw`mr-2 pb-2 rounded-xl bg-gray-200 dark:bg-gray-800`}
+          style={tw`mr-2 pb-2 rounded-xl bg-gray-800`}
           data={playerStates}
           keyExtractor={item => item.id}
           onEndReached={fetchPlayerStates}
@@ -173,12 +169,10 @@ export default function LeftDrawerContents({ navigation }) {
           )}
           stickyHeaderIndices={[0]}
           ListHeaderComponent={
-            <View
-              style={tw`px-4 pt-2 rounded-t-xl bg-gray-200 dark:bg-gray-800 shadow-lg`}
-            >
+            <View style={tw`px-4 pt-2 rounded-t-xl bg-gray-800 shadow-lg`}>
               <Text
                 numberOfLines={1}
-                style={tw`mb-1 text-xl font-bold text-gray-700 dark:text-gray-100`}
+                style={tw`mb-1 text-xl font-bold text-gray-100`}
               >
                 Recent
               </Text>

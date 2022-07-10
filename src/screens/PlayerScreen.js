@@ -17,10 +17,6 @@ import Background from './PlayerScreen/Background'
 import BookDetails from './PlayerScreen/BookDetails'
 import PlaybackRate from './PlayerScreen/PlaybackRate'
 import PlayerControls from './PlayerScreen/PlayerControls'
-// import {
-//   Chapters,
-//   useChapters
-// } from './PlayerScreen/PlayerControls/ChapterControls'
 import PlayerHeader from './PlayerScreen/PlayerHeader'
 import ProgressDisplay from './PlayerScreen/ProgressDisplay'
 import SleepTimerToggle from './PlayerScreen/SleepTimerToggle'
@@ -52,22 +48,14 @@ export default function PlayerScreen() {
     }
   }, [opacity, loading])
 
-  const animatedStyle = useAnimatedStyle(() => {
+  const animatedOpacity = useAnimatedStyle(() => {
     return { opacity: opacity.value }
   })
-
-  // const chaptersRef = useRef()
-  // const { chaptersOpen, onChaptersChange, toggleChapters } = useChapters(
-  //   chaptersRef,
-  //   loading
-  // )
 
   if (error) {
     return (
       <ScreenCentered>
-        <Text style={tw`text-gray-700 dark:text-gray-200`}>
-          Failed to load player!
-        </Text>
+        <Text style={tw`text-gray-200`}>Failed to load player!</Text>
       </ScreenCentered>
     )
   }
@@ -77,7 +65,7 @@ export default function PlayerScreen() {
       <Background loading={loading} imageSource={imageSource} blur={0}>
         <ScreenCentered>
           <View
-            style={tw`flex items-center justify-center w-14 h-14 rounded-full bg-gray-200 dark:bg-gray-800`}
+            style={tw`flex items-center justify-center w-14 h-14 rounded-full bg-gray-800`}
           >
             <LargeActivityIndicator />
           </View>
@@ -97,7 +85,7 @@ export default function PlayerScreen() {
   if (!media) {
     return (
       <ScreenCentered>
-        <Text style={tw`text-gray-700 dark:text-gray-200 mb-4`}>
+        <Text style={tw`text-gray-200 mb-4`}>
           No audiobook selected. Visit the library to choose a book:
         </Text>
         <TouchableNativeFeedback
@@ -118,31 +106,24 @@ export default function PlayerScreen() {
   }
 
   return (
-    <>
-      <Background
-        imageSource={imageSource}
-        blur={Platform.OS === 'ios' ? 25 : 10}
-      >
-        <Animated.View style={animatedStyle}>
-          <View style={tw`h-full`}>
-            <PlayerHeader>
-              <BookDetails imageSource={imageSource} media={media} />
-              <ProgressDisplay />
-              <View style={tw`flex-row items-center`}>
-                <SleepTimerToggle />
-                <View style={tw`flex-grow`} />
-                <PlaybackRate />
-              </View>
-            </PlayerHeader>
-            <PlayerControls />
-          </View>
-        </Animated.View>
-      </Background>
-      {/* <Chapters
-        sheetRef={chaptersRef}
-        onChange={onChaptersChange}
-        isOpen={chaptersOpen}
-      /> */}
-    </>
+    <Background
+      imageSource={imageSource}
+      blur={Platform.OS === 'ios' ? 25 : 10}
+    >
+      <Animated.View style={animatedOpacity}>
+        <View style={tw`h-full`}>
+          <PlayerHeader>
+            <BookDetails imageSource={imageSource} media={media} />
+            <ProgressDisplay />
+            <View style={tw`flex-row items-center`}>
+              <SleepTimerToggle />
+              <View style={tw`flex-grow`} />
+              <PlaybackRate />
+            </View>
+          </PlayerHeader>
+          <PlayerControls />
+        </View>
+      </Animated.View>
+    </Background>
   )
 }
