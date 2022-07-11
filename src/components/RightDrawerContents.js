@@ -7,6 +7,7 @@ import tw from '../lib/tailwind'
 import { secondsDisplay } from '../lib/utils'
 import usePlayer, { seekTo } from '../stores/Player'
 import shallow from 'zustand/shallow'
+import { useDrawerStatus } from '@react-navigation/drawer'
 
 const CHAPTER_HEIGHT = 52
 
@@ -53,6 +54,7 @@ const playerSelector = [state => [state.media, state.currentChapter], shallow]
 const ChaptersList = ({ navigation }) => {
   // console.log('RENDERING: ChaptersList')
 
+  const isOpen = useDrawerStatus() === 'open'
   const [media, currentChapter] = usePlayer(...playerSelector)
   const ref = useRef()
 
@@ -65,7 +67,7 @@ const ChaptersList = ({ navigation }) => {
     if (index >= 0 && index < media.chapters.length) {
       ref.current.scrollToIndex({ index, viewPosition: 0.5 })
     }
-  }, [media, currentChapter])
+  }, [media, currentChapter, isOpen])
 
   return (
     <FlatList
