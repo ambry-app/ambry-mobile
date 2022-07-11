@@ -170,10 +170,7 @@ export default function LeftDrawerContents({ navigation }) {
           stickyHeaderIndices={[0]}
           ListHeaderComponent={
             <View style={tw`px-4 pt-2 rounded-t-xl bg-gray-800 shadow-lg`}>
-              <Text
-                numberOfLines={1}
-                style={tw`mb-1 text-xl font-bold text-gray-100`}
-              >
+              <Text style={tw`mb-1 text-xl font-bold text-gray-100`}>
                 Recent
               </Text>
             </View>

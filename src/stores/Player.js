@@ -492,3 +492,29 @@ export const destroy = () => {
   })
   return TrackPlayer.destroy()
 }
+
+export const seekNextChapter = async () => {
+  const { media, currentChapter } = useStore.getState()
+  const chapters = media.chapters
+  const index = chapters.indexOf(currentChapter)
+  const nextChapter = chapters[index + 1]
+
+  if (nextChapter) {
+    return seekTo(nextChapter.startTime)
+  } else {
+    return seekTo(media.duration)
+  }
+}
+
+export const seekPreviousChapter = async () => {
+  const { media, currentChapter } = useStore.getState()
+  const chapters = media.chapters
+  const index = chapters.indexOf(currentChapter)
+  const previousChapter = chapters[index - 1]
+
+  if (previousChapter) {
+    return seekTo(previousChapter.startTime)
+  } else {
+    return seekTo(0)
+  }
+}

@@ -4,8 +4,9 @@ import {
 } from '@react-navigation/drawer'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React, { useEffect } from 'react'
-import { Text, useWindowDimensions, View } from 'react-native'
+import { useWindowDimensions } from 'react-native'
 import LeftDrawerContents from '../components/LeftDrawerContents'
+import RightDrawerContents from '../components/RightDrawerContents'
 import tw from '../lib/tailwind'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
 import PersonDetailsScreen from '../screens/PersonDetailsScreen'
@@ -85,7 +86,7 @@ const LeftDrawerScreen = ({ navigation }) => {
       screenOptions={{
         drawerPosition: 'left',
         drawerType: 'back',
-        drawerStyle: tw`bg-gray-100 dark:bg-gray-900 w-5/6`
+        drawerStyle: tw`bg-gray-900 w-5/6`
       }}
     >
       <LeftDrawer.Screen
@@ -97,26 +98,18 @@ const LeftDrawerScreen = ({ navigation }) => {
   )
 }
 
-function RightDrawerContent() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>This is the right drawer</Text>
-    </View>
-  )
-}
-
 const RightDrawer = createDrawerNavigator()
 
 const RightDrawerScreen = () => {
   return (
     <RightDrawer.Navigator
       id="RightDrawer"
-      drawerContent={RightDrawerContent}
+      drawerContent={RightDrawerContents}
       screenOptions={{
         drawerPosition: 'right',
         headerShown: false,
         drawerType: 'back',
-        drawerStyle: tw`bg-gray-100 dark:bg-gray-900 w-5/6`
+        drawerStyle: tw`bg-gray-900 w-5/6`
       }}
     >
       <RightDrawer.Screen name="HomeDrawer" component={LeftDrawerScreen} />

@@ -19,6 +19,9 @@ import { faBackward } from '@fortawesome/free-solid-svg-icons/faBackward'
 import { faForward } from '@fortawesome/free-solid-svg-icons/faForward'
 import { faStopwatch } from '@fortawesome/free-solid-svg-icons/faStopwatch'
 import { faGaugeHigh } from '@fortawesome/free-solid-svg-icons/faGaugeHigh'
+import { faVolumeHigh } from '@fortawesome/free-solid-svg-icons/faVolumeHigh'
+import { faForwardStep } from '@fortawesome/free-solid-svg-icons/faForwardStep'
+import { faBackwardStep } from '@fortawesome/free-solid-svg-icons/faBackwardStep'
 
 library.add(
   faCirclePlay,
@@ -33,7 +36,10 @@ library.add(
   faBackward,
   faForward,
   faStopwatch,
-  faGaugeHigh
+  faGaugeHigh,
+  faVolumeHigh,
+  faForwardStep,
+  faBackwardStep
 )
 
 export default function App() {
