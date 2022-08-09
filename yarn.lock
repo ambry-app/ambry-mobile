@@ -746,10 +746,17 @@
     pirates "^4.0.5"
     source-map-support "^0.5.16"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.12.5", "@babel/runtime@^7.7.2":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.12.5":
   version "7.18.6"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.18.6.tgz#6a1ef59f838debd670421f8c7f2cbb8da9751580"
   integrity sha512-t9wi7/AW6XtKahAe20Yw0/mMljKq0B1r2fPdvaAdV/KPDZewFXdaaa6K7lxmZBZ8FBNpCiAT6iHPmd6QO9bKfQ==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
+"@babel/runtime@^7.7.2":
+  version "7.18.9"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.18.9.tgz#b4fcfce55db3d2e5e080d2490f608a3b9f407f4a"
+  integrity sha512-lkqXDcvlFT5rvEjiu6+QYO+1GXrEHRo2LOtS7E4GtX5ESIZOgepqsZBVIj6Pv+a6zqsya9VCgiK1KAK4BvJDAw==
   dependencies:
     regenerator-runtime "^0.13.4"
 
@@ -6860,9 +6867,9 @@ react-native-bars@^1.1.4:
   integrity sha512-2pXnT6zimIg7wCniZKd3kYgP7Zz0RDhUYSi0cdFANSSyv7BiqyvRNrFpkMXbaz/zfEnYiSfSe7XjT/L4MfdaSQ==
 
 react-native-bootsplash@^4.1.5:
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/react-native-bootsplash/-/react-native-bootsplash-4.2.3.tgz#9914fbe2e749ee4cbfa7a2c731cc530bee488431"
-  integrity sha512-IqE12pdM7DYozZBgoE3WdcxSPj7p2QY41sUzjgKJGKkl0urCk/QauKst+5jdHAcOUqB3Gym6EtihFwq0QXh2uw==
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-bootsplash/-/react-native-bootsplash-4.3.0.tgz#c020b41991a497e5846fce6892d8b5dbe36f587d"
+  integrity sha512-RertPUk+D6R96e+dbGNbH+sXk93T+ixHPj65KqRluQO2v6DGElK0r9AMbf0d47ItK5GzXiESoLO1HLEH/cB7lA==
   dependencies:
     fs-extra "^10.1.0"
     jimp "^0.16.1"
