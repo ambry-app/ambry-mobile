@@ -1,5 +1,11 @@
+import request, { gql } from 'graphql-request'
+
 function apiUrl(host, path) {
   return `${host}/api/${path}`
+}
+
+function gqlUrl(host, name) {
+  return `${host}/gql/${name}`
 }
 
 async function handleResponse(response, withHasMore = false) {
@@ -9,6 +15,53 @@ async function handleResponse(response, withHasMore = false) {
   } else {
     throw response.status
   }
+}
+
+const booksQuery = gql`
+  query Books($first: Int, $after: String) {
+    books(first: $first, after: $after) {
+      edges {
+        node {
+          id
+          title
+          imagePath
+          authors {
+            id
+            name
+            person {
+              id
+            }
+          }
+          seriesBooks {
+            bookNumber
+            series {
+              id
+              name
+            }
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`
+async function fetchBooks({ host, token }, cursor) {
+  const variables = cursor ? { first: 50, after: cursor } : { first: 50 }
+  const requestHeaders = { authorization: `Bearer ${token}` }
+  const data = await request(
+    gqlUrl(
+      host,
+      cursor ? `Books(first:50,after:${cursor})` : `Books(first:50)`
+    ),
+    booksQuery,
+    variables,
+    requestHeaders
+  )
+
+  return data.books
 }
 
 export async function getRecentBooks({ host, token }, page = 1) {
@@ -84,21 +137,51 @@ export async function reportPlayerState(
   return handleResponse(response)
 }
 
-export async function createToken(host, email, password) {
-  const response = await fetch(apiUrl(host, 'log_in'), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      user: {
-        email: email,
-        password: password
+const createSessionMutation = gql`
+  mutation CreateSession($input: CreateSessionInput!) {
+    createSession(input: $input) {
+      token
+      user {
+        email
       }
-    })
-  })
+    }
+  }
+`
+export async function createSession(host, email, password) {
+  const variables = { input: { email, password } }
+  const data = await request(
+    gqlUrl(host, 'CreateSession'),
+    createSessionMutation,
+    variables
+  )
 
-  return handleResponse(response)
+  const {
+    createSession: {
+      token,
+      user: { email: serverEmail }
+    }
+  } = data
+
+  return { token, email: serverEmail }
+}
+
+const deleteSessionMutation = gql`
+  mutation DeleteSession {
+    deleteSession {
+      deleted
+    }
+  }
+`
+export async function deleteSession({ host, token }) {
+  const requestHeaders = { authorization: `Bearer ${token}` }
+  await request(
+    gqlUrl(host, 'DeleteSession'),
+    deleteSessionMutation,
+    {},
+    requestHeaders
+  )
+
+  return true
 }
 
 export function uriSource({ host, token }, path) {
@@ -111,6 +194,7 @@ export function uriSource({ host, token }, path) {
 }
 
 export default {
+  fetchBooks,
   getRecentBooks,
   getRecentPlayerStates,
   getBook,

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useDeviceContext } from 'twrnc'
 import tw from './lib/tailwind'
@@ -22,6 +22,14 @@ import { faGaugeHigh } from '@fortawesome/free-solid-svg-icons/faGaugeHigh'
 import { faVolumeHigh } from '@fortawesome/free-solid-svg-icons/faVolumeHigh'
 import { faForwardStep } from '@fortawesome/free-solid-svg-icons/faForwardStep'
 import { faBackwardStep } from '@fortawesome/free-solid-svg-icons/faBackwardStep'
+import {
+  focusManager,
+  onlineManager,
+  QueryClient,
+  QueryClientProvider
+} from '@tanstack/react-query'
+import NetInfo from '@react-native-community/netinfo'
+import { AppState, Platform } from 'react-native'
 
 library.add(
   faCirclePlay,
@@ -42,13 +50,37 @@ library.add(
   faBackwardStep
 )
 
+onlineManager.setEventListener(setOnline => {
+  return NetInfo.addEventListener(state => {
+    setOnline(!!state.isConnected)
+  })
+})
+
+function onAppStateChange(status) {
+  if (Platform.OS !== 'web') {
+    focusManager.setFocused(status === 'active')
+  }
+}
+
+const queryClient = new QueryClient()
+
 export default function App() {
   useDeviceContext(tw)
 
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', onAppStateChange)
+
+    return () => subscription.remove()
+  }, [])
+
   return (
-    <SafeAreaProvider>
+    <>
       <SystemBars animated={true} barStyle="light-content" />
-      <Router />
-    </SafeAreaProvider>
+      <QueryClientProvider client={queryClient}>
+        <SafeAreaProvider>
+          <Router />
+        </SafeAreaProvider>
+      </QueryClientProvider>
+    </>
   )
 }

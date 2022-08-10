@@ -1,12 +1,10 @@
 import { useNavigation } from '@react-navigation/core'
 import React from 'react'
+import { Image, Text, View } from 'react-native'
 import {
-  Image,
-  Text,
   TouchableNativeFeedback,
-  TouchableOpacity,
-  View
-} from 'react-native'
+  TouchableOpacity
+} from 'react-native-gesture-handler'
 import tw from '../lib/tailwind'
 import { uriSource } from '../stores/AmbryAPI'
 
@@ -16,7 +14,7 @@ export default function BookLink({ book }) {
   const authorsList = book.authors.map(author => (
     <TouchableOpacity
       key={author.id}
-      onPress={() => navigation.push('Person', { personId: author.personId })}
+      onPress={() => navigation.push('Person', { personId: author.person.id })}
     >
       <Text
         style={tw`leading-none text-lg text-gray-500 dark:text-gray-400 text-center`}
@@ -26,13 +24,15 @@ export default function BookLink({ book }) {
     </TouchableOpacity>
   ))
 
-  const seriesList = book.series.map(series => (
+  const seriesList = book.seriesBooks.map(seriesBook => (
     <TouchableOpacity
-      key={series.id}
-      onPress={() => navigation.push('Series', { seriesId: series.id })}
+      key={seriesBook.series.id}
+      onPress={() =>
+        navigation.push('Series', { seriesId: seriesBook.series.id })
+      }
     >
       <Text style={tw`text-gray-400 dark:text-gray-500 text-center`}>
-        {series.name} #{series.bookNumber}
+        {seriesBook.series.name} #{seriesBook.bookNumber}
       </Text>
     </TouchableOpacity>
   ))

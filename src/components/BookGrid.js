@@ -18,6 +18,7 @@ export default function BookGrid({
       keyExtractor={item => item.id}
       numColumns={2}
       onEndReached={onEndReached}
+      onEndReachedThreshold={1}
       onRefresh={onRefresh}
       refreshing={refreshing}
       renderItem={({ item }) => <BookLink book={item} />}

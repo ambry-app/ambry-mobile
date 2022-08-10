@@ -1,7 +1,7 @@
 import EncryptedStorage from 'react-native-encrypted-storage'
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
-import API, { createToken } from '../api/ambry'
+import API, { createSession, deleteSession } from '../api/ambry'
 
 const AUTH_STORAGE_KEY = '@Ambry_userSession'
 
@@ -48,8 +48,12 @@ export const signIn = async (host, email, password) => {
   console.debug('AmbryAPI: Signing in with the server')
 
   const { knownHosts } = useStore.getState()
-  const { token } = await createToken(host, email, password)
-  const newAuthData = { host, email, token }
+  const { token, email: serverEmail } = await createSession(
+    host,
+    email,
+    password
+  )
+  const newAuthData = { host, token, email: serverEmail }
 
   console.debug(`AmbryAPI: Signed in as ${email} at host ${host}`)
 
@@ -60,16 +64,22 @@ export const signIn = async (host, email, password) => {
   })
 }
 
-export const signOut = () => {
+export const signOut = async () => {
   console.debug('AmbryAPI: Signing out')
 
-  // TODO: call signOut in API so it also invalidates the session server-side.
+  deleteSession(useStore.getState()._authData)
   // TODO: keep email and host and restore them in the sign-in form for
   // convenience.
   useStore.setState({
     _authData: null,
     loggedIn: false
   })
+}
+
+export const fetchBooks = async ({ pageParam }) => {
+  console.debug(`AmbryAPI: Fetching books`)
+
+  return API.fetchBooks(useStore.getState()._authData, pageParam)
 }
 
 export const doAPICall = async (apiFunc, ...args) => {
@@ -85,7 +95,6 @@ export const doAPICall = async (apiFunc, ...args) => {
   }
 }
 
-export const getRecentBooks = page => doAPICall(API.getRecentBooks, page)
 export const getRecentPlayerStates = page =>
   doAPICall(API.getRecentPlayerStates, page)
 export const getBook = bookId => doAPICall(API.getBook, bookId)
