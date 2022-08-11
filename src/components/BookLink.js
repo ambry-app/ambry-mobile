@@ -8,7 +8,7 @@ import {
 import tw from '../lib/tailwind'
 import { uriSource } from '../stores/AmbryAPI'
 
-export default function BookLink({ book }) {
+export default function BookLink({ book, seriesBook: primarySeriesBook }) {
   const navigation = useNavigation()
 
   const authorsList = book.authors.map(author => (
@@ -39,9 +39,9 @@ export default function BookLink({ book }) {
 
   return (
     <View style={tw`p-2 w-1/2`}>
-      {book.bookNumber && (
+      {primarySeriesBook && (
         <Text style={tw`text-center text-lg text-gray-700 dark:text-gray-200`}>
-          Book {book.bookNumber}
+          Book {primarySeriesBook.bookNumber}
         </Text>
       )}
       <View

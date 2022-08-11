@@ -1,22 +1,17 @@
-import React, { useCallback, useEffect, useReducer } from 'react'
+import React, { useEffect } from 'react'
 import { Image, SectionList, Text, View } from 'react-native'
 import BookGrid from '../components/BookGrid'
 import Description from '../components/Description'
-import { Header1, Header2 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import SafeBottomBorder from '../components/SafeBottomBorder'
 import ScreenCentered from '../components/ScreenCentered'
 import tw from '../lib/tailwind'
-import { actionCreators, initialState, reducer } from '../reducers/person'
-import { getPerson, uriSource } from '../stores/AmbryAPI'
+import { uriSource, usePerson } from '../stores/AmbryAPI'
 
 function PersonHeader({ person }) {
   return (
     <View style={tw`p-4`}>
-      <Header1 style={tw`text-center`}>{person.name}</Header1>
-      <View
-        style={tw`mx-12 my-8 rounded-full bg-gray-200 dark:bg-gray-800 shadow-lg`}
-      >
+      <View style={tw`mx-12 my-8 rounded-full bg-gray-900`}>
         <Image
           source={uriSource(person.imagePath)}
           style={tw.style('rounded-full w-full', {
@@ -30,24 +25,8 @@ function PersonHeader({ person }) {
 }
 
 export default function PersonDetailsScreen({ route, navigation }) {
-  const [state, dispatch] = useReducer(reducer, initialState)
-
-  const { person, loading, error } = state
-
-  const fetchPerson = useCallback(async () => {
-    dispatch(actionCreators.loading())
-
-    try {
-      const loadedPerson = await getPerson(route.params.personId)
-      dispatch(actionCreators.success(loadedPerson))
-    } catch {
-      dispatch(actionCreators.failure())
-    }
-  }, [route.params.personId])
-
-  useEffect(() => {
-    fetchPerson()
-  }, [fetchPerson, route.params.personId])
+  const { isLoading, isError, data } = usePerson(route.params.personId)
+  const person = data?.node
 
   useEffect(() => {
     if (person) {
@@ -55,58 +34,69 @@ export default function PersonDetailsScreen({ route, navigation }) {
     }
   }, [navigation, person])
 
-  if (!person) {
-    if (loading) {
-      return (
-        <ScreenCentered>
-          <LargeActivityIndicator />
-        </ScreenCentered>
-      )
-    }
-
-    if (error) {
-      return (
-        <ScreenCentered>
-          <Text style={tw`text-gray-700 dark:text-gray-200`}>
-            Failed to load person!
-          </Text>
-        </ScreenCentered>
-      )
-    }
-  } else {
-    const authorSections = person.authors.map(author => {
-      return {
-        title:
-          author.name === person.name
-            ? `Written by ${author.name}`
-            : `Written by ${person.name} as ${author.name}`,
-        data: [{ id: author.id, books: author.books }]
-      }
-    })
-
-    const narratorSections = person.narrators.map(narrator => {
-      return {
-        title:
-          narrator.name === person.name
-            ? `Narrated by ${narrator.name}`
-            : `Narrated by ${person.name} as ${narrator.name}`,
-        data: [{ id: narrator.id, books: narrator.books }]
-      }
-    })
+  if (isLoading) {
     return (
-      <SafeBottomBorder>
-        <SectionList
-          sections={[...authorSections, ...narratorSections]}
-          keyExtractor={({ id }) => id}
-          renderItem={({ item: { books } }) => <BookGrid books={books} />}
-          renderSectionHeader={({ section: { title } }) => (
-            <Header2 style={tw`px-4 pt-8 pb-0`}>{title}</Header2>
-          )}
-          ListHeaderComponent={<PersonHeader person={person} />}
-        />
-      </SafeBottomBorder>
+      <ScreenCentered>
+        <LargeActivityIndicator />
+      </ScreenCentered>
     )
   }
 
-  return null
+  if (isError) {
+    return (
+      <ScreenCentered>
+        <Text style={tw`text-gray-200`}>Failed to load person!</Text>
+      </ScreenCentered>
+    )
+  }
+
+  const authorSections = person.authors.map(author => {
+    return {
+      title:
+        author.name === person.name
+          ? `Written by ${author.name}`
+          : `Written by ${person.name} as ${author.name}`,
+      data: [
+        {
+          id: author.id,
+          books: author.authoredBooks.edges.map(edge => edge.node)
+          // FIXME: pass in author.authoredBooks.pageInfo.hasNextPage and a link
+          // to bring us to a new screen for infinite scrolling of authored books.
+        }
+      ]
+    }
+  })
+
+  const narratorSections = person.narrators.map(narrator => {
+    return {
+      title:
+        narrator.name === person.name
+          ? `Narrated by ${narrator.name}`
+          : `Narrated by ${person.name} as ${narrator.name}`,
+      data: [
+        {
+          id: narrator.id,
+          books: narrator.narratedMedia.edges.map(edge => edge.node.book)
+          // FIXME: pass in narrator.narratedMedia.pageInfo.hasNextPage and a
+          // link to bring us to a new screen for infinite scrolling of narrated
+          // media.
+        }
+      ]
+    }
+  })
+  return (
+    <SafeBottomBorder>
+      <SectionList
+        sections={[...authorSections, ...narratorSections]}
+        keyExtractor={({ id }) => id}
+        renderItem={({ item: { books } }) => <BookGrid books={books} />}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text style={tw`px-4 pt-8 pb-0 text-xl font-bold text-gray-100`}>
+            {title}
+          </Text>
+        )}
+        ListHeaderComponent={<PersonHeader person={person} />}
+      />
+    </SafeBottomBorder>
+  )
 }

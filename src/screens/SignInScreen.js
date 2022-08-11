@@ -11,13 +11,11 @@ import {
 import Logo from '../assets/logo_256x1056.svg'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import tw from '../lib/tailwind'
-import useAmbryAPI, { signIn } from '../stores/AmbryAPI'
+import useAmbryAPI, { useLoginAction } from '../stores/AmbryAPI'
 
 export default function SignInScreen() {
   const knownHosts = useAmbryAPI(state => state.knownHosts)
   const [showHostInput, setShowHostInput] = useState()
-  const [loading, isLoading] = useState(false)
-  const [error, isError] = useState(false)
   const [email, setEmail] = useState('')
   const [host, setHost] = useState('')
   const [password, setPassword] = useState('')
@@ -29,17 +27,7 @@ export default function SignInScreen() {
     }
   }, [knownHosts])
 
-  const signInCallback = async (...args) => {
-    isError(false)
-    isLoading(true)
-
-    try {
-      await signIn(...args)
-    } catch (e) {
-      isLoading(false)
-      isError(true)
-    }
-  }
+  const { isLoading, isError, login } = useLoginAction(host, email, password)
 
   return (
     <ScrollView style={tw`p-4`}>
@@ -127,11 +115,11 @@ export default function SignInScreen() {
       <Button
         title="Sign in"
         color={tw.color('lime-500')}
-        onPress={() => signInCallback(host, email, password)}
-        disabled={loading}
+        onPress={login}
+        disabled={isLoading}
       />
-      {loading && <LargeActivityIndicator style={tw`mt-4`} />}
-      {error && (
+      {isLoading && <LargeActivityIndicator style={tw`mt-4`} />}
+      {isError && (
         <Text style={tw`mt-4 text-red-500 text-center`}>
           Invalid username or password
         </Text>

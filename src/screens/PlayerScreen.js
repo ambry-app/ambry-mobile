@@ -115,7 +115,7 @@ export default function PlayerScreen() {
           <PlayerHeader>
             <BookDetails imageSource={imageSource} media={media} />
             <ProgressDisplay />
-            <View style={tw`flex-row items-center`}>
+            <View style={tw`flex-row items-center -ml-2`}>
               <SleepTimerToggle />
               <View style={tw`flex-grow`} />
               <PlaybackRate />

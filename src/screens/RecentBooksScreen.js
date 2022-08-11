@@ -1,5 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
-import React from 'react'
+import React, { useState } from 'react'
 import { Button, Text, View } from 'react-native'
 import BookGrid from '../components/BookGrid'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
@@ -7,26 +6,20 @@ import SafeBottomBorder from '../components/SafeBottomBorder'
 import ScreenCentered from '../components/ScreenCentered'
 import { useRefreshOnFocus } from '../hooks/refetchOnFocus'
 import tw from '../lib/tailwind'
-import { fetchBooks } from '../stores/AmbryAPI'
+import { useBooks } from '../stores/AmbryAPI'
 
 export default function RecentBooksScreen() {
-  const [refreshing, setRefreshing] = React.useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   const {
+    data,
     isLoading,
     isError,
-    isFetchingNextPage,
     hasNextPage,
+    isFetchingNextPage,
     fetchNextPage,
-    refetch,
-    data
-  } = useInfiniteQuery(['books'], fetchBooks, {
-    getNextPageParam: lastPage => {
-      if (lastPage?.pageInfo?.hasNextPage) {
-        return lastPage.pageInfo.endCursor
-      }
-    }
-  })
+    refetch
+  } = useBooks()
 
   useRefreshOnFocus(refetch)
 
@@ -61,7 +54,9 @@ export default function RecentBooksScreen() {
     )
   }
 
-  const books = data.pages.map(page => page.edges.map(edge => edge.node)).flat()
+  const books = data.pages.flatMap(page =>
+    page.books.edges.map(edge => edge.node)
+  )
 
   return (
     <SafeBottomBorder>

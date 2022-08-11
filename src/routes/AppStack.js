@@ -36,14 +36,14 @@ const MainStack = ({ navigation }) => {
   return (
     <Stack.Navigator>
       <Stack.Screen
+        name="Recent"
+        options={{ title: 'Latest books' }}
+        component={RecentBooksScreen}
+      />
+      <Stack.Screen
         name="Player"
         options={{ headerShown: false }}
         component={PlayerScreen}
-      />
-      <Stack.Screen
-        name="Recent"
-        options={{ title: 'Newest books' }}
-        component={RecentBooksScreen}
       />
       <Stack.Screen
         name="Book"

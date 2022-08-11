@@ -17,7 +17,7 @@ export default function ChapterControls() {
   return (
     <>
       {currentChapter && (
-        <View style={tw`w-full flex flex-row items-center px-2`}>
+        <View style={tw`w-full flex flex-row items-center px-4`}>
           <View style={tw`h-6 w-6`}>
             <TouchableNativeFeedback
               onPress={() => {

@@ -9,7 +9,8 @@ export default function BookGrid({
   onRefresh,
   refreshing,
   ListHeaderComponent,
-  ListFooterComponent
+  ListFooterComponent,
+  itemType = 'book'
 }) {
   return (
     <FlatList
@@ -21,7 +22,13 @@ export default function BookGrid({
       onEndReachedThreshold={1}
       onRefresh={onRefresh}
       refreshing={refreshing}
-      renderItem={({ item }) => <BookLink book={item} />}
+      renderItem={({ item }) =>
+        itemType === 'seriesBook' ? (
+          <BookLink book={item.book} seriesBook={item} />
+        ) : (
+          <BookLink book={item} />
+        )
+      }
       ListHeaderComponent={ListHeaderComponent}
       ListFooterComponent={ListFooterComponent}
     />

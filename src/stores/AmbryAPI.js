@@ -1,7 +1,18 @@
+import { useCallback } from 'react'
+import { GraphQLClient } from 'graphql-request'
 import EncryptedStorage from 'react-native-encrypted-storage'
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
-import API, { createSession, deleteSession } from '../api/ambry'
+import API from '../api/ambry'
+import {
+  useBookQuery,
+  useInfiniteBooksQuery,
+  useInfiniteSeriesBooksQuery,
+  useLoginMutation,
+  useLogoutMutation,
+  usePersonQuery,
+  useSeriesQuery
+} from '../graphql/types-and-hooks'
 
 const AUTH_STORAGE_KEY = '@Ambry_userSession'
 
@@ -40,22 +51,11 @@ const useStore = create(
   )
 )
 
-export default useStore
+// Private state mutators:
 
-// Actions:
-
-export const signIn = async (host, email, password) => {
-  console.debug('AmbryAPI: Signing in with the server')
-
+function setLoggedInState(host, token, email) {
   const { knownHosts } = useStore.getState()
-  const { token, email: serverEmail } = await createSession(
-    host,
-    email,
-    password
-  )
-  const newAuthData = { host, token, email: serverEmail }
-
-  console.debug(`AmbryAPI: Signed in as ${email} at host ${host}`)
+  const newAuthData = { host, token, email }
 
   useStore.setState({
     _authData: newAuthData,
@@ -64,22 +64,109 @@ export const signIn = async (host, email, password) => {
   })
 }
 
-export const signOut = async () => {
-  console.debug('AmbryAPI: Signing out')
-
-  deleteSession(useStore.getState()._authData)
-  // TODO: keep email and host and restore them in the sign-in form for
-  // convenience.
+function setLoggedOutState() {
   useStore.setState({
     _authData: null,
     loggedIn: false
   })
 }
 
-export const fetchBooks = async ({ pageParam }) => {
-  console.debug(`AmbryAPI: Fetching books`)
+// Hooks:
 
-  return API.fetchBooks(useStore.getState()._authData, pageParam)
+export default useStore
+
+const useClient = fallbackHost => {
+  const _authData = useStore(state => state._authData)
+
+  if (_authData) {
+    const { host, token } = _authData
+    const endpoint = `${host}/gql`
+    const headers = { authorization: `Bearer ${token}` }
+
+    return new GraphQLClient(endpoint, { headers })
+  } else if (fallbackHost) {
+    const endpoint = `${fallbackHost}/gql`
+
+    return new GraphQLClient(endpoint)
+  }
+}
+
+export const useLoginAction = (host, email, password) => {
+  const client = useClient(host)
+
+  const { isLoading, isError, mutate } = useLoginMutation(client, {
+    onSuccess: data => {
+      setLoggedInState(host, data.login.token, data.login.user.email)
+    }
+  })
+
+  const login = useCallback(() => {
+    mutate({ input: { email, password } })
+  }, [email, password, mutate])
+
+  return { isLoading, isError, login }
+}
+
+export const useLogoutAction = () => {
+  const client = useClient()
+
+  const { mutate } = useLogoutMutation(client, {
+    onSuccess: setLoggedOutState
+  })
+
+  return { logout: mutate }
+}
+
+export const useBooks = () => {
+  const client = useClient()
+
+  return useInfiniteBooksQuery(
+    'after',
+    client,
+    { first: 50 },
+    {
+      getNextPageParam: lastPage => {
+        if (lastPage.books.pageInfo.hasNextPage) {
+          return { after: lastPage.books.pageInfo.endCursor }
+        }
+      }
+    }
+  )
+}
+
+export const useSeriesBooks = id => {
+  const client = useClient()
+
+  return useInfiniteSeriesBooksQuery(
+    'after',
+    client,
+    { id, first: 50 },
+    {
+      getNextPageParam: lastPage => {
+        if (lastPage.node.seriesBooks.pageInfo.hasNextPage) {
+          return { after: lastPage.node.seriesBooks.pageInfo.endCursor }
+        }
+      }
+    }
+  )
+}
+
+export const useBook = id => {
+  const client = useClient()
+
+  return useBookQuery(client, { id })
+}
+
+export const usePerson = id => {
+  const client = useClient()
+
+  return usePersonQuery(client, { id, previewBooks: 10 })
+}
+
+export const useSeries = id => {
+  const client = useClient()
+
+  return useSeriesQuery(client, { id })
 }
 
 export const doAPICall = async (apiFunc, ...args) => {
@@ -87,7 +174,7 @@ export const doAPICall = async (apiFunc, ...args) => {
     return await apiFunc(useStore.getState()._authData, ...args)
   } catch (error) {
     if (error === 401) {
-      signOut()
+      // signOut()
     } else {
       console.warn('AmbryAPI: Unhandled API call error', error)
     }
@@ -97,8 +184,6 @@ export const doAPICall = async (apiFunc, ...args) => {
 
 export const getRecentPlayerStates = page =>
   doAPICall(API.getRecentPlayerStates, page)
-export const getBook = bookId => doAPICall(API.getBook, bookId)
-export const getPerson = personId => doAPICall(API.getPerson, personId)
 export const getSeries = seriesId => doAPICall(API.getSeries, seriesId)
 export const getPlayerState = mediaId => doAPICall(API.getPlayerState, mediaId)
 export const listBookmarks = page => doAPICall(API.listBookmarks, page)

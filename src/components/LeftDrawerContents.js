@@ -9,7 +9,11 @@ import useFirstRender from '../hooks/firstRender'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
 import { actionCreators, initialState, reducer } from '../reducers/playerStates'
-import { getRecentPlayerStates, signOut, uriSource } from '../stores/AmbryAPI'
+import {
+  getRecentPlayerStates,
+  uriSource,
+  useLogoutAction
+} from '../stores/AmbryAPI'
 import usePlayer, {
   destroy,
   loadMedia,
@@ -62,6 +66,7 @@ function Item({ playerState, navigation }) {
 export default function LeftDrawerContents({ navigation }) {
   const isFirstRender = useFirstRender()
   const [state, dispatch] = useReducer(reducer, initialState)
+  const { logout } = useLogoutAction()
 
   const { playerStates, nextPage, hasMore, loading, refreshing, error } = state
 
@@ -98,8 +103,8 @@ export default function LeftDrawerContents({ navigation }) {
 
   const clearMediaAndSignOut = useCallback(() => {
     destroy()
-    signOut()
-  }, [])
+    logout()
+  }, [logout])
 
   if (isFirstRender) {
     fetchPlayerStates()
