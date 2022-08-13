@@ -69,6 +69,17 @@ const ChaptersList = ({ navigation }) => {
     }
   }, [media, currentChapter, isOpen])
 
+  if (!media) {
+    return (
+      <View style={tw`m-4`}>
+        <Text style={tw`text-gray-200 mb-4`}>
+          This is the chapter list. Load a book into the player by visiting the
+          Library and this drawer will display the book's chapters.
+        </Text>
+      </View>
+    )
+  }
+
   return (
     <FlatList
       ref={ref}
