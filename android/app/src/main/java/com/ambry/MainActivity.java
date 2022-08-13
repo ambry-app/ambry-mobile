@@ -28,6 +28,13 @@ public class MainActivity extends ReactActivity {
     return new MainActivityDelegate(this, getMainComponentName());
   }
 
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    RNBootSplash.init(this);
+    super.onCreate(null);
+    RNBars.init(this, "light-content");
+  }
+
   public static class MainActivityDelegate extends ReactActivityDelegate {
     public MainActivityDelegate(ReactActivity activity, String mainComponentName) {
       super(activity, mainComponentName);
@@ -39,13 +46,6 @@ public class MainActivity extends ReactActivity {
       // If you opted-in for the New Architecture, we enable the Fabric Renderer.
       reactRootView.setIsFabric(BuildConfig.IS_NEW_ARCHITECTURE_ENABLED);
       return reactRootView;
-    }
-
-    @Override
-    protected void loadApp(String appKey) {
-      RNBootSplash.init(getPlainActivity());
-      super.loadApp(appKey);
-      RNBars.init(getPlainActivity(), "light-content");
     }
 
     @Override
