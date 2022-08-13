@@ -1,13 +1,11 @@
 import { Picker } from '@react-native-picker/picker'
 import React, { useEffect, useState } from 'react'
+import { Button, Text, useColorScheme, View } from 'react-native'
 import {
-  Button,
+  NativeViewGestureHandler,
   ScrollView,
-  Text,
-  TextInput,
-  useColorScheme,
-  View
-} from 'react-native'
+  TextInput
+} from 'react-native-gesture-handler'
 import Logo from '../assets/logo_256x1056.svg'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import tw from '../lib/tailwind'
@@ -63,30 +61,32 @@ export default function SignInScreen() {
         <View
           style={tw`my-2 border-2 border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700 rounded`}
         >
-          <Picker
-            selectedValue={host}
-            onValueChange={(itemValue, _itemIndex) =>
-              itemValue === 'new'
-                ? (() => {
-                    setShowHostInput(true)
-                    setHost('')
-                  })()
-                : setHost(itemValue)
-            }
-            style={tw`text-gray-700 dark:text-gray-200`}
-            dropdownIconColor={
-              scheme === 'dark' ? tw.color('gray-200') : tw.color('gray-700')
-            }
-          >
-            {knownHosts.map(selectableHost => (
-              <Picker.Item
-                key={selectableHost}
-                label={selectableHost}
-                value={selectableHost}
-              />
-            ))}
-            <Picker.Item label="New Host" value="new" />
-          </Picker>
+          <NativeViewGestureHandler>
+            <Picker
+              selectedValue={host}
+              onValueChange={(itemValue, _itemIndex) =>
+                itemValue === 'new'
+                  ? (() => {
+                      setShowHostInput(true)
+                      setHost('')
+                    })()
+                  : setHost(itemValue)
+              }
+              style={tw`text-gray-700 dark:text-gray-200`}
+              dropdownIconColor={
+                scheme === 'dark' ? tw.color('gray-200') : tw.color('gray-700')
+              }
+            >
+              {knownHosts.map(selectableHost => (
+                <Picker.Item
+                  key={selectableHost}
+                  label={selectableHost}
+                  value={selectableHost}
+                />
+              ))}
+              <Picker.Item label="New Host" value="new" />
+            </Picker>
+          </NativeViewGestureHandler>
         </View>
       )}
       <TextInput

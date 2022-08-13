@@ -1,13 +1,11 @@
 import { useNavigation } from '@react-navigation/core'
 import Moment from 'moment'
 import React, { useEffect } from 'react'
+import { Image, Text, View } from 'react-native'
 import {
-  Image,
   ScrollView,
-  Text,
-  TouchableNativeFeedback,
-  View
-} from 'react-native'
+  TouchableNativeFeedback
+} from 'react-native-gesture-handler'
 import Description from '../components/Description'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import PlayButton from '../components/PlayButton'

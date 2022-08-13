@@ -1,5 +1,5 @@
 import React from 'react'
-import { FlatList } from 'react-native'
+import { FlatList } from 'react-native-gesture-handler'
 import tw from '../lib/tailwind'
 import BookLink from './BookLink'
 

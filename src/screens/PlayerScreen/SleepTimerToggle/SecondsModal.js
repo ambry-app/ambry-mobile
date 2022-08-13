@@ -1,13 +1,10 @@
 import Slider from '@react-native-community/slider'
 import React, { useEffect, useState } from 'react'
+import { Button, Modal, Text, View } from 'react-native'
 import {
-  Button,
-  Modal,
-  Text,
-  TouchableOpacity,
-  useColorScheme,
-  View
-} from 'react-native'
+  gestureHandlerRootHOC,
+  TouchableOpacity
+} from 'react-native-gesture-handler'
 import ScreenCentered from '../../../components/ScreenCentered'
 import tw from '../../../lib/tailwind'
 
@@ -21,19 +18,6 @@ export default function SecondsModal({
   onNewValue,
   onRequestClose
 }) {
-  const scheme = useColorScheme()
-  const [seconds, setSeconds] = useState()
-  const [displaySeconds, setDisplaySeconds] = useState()
-
-  const setNewSeconds = value => {
-    setSeconds(value)
-    setDisplaySeconds(value)
-  }
-
-  useEffect(() => {
-    setNewSeconds(countdownSeconds)
-  }, [countdownSeconds])
-
   return (
     <Modal
       animationType="fade"
@@ -41,19 +25,37 @@ export default function SecondsModal({
       visible={visible}
       onRequestClose={onRequestClose}
     >
+      <SecondsModalContent
+        countdownSeconds={countdownSeconds}
+        onNewValue={onNewValue}
+        onRequestClose={onRequestClose}
+      />
+    </Modal>
+  )
+}
+
+const SecondsModalContent = gestureHandlerRootHOC(
+  ({ countdownSeconds, onNewValue, onRequestClose }) => {
+    const [seconds, setSeconds] = useState()
+    const [displaySeconds, setDisplaySeconds] = useState()
+
+    const setNewSeconds = value => {
+      setSeconds(value)
+      setDisplaySeconds(value)
+    }
+
+    useEffect(() => {
+      setNewSeconds(countdownSeconds)
+    }, [countdownSeconds])
+
+    return (
       <ScreenCentered>
         <View
-          style={tw`shadow-lg bg-white dark:bg-gray-800 rounded-lg w-11/12 overflow-hidden`}
+          style={tw`shadow-lg bg-gray-800 rounded-lg w-11/12 overflow-hidden`}
         >
           <View style={tw`p-4`}>
-            <Text
-              style={tw`text-xl text-gray-700 dark:text-gray-100 font-bold`}
-            >
-              Sleep Timer
-            </Text>
-            <Text
-              style={tw`m-4 text-gray-700 dark:text-gray-100 text-lg text-center`}
-            >
+            <Text style={tw`text-xl text-gray-100 font-bold`}>Sleep Timer</Text>
+            <Text style={tw`m-4 text-gray-100 text-lg text-center`}>
               {formatSeconds(displaySeconds)}m
             </Text>
             <Slider
@@ -62,15 +64,9 @@ export default function SecondsModal({
               minimumValue={300}
               maximumValue={5400}
               step={300}
-              thumbTintColor={
-                scheme === 'dark' ? tw.color('lime-400') : tw.color('lime-500')
-              }
-              minimumTrackTintColor={
-                scheme === 'dark' ? tw.color('gray-400') : tw.color('gray-200')
-              }
-              maximumTrackTintColor={
-                scheme === 'dark' ? tw.color('gray-400') : tw.color('gray-200')
-              }
+              thumbTintColor={tw.color('lime-400')}
+              minimumTrackTintColor={tw.color('gray-400')}
+              maximumTrackTintColor={tw.color('gray-400')}
               onValueChange={value => {
                 setDisplaySeconds(parseFloat(value.toFixed(2)))
               }}
@@ -81,42 +77,42 @@ export default function SecondsModal({
             <View style={tw`flex-row justify-between my-4`}>
               <TouchableOpacity onPress={() => setNewSeconds(300)}>
                 <Text
-                  style={tw`text-gray-700 dark:text-gray-100 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-500 rounded-md`}
+                  style={tw`text-gray-100 text-center py-1 px-2 w-14 border border-gray-500 rounded-md`}
                 >
                   5m
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setNewSeconds(600)}>
                 <Text
-                  style={tw`text-gray-700 dark:text-gray-100 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-500 rounded-md`}
+                  style={tw`text-gray-100 text-center py-1 px-2 w-14 border border-gray-500 rounded-md`}
                 >
                   10m
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setNewSeconds(900)}>
                 <Text
-                  style={tw`text-gray-700 dark:text-gray-100 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-500 rounded-md`}
+                  style={tw`text-gray-100 text-center py-1 px-2 w-14 border border-gray-500 rounded-md`}
                 >
                   15m
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setNewSeconds(1800)}>
                 <Text
-                  style={tw`text-gray-700 dark:text-gray-100 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-500 rounded-md`}
+                  style={tw`text-gray-100 text-center py-1 px-2 w-14 border border-gray-500 rounded-md`}
                 >
                   30m
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setNewSeconds(3600)}>
                 <Text
-                  style={tw`text-gray-700 dark:text-gray-100 text-center py-1 px-2 w-14 border border-gray-300 dark:border-gray-500 rounded-md`}
+                  style={tw`text-gray-100 text-center py-1 px-2 w-14 border border-gray-500 rounded-md`}
                 >
                   60m
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
-          <View style={tw`flex-row-reverse bg-gray-100 dark:bg-gray-700 p-4`}>
+          <View style={tw`flex-row-reverse bg-gray-700 p-4`}>
             <Button
               title="Ok"
               color={tw.color('lime-500')}
@@ -128,6 +124,6 @@ export default function SecondsModal({
           </View>
         </View>
       </ScreenCentered>
-    </Modal>
-  )
-}
+    )
+  }
+)
