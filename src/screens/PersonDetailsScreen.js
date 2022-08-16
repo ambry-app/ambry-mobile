@@ -6,6 +6,7 @@ import Description from '../components/Description'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import SafeBottomBorder from '../components/SafeBottomBorder'
 import ScreenCentered from '../components/ScreenCentered'
+import { useRefreshOnFocus } from '../hooks/refetchOnFocus'
 import tw from '../lib/tailwind'
 import { uriSource, usePerson } from '../stores/AmbryAPI'
 
@@ -26,8 +27,10 @@ function PersonHeader({ person }) {
 }
 
 export default function PersonDetailsScreen({ route, navigation }) {
-  const { isLoading, isError, data } = usePerson(route.params.personId)
+  const { data, isLoading, isError, refetch } = usePerson(route.params.personId)
   const person = data?.node
+
+  useRefreshOnFocus(refetch)
 
   useEffect(() => {
     if (person) {

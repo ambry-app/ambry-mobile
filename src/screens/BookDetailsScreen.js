@@ -12,6 +12,7 @@ import PlayButton from '../components/PlayButton'
 import SafeBottomBorder from '../components/SafeBottomBorder'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
+import { useRefreshOnFocus } from '../hooks/refetchOnFocus'
 import tw from '../lib/tailwind'
 import { durationDisplay } from '../lib/utils'
 import { uriSource, useBook } from '../stores/AmbryAPI'
@@ -89,8 +90,10 @@ function MediaList({ book, media: mediaList }) {
 }
 
 export default function BookDetailsScreen({ route, navigation }) {
-  const { isLoading, isError, data } = useBook(route.params.bookId)
+  const { data, isLoading, isError, refetch } = useBook(route.params.bookId)
   const book = data?.node
+
+  useRefreshOnFocus(refetch)
 
   useEffect(() => {
     if (book?.title) {

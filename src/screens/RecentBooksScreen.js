@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Button, Text, View } from 'react-native'
 import BookGrid from '../components/BookGrid'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
@@ -9,8 +9,6 @@ import tw from '../lib/tailwind'
 import { useBooks } from '../stores/AmbryAPI'
 
 export default function RecentBooksScreen() {
-  const [refreshing, setRefreshing] = useState(false)
-
   const {
     data,
     isLoading,
@@ -21,19 +19,13 @@ export default function RecentBooksScreen() {
     refetch
   } = useBooks()
 
-  useRefreshOnFocus(refetch)
-
   const loadMore = () => {
     if (hasNextPage) {
       fetchNextPage()
     }
   }
 
-  const refresh = async () => {
-    setRefreshing(true)
-    await refetch()
-    setRefreshing(false)
-  }
+  useRefreshOnFocus(refetch)
 
   if (isLoading) {
     return (
@@ -63,8 +55,6 @@ export default function RecentBooksScreen() {
       <BookGrid
         books={books}
         onEndReached={loadMore}
-        onRefresh={refresh}
-        refreshing={refreshing}
         ListFooterComponent={
           <View style={tw`h-14`}>
             {isFetchingNextPage && <LargeActivityIndicator />}

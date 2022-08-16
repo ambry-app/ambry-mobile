@@ -68,7 +68,7 @@ export default function LeftDrawerContents({ navigation }) {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { logout } = useLogoutAction()
 
-  const { playerStates, nextPage, hasMore, loading, refreshing, error } = state
+  const { playerStates, nextPage, hasMore, loading, error } = state
 
   const fetchPlayerStates = useCallback(async () => {
     if (!hasMore) return
@@ -84,17 +84,6 @@ export default function LeftDrawerContents({ navigation }) {
       dispatch(actionCreators.failure())
     }
   }, [hasMore, nextPage])
-
-  const refreshPlayerStates = useCallback(async () => {
-    dispatch(actionCreators.refresh())
-
-    try {
-      const [nextPlayerStates, newHasMore] = await getRecentPlayerStates(1)
-      dispatch(actionCreators.success(nextPlayerStates, 1, newHasMore, true))
-    } catch {
-      dispatch(actionCreators.failure())
-    }
-  }, [])
 
   const clearMediaAndNavigate = useCallback(() => {
     destroy()
@@ -167,8 +156,6 @@ export default function LeftDrawerContents({ navigation }) {
           data={playerStates}
           keyExtractor={item => item.id}
           onEndReached={fetchPlayerStates}
-          onRefresh={refreshPlayerStates}
-          refreshing={refreshing}
           renderItem={({ item }) => (
             <Item playerState={item} navigation={navigation} />
           )}

@@ -2294,14 +2294,14 @@
     svgo "^2.8.0"
 
 "@tanstack/query-core@^4.0.0-beta.1":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.1.2.tgz#b13744d6ded73c5ae9760a61a6c39501c3cb1bda"
-  integrity sha512-s9a4tkJOGrKyyX2iVjkyMxQJ+4mVro6YJBQV8NzgorUtjnwJRiFkTYbLJPLbHGLIoICTzsbMfplnI5KuFDfyzw==
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.1.3.tgz#06b24315577971376b5a15124fc132c0b3ebc1b3"
+  integrity sha512-mSWGovlZnEiVwC99t+Q9uLwGdV9hnq+Z2+sHNAr8tsujzMPRLFNSmWAh/AayAaxIRWPwF4Ce9dmhV2BrYmuK1A==
 
 "@tanstack/react-query@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.1.0.tgz#eafda4578e7268cb3e36b2840107e680a57f626c"
-  integrity sha512-ZwPCqVoCqvUvTfmvpPlC6apyrvV4JmK1XsesreFs9TxZmASyRvj9Dk1Z++ct6m5lniccDssnLOo+36E1EAi/nA==
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-4.1.3.tgz#ebe5b668e321ba63a21ef369b5d263e2466c0e14"
+  integrity sha512-BHI/dV3LOuVOZAaifM6u680Wi5rmiHu4aD3WkvrQT/9fYhHDhTzMdJO8l2Xh0UR7JhM8e9O3f89SJhD3T8Ejgw==
   dependencies:
     "@tanstack/query-core" "^4.0.0-beta.1"
     "@types/use-sync-external-store" "^0.0.3"
@@ -8092,14 +8092,14 @@ react-is@^17.0.1:
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
 react-native-bars@^1.1.4:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/react-native-bars/-/react-native-bars-1.2.1.tgz#3fce4ba14112b6b04cead4ad8f8e89302fb85e42"
-  integrity sha512-BXuLV2Re2loPdhhE3B3GnhHfkqcxN9AhBXvMXn4Ms3Shmqms5mPQoeQx2bxHX97Uwkw7pcVZLVn70PGWsyY5+w==
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/react-native-bars/-/react-native-bars-1.2.2.tgz#b1d7cbd7066da3e4aba4e15cd63f2d757c87d719"
+  integrity sha512-4xSdhRcGdY3TMM0XFYf31VpjZ6pM/E4mN9DTpQdDH02RS0QB/V1zK+rllLEO/tVp9tgb0D4e3X0rhEED9FwpCQ==
 
 react-native-bootsplash@^4.1.5:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/react-native-bootsplash/-/react-native-bootsplash-4.3.1.tgz#ef62b346f7467a1df57bbdeb0b8f8874f0211b56"
-  integrity sha512-/ztk9u8OHDkXFT1UdPOk1EEG6TByBZelgTQPB0A6NEmypbCDxbKPrssL7Q9s5oeiL355eM9miPSBjPWQk43rOw==
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/react-native-bootsplash/-/react-native-bootsplash-4.3.2.tgz#347b024975dc344310ee4d95cb3be56b0b39e381"
+  integrity sha512-HzXl6AKk4sRjEtV+1C7q4gSXP5kYMhpzGaB4DllZNObdZ8oVH8Ac7Y9ShKZ8wLQLJaG/TtzyGHKIDaNi0oNGJA==
   dependencies:
     fs-extra "^10.1.0"
     jimp "^0.16.1"

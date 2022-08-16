@@ -51,6 +51,8 @@ const useStore = create(
   )
 )
 
+export default useStore
+
 // Private state mutators:
 
 function setLoggedInState(host, token, email) {
@@ -72,8 +74,6 @@ function setLoggedOutState() {
 }
 
 // Hooks:
-
-export default useStore
 
 const useClient = fallbackHost => {
   const _authData = useStore(state => state._authData)
@@ -160,7 +160,7 @@ export const useBook = id => {
 export const usePerson = id => {
   const client = useClient()
 
-  return usePersonQuery(client, { id, previewBooks: 10 })
+  return usePersonQuery(client, { id, previewBooks: 25 })
 }
 
 export const useSeries = id => {
@@ -184,9 +184,7 @@ export const doAPICall = async (apiFunc, ...args) => {
 
 export const getRecentPlayerStates = page =>
   doAPICall(API.getRecentPlayerStates, page)
-export const getSeries = seriesId => doAPICall(API.getSeries, seriesId)
 export const getPlayerState = mediaId => doAPICall(API.getPlayerState, mediaId)
-export const listBookmarks = page => doAPICall(API.listBookmarks, page)
 export const reportPlayerState = stateReport =>
   doAPICall(API.reportPlayerState, stateReport)
 export const uriSource = path =>

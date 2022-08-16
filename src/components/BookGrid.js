@@ -6,8 +6,6 @@ import BookLink from './BookLink'
 export default function BookGrid({
   books,
   onEndReached,
-  onRefresh,
-  refreshing,
   ListHeaderComponent,
   ListFooterComponent,
   itemType = 'book'
@@ -20,8 +18,6 @@ export default function BookGrid({
       numColumns={2}
       onEndReached={onEndReached}
       onEndReachedThreshold={1}
-      onRefresh={onRefresh}
-      refreshing={refreshing}
       renderItem={({ item }) =>
         itemType === 'seriesBook' ? (
           <BookLink book={item.book} seriesBook={item} />
