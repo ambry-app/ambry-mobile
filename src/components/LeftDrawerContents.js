@@ -1,25 +1,20 @@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import React, { useCallback, useReducer } from 'react'
+import React, { useCallback } from 'react'
 import { Button, Image, Text, View } from 'react-native'
 import { FlatList, TouchableNativeFeedback } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import LargeActivityIndicator from './LargeActivityIndicator'
 import ScreenCentered from './ScreenCentered'
-import useFirstRender from '../hooks/firstRender'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
-import { actionCreators, initialState, reducer } from '../reducers/playerStates'
-import {
-  getRecentPlayerStates,
-  uriSource,
-  useLogoutAction
-} from '../stores/AmbryAPI'
+import { uriSource, useLogoutAction, usePlayerStates } from '../stores/AmbryAPI'
 import usePlayer, {
   destroy,
   loadMedia,
   setLoadingImage
 } from '../stores/Player'
 import WrappingList from './WrappingList'
+import { useRefreshOnDrawerOpen } from '../hooks/refetchOnDrawerOpen'
 
 function Item({ playerState, navigation }) {
   const selectedMedia = usePlayer(state => state.selectedMedia)
@@ -64,26 +59,17 @@ function Item({ playerState, navigation }) {
 }
 
 export default function LeftDrawerContents({ navigation }) {
-  const isFirstRender = useFirstRender()
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const {
+    data,
+    isLoading,
+    isError,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    refetch
+  } = usePlayerStates()
+
   const { logout } = useLogoutAction()
-
-  const { playerStates, nextPage, hasMore, loading, error } = state
-
-  const fetchPlayerStates = useCallback(async () => {
-    if (!hasMore) return
-
-    dispatch(actionCreators.loading())
-
-    try {
-      const [nextPlayerStates, newHasMore] = await getRecentPlayerStates(
-        nextPage
-      )
-      dispatch(actionCreators.success(nextPlayerStates, nextPage, newHasMore))
-    } catch {
-      dispatch(actionCreators.failure())
-    }
-  }, [hasMore, nextPage])
 
   const clearMediaAndNavigate = useCallback(() => {
     destroy()
@@ -95,28 +81,33 @@ export default function LeftDrawerContents({ navigation }) {
     logout()
   }, [logout])
 
-  if (isFirstRender) {
-    fetchPlayerStates()
-  }
-
-  // We'll show an error only if the first page fails to load
-  if (playerStates.length === 0) {
-    if (loading) {
-      return (
-        <ScreenCentered>
-          <LargeActivityIndicator />
-        </ScreenCentered>
-      )
-    }
-
-    if (error) {
-      return (
-        <ScreenCentered>
-          <Text style={tw`text-gray-200`}>Failed to load recent books!</Text>
-        </ScreenCentered>
-      )
+  const loadMore = () => {
+    if (hasNextPage) {
+      fetchNextPage()
     }
   }
+
+  useRefreshOnDrawerOpen(refetch)
+
+  if (isLoading) {
+    return (
+      <ScreenCentered>
+        <LargeActivityIndicator />
+      </ScreenCentered>
+    )
+  }
+
+  if (isError) {
+    return (
+      <ScreenCentered>
+        <Text style={tw`text-gray-200`}>Failed to load recent books!</Text>
+      </ScreenCentered>
+    )
+  }
+
+  const playerStates = data.pages.flatMap(page =>
+    page.playerStates.edges.map(edge => edge.node)
+  )
 
   return (
     <SafeAreaView>
@@ -155,7 +146,7 @@ export default function LeftDrawerContents({ navigation }) {
           style={tw`mr-2 pb-2 rounded-xl bg-gray-800`}
           data={playerStates}
           keyExtractor={item => item.id}
-          onEndReached={fetchPlayerStates}
+          onEndReached={loadMore}
           renderItem={({ item }) => (
             <Item playerState={item} navigation={navigation} />
           )}
@@ -180,7 +171,7 @@ export default function LeftDrawerContents({ navigation }) {
                   <Button title="Sign Out" onPress={clearMediaAndSignOut} />
                 </>
               )}
-              {loading && <LargeActivityIndicator />}
+              {isFetchingNextPage && <LargeActivityIndicator />}
             </View>
           }
         />

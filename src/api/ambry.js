@@ -11,35 +11,11 @@ async function handleResponse(response, withHasMore = false) {
   }
 }
 
-export async function getRecentPlayerStates({ host, token }, page = 1) {
-  const response = await fetch(apiUrl(host, `player_states?page=${page}`), {
-    headers: { Authorization: 'Bearer ' + token }
-  })
-  return handleResponse(response, true)
-}
-
-export async function getSeries({ host, token }, seriesId) {
-  const response = await fetch(apiUrl(host, `series/${seriesId}`), {
-    headers: { Authorization: 'Bearer ' + token }
-  })
-  return handleResponse(response)
-}
-
 export async function getPlayerState({ host, token }, mediaId) {
   const response = await fetch(apiUrl(host, `player_states/${mediaId}`), {
     headers: { Authorization: 'Bearer ' + token }
   })
   return handleResponse(response)
-}
-
-export async function listBookmarks({ host, token }, mediaId, page = 1) {
-  const response = await fetch(
-    apiUrl(host, `bookmarks/${mediaId}?page=${page}`),
-    {
-      headers: { Authorization: 'Bearer ' + token }
-    }
-  )
-  return handleResponse(response, true)
 }
 
 export async function reportPlayerState(
@@ -73,10 +49,7 @@ export function uriSource({ host, token }, path) {
 }
 
 export default {
-  getRecentPlayerStates,
-  getSeries,
   getPlayerState,
-  listBookmarks,
   reportPlayerState,
   uriSource
 }

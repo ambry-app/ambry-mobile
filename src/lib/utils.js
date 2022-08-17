@@ -57,7 +57,3 @@ export function isPlaying(trackPlayerState) {
     trackPlayerState === State.Playing || trackPlayerState === State.Buffering
   )
 }
-
-export function isPaused(trackPlayerState) {
-  return !isPlaying(trackPlayerState)
-}

@@ -68,6 +68,13 @@ fragment MediaBasics on Media {
   duration
 }
 
+fragment PlayerStateBasics on PlayerState {
+  id
+  status
+  position
+  playbackRate
+}
+
 query books($first: Int, $after: String) {
   books(first: $first, after: $after) {
     edges {
@@ -201,6 +208,26 @@ query seriesBooks($id: ID!, $first: Int, $after: String) {
           endCursor
         }
       }
+    }
+  }
+}
+
+query playerStates($first: Int, $after: String) {
+  playerStates(first: $first, after: $after) {
+    edges {
+      node {
+        ...PlayerStateBasics
+        media {
+          duration
+          book {
+            ...BookWithAuthorsAndSeries
+          }
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
     }
   }
 }

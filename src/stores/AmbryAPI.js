@@ -7,6 +7,7 @@ import API from '../api/ambry'
 import {
   useBookQuery,
   useInfiniteBooksQuery,
+  useInfinitePlayerStatesQuery,
   useInfiniteSeriesBooksQuery,
   useLoginMutation,
   useLogoutMutation,
@@ -151,6 +152,23 @@ export const useSeriesBooks = id => {
   )
 }
 
+export const usePlayerStates = () => {
+  const client = useClient()
+
+  return useInfinitePlayerStatesQuery(
+    'after',
+    client,
+    { first: 50 },
+    {
+      getNextPageParam: lastPage => {
+        if (lastPage.playerStates.pageInfo.hasNextPage) {
+          return { after: lastPage.playerStates.pageInfo.endCursor }
+        }
+      }
+    }
+  )
+}
+
 export const useBook = id => {
   const client = useClient()
 
@@ -182,8 +200,6 @@ export const doAPICall = async (apiFunc, ...args) => {
   }
 }
 
-export const getRecentPlayerStates = page =>
-  doAPICall(API.getRecentPlayerStates, page)
 export const getPlayerState = mediaId => doAPICall(API.getPlayerState, mediaId)
 export const reportPlayerState = stateReport =>
   doAPICall(API.reportPlayerState, stateReport)

@@ -398,6 +398,14 @@ export type MediaBasicsFragment = {
   duration?: any | null
 }
 
+export type PlayerStateBasicsFragment = {
+  __typename?: 'PlayerState'
+  id: string
+  status: PlayerStateStatus
+  position: any
+  playbackRate: any
+}
+
 export type BooksQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']>
   after?: InputMaybe<Scalars['String']>
@@ -753,6 +761,55 @@ export type SeriesBooksQuery = {
     | null
 }
 
+export type PlayerStatesQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']>
+  after?: InputMaybe<Scalars['String']>
+}>
+
+export type PlayerStatesQuery = {
+  __typename?: 'RootQueryType'
+  playerStates?: {
+    __typename?: 'PlayerStateConnection'
+    edges?: Array<{
+      __typename?: 'PlayerStateEdge'
+      node?: {
+        __typename?: 'PlayerState'
+        id: string
+        status: PlayerStateStatus
+        position: any
+        playbackRate: any
+        media: {
+          __typename?: 'Media'
+          duration?: any | null
+          book: {
+            __typename?: 'Book'
+            id: string
+            title: string
+            imagePath?: string | null
+            authors: Array<{
+              __typename?: 'Author'
+              id: string
+              name: string
+              person: { __typename?: 'Person'; id: string }
+            }>
+            seriesBooks: Array<{
+              __typename?: 'SeriesBook'
+              id: string
+              bookNumber: any
+              series: { __typename?: 'Series'; id: string; name: string }
+            }>
+          }
+        }
+      } | null
+    } | null> | null
+    pageInfo: {
+      __typename?: 'PageInfo'
+      hasNextPage: boolean
+      endCursor?: string | null
+    }
+  } | null
+}
+
 export const NarratorBasicsFragmentDoc = `
     fragment NarratorBasics on Narrator {
   id
@@ -817,6 +874,14 @@ export const MediaBasicsFragmentDoc = `
   fullCast
   abridged
   duration
+}
+    `
+export const PlayerStateBasicsFragmentDoc = `
+    fragment PlayerStateBasics on PlayerState {
+  id
+  status
+  position
+  playbackRate
 }
     `
 export const LoginDocument = `
@@ -1284,6 +1349,71 @@ export const useInfiniteSeriesBooksQuery = <
       fetcher<SeriesBooksQuery, SeriesBooksQueryVariables>(
         client,
         SeriesBooksDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  )
+
+export const PlayerStatesDocument = `
+    query playerStates($first: Int, $after: String) {
+  playerStates(first: $first, after: $after) {
+    edges {
+      node {
+        ...PlayerStateBasics
+        media {
+          duration
+          book {
+            ...BookWithAuthorsAndSeries
+          }
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    ${PlayerStateBasicsFragmentDoc}
+${BookWithAuthorsAndSeriesFragmentDoc}`
+export const usePlayerStatesQuery = <
+  TData = PlayerStatesQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables?: PlayerStatesQueryVariables,
+  options?: UseQueryOptions<PlayerStatesQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<PlayerStatesQuery, TError, TData>(
+    variables === undefined ? ['playerStates'] : ['playerStates', variables],
+    fetcher<PlayerStatesQuery, PlayerStatesQueryVariables>(
+      client,
+      PlayerStatesDocument,
+      variables,
+      headers
+    ),
+    options
+  )
+export const useInfinitePlayerStatesQuery = <
+  TData = PlayerStatesQuery,
+  TError = unknown
+>(
+  _pageParamKey: keyof PlayerStatesQueryVariables,
+  client: GraphQLClient,
+  variables?: PlayerStatesQueryVariables,
+  options?: UseInfiniteQueryOptions<PlayerStatesQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<PlayerStatesQuery, TError, TData>(
+    variables === undefined
+      ? ['playerStates.infinite']
+      : ['playerStates.infinite', variables],
+    metaData =>
+      fetcher<PlayerStatesQuery, PlayerStatesQueryVariables>(
+        client,
+        PlayerStatesDocument,
         { ...variables, ...(metaData.pageParam ?? {}) },
         headers
       )(),
