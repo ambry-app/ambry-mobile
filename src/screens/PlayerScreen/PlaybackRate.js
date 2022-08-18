@@ -134,7 +134,7 @@ const PlaybackRateModalContents = gestureHandlerRootHOC(
               </TouchableOpacity>
             </View>
           </View>
-          <View style={tw`flex-row-reverse bg-gray-100 dark:bg-gray-700 p-4`}>
+          <View style={tw`flex-row-reverse bg-gray-700 p-4`}>
             <Button
               title="Ok"
               color={tw.color('lime-500')}

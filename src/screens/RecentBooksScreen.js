@@ -38,9 +38,7 @@ export default function RecentBooksScreen() {
   if (isError) {
     return (
       <ScreenCentered>
-        <Text style={tw`text-gray-700 dark:text-gray-200 mb-4`}>
-          Failed to load books!
-        </Text>
+        <Text style={tw`text-gray-200 mb-4`}>Failed to load books!</Text>
         <Button title="Retry" color={tw.color('lime-500')} onPress={refetch} />
       </ScreenCentered>
     )

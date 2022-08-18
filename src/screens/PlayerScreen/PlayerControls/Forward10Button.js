@@ -1,12 +1,10 @@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import React from 'react'
-import { Text, useColorScheme } from 'react-native'
+import { Text } from 'react-native'
 import { TouchableNativeFeedback } from 'react-native-gesture-handler'
 import tw from '../../../lib/tailwind'
 
 export default function Forward10Button({ onPress }) {
-  const scheme = useColorScheme()
-
   return (
     <TouchableNativeFeedback
       onPress={onPress}
@@ -14,7 +12,7 @@ export default function Forward10Button({ onPress }) {
     >
       <FontAwesomeIcon
         icon="rotate-right"
-        color={scheme === 'dark' ? tw.color('gray-100') : tw.color('gray-700')}
+        color={tw.color('gray-100')}
         size={32}
       />
       <Text style={tw`text-gray-400 text-center`}>10 s</Text>

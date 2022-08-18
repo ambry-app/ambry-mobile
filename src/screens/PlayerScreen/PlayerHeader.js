@@ -8,7 +8,7 @@ export default function PlayerHeader({ children }) {
 
   return (
     <View
-      style={tw.style(tw`p-4 bg-white/85 dark:bg-gray-900/85`, {
+      style={tw.style(tw`p-4 bg-gray-900/85`, {
         paddingTop: topMargin
       })}
     >

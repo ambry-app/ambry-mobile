@@ -17,9 +17,7 @@ export default function BookLink({ book, seriesBook: primarySeriesBook }) {
       key={author.id}
       onPress={() => navigation.push('Person', { personId: author.person.id })}
     >
-      <Text
-        style={tw`leading-none text-lg text-gray-500 dark:text-gray-400 text-center`}
-      >
+      <Text style={tw`leading-none text-lg text-gray-400 text-center`}>
         {author.name}
       </Text>
     </TouchableOpacity>
@@ -32,7 +30,7 @@ export default function BookLink({ book, seriesBook: primarySeriesBook }) {
         navigation.push('Series', { seriesId: seriesBook.series.id })
       }
     >
-      <Text style={tw`text-gray-400 dark:text-gray-500 text-center`}>
+      <Text style={tw`text-gray-500 text-center`}>
         {seriesBook.series.name} #{seriesBook.bookNumber}
       </Text>
     </TouchableOpacity>
@@ -41,13 +39,11 @@ export default function BookLink({ book, seriesBook: primarySeriesBook }) {
   return (
     <View style={tw`p-2 w-1/2`}>
       {primarySeriesBook && (
-        <Text style={tw`text-center text-lg text-gray-700 dark:text-gray-200`}>
+        <Text style={tw`text-center text-lg text-gray-200`}>
           Book {primarySeriesBook.bookNumber}
         </Text>
       )}
-      <View
-        style={tw`rounded-lg bg-gray-100 dark:bg-gray-800 shadow-lg mb-1 overflow-hidden`}
-      >
+      <View style={tw`rounded-lg bg-gray-800 shadow-lg mb-1 overflow-hidden`}>
         <TouchableNativeFeedback
           onPress={() => navigation.push('Book', { bookId: book.id })}
           useForeground={true}
@@ -69,9 +65,7 @@ export default function BookLink({ book, seriesBook: primarySeriesBook }) {
       <TouchableOpacity
         onPress={() => navigation.push('Book', { bookId: book.id })}
       >
-        <Text style={tw`text-xl text-gray-700 dark:text-gray-200 text-center`}>
-          {book.title}
-        </Text>
+        <Text style={tw`text-xl text-gray-200 text-center`}>{book.title}</Text>
       </TouchableOpacity>
       {authorsList}
       {seriesList}
