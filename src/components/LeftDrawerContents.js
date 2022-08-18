@@ -7,7 +7,7 @@ import LargeActivityIndicator from './LargeActivityIndicator'
 import ScreenCentered from './ScreenCentered'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
-import { uriSource, useLogoutAction, usePlayerStates } from '../stores/AmbryAPI'
+import { useLogoutAction, usePlayerStates, useSource } from '../stores/AmbryAPI'
 import usePlayer, {
   destroy,
   loadMedia,
@@ -18,6 +18,7 @@ import { useRefreshOnDrawerOpen } from '../hooks/refetchOnDrawerOpen'
 
 function Item({ playerState, navigation }) {
   const selectedMedia = usePlayer(state => state.selectedMedia)
+  const source = useSource()
 
   return (
     <TouchableNativeFeedback
@@ -35,7 +36,7 @@ function Item({ playerState, navigation }) {
       <View style={tw`p-4 py-2 flex-row`}>
         <View style={tw`w-1/4 bg-gray-800`}>
           <Image
-            source={uriSource(playerState.media.book.imagePath)}
+            source={source(playerState.media.book.imagePath)}
             style={tw.style('rounded-md', 'w-full', {
               aspectRatio: 10 / 15
             })}
@@ -145,7 +146,7 @@ export default function LeftDrawerContents({ navigation }) {
         <FlatList
           style={tw`mr-2 pb-2 rounded-xl bg-gray-800`}
           data={playerStates}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item.media.id}
           onEndReached={loadMore}
           renderItem={({ item }) => (
             <Item playerState={item} navigation={navigation} />

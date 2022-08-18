@@ -8,14 +8,16 @@ import SafeBottomBorder from '../components/SafeBottomBorder'
 import ScreenCentered from '../components/ScreenCentered'
 import { useRefreshOnFocus } from '../hooks/refetchOnFocus'
 import tw from '../lib/tailwind'
-import { uriSource, usePerson } from '../stores/AmbryAPI'
+import { usePerson, useSource } from '../stores/AmbryAPI'
 
 function PersonHeader({ person }) {
+  const source = useSource()
+
   return (
     <View style={tw`p-4`}>
       <View style={tw`mx-12 my-8 rounded-full bg-gray-900`}>
         <Image
-          source={uriSource(person.imagePath)}
+          source={source(person.imagePath)}
           style={tw.style('rounded-full w-full', {
             aspectRatio: 1 / 1
           })}

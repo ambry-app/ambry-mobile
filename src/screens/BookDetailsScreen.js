@@ -15,7 +15,7 @@ import WrappingListOfLinks from '../components/WrappingListOfLinks'
 import { useRefreshOnFocus } from '../hooks/refetchOnFocus'
 import tw from '../lib/tailwind'
 import { durationDisplay } from '../lib/utils'
-import { uriSource, useBook } from '../stores/AmbryAPI'
+import { useBook, useSource } from '../stores/AmbryAPI'
 import usePlayer, { loadMedia, setLoadingImage } from '../stores/Player'
 
 function MediaList({ book, media: mediaList }) {
@@ -90,6 +90,7 @@ function MediaList({ book, media: mediaList }) {
 }
 
 export default function BookDetailsScreen({ route, navigation }) {
+  const source = useSource()
   const { data, isLoading, isError, refetch } = useBook(route.params.bookId)
   const book = data?.node
 
@@ -146,7 +147,7 @@ export default function BookDetailsScreen({ route, navigation }) {
           <MediaList book={book} media={book.media} />
           <View style={tw`mt-4 rounded-2xl bg-gray-800 shadow-lg`}>
             <Image
-              source={uriSource(book.imagePath)}
+              source={source(book.imagePath)}
               style={tw.style('rounded-2xl', 'w-full', {
                 aspectRatio: 10 / 15.5
               })}

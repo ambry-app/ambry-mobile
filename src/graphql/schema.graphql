@@ -16,7 +16,7 @@ type Media implements Node {
 
   abridged: Boolean!
 
-  duration: Decimal
+  duration: Float
 
   mpdPath: String
 
@@ -53,12 +53,7 @@ type Series implements Node {
 
   name: String!
 
-  seriesBooks(
-    after: String
-    first: Int
-    before: String
-    last: Int
-  ): SeriesBookConnection
+  seriesBooks(after: String, first: Int, before: String, last: Int): SeriesBookConnection
 
   insertedAt: NaiveDateTime!
 
@@ -126,20 +121,20 @@ type PlayerStateEdge {
 }
 
 type Chapter {
-  time: Decimal!
-  title: String!
+  id: ID!
+  title: String
+  startTime: Float!
+  endTime: Float
 }
 
 type RootQueryType {
-  node("The ID of an object." id: ID!): Node
+  node(
+    "The ID of an object."
+    id: ID!
+  ): Node
   me: User
   books(after: String, first: Int, before: String, last: Int): BookConnection
-  playerStates(
-    after: String
-    first: Int
-    before: String
-    last: Int
-  ): PlayerStateConnection
+  playerStates(after: String, first: Int, before: String, last: Int): PlayerStateConnection
 }
 
 type MediaEdge {
@@ -156,9 +151,9 @@ type PlayerState implements Node {
   "The ID of an object"
   id: ID!
 
-  playbackRate: Decimal!
+  playbackRate: Float!
 
-  position: Decimal!
+  position: Float!
 
   status: PlayerStateStatus!
 
@@ -179,6 +174,10 @@ type CreateSessionPayload {
   user: User!
 }
 
+type UpdatePlayerStatePayload {
+  playerState: PlayerState!
+}
+
 type Author implements Node {
   "The ID of an object"
   id: ID!
@@ -187,12 +186,7 @@ type Author implements Node {
 
   person: Person!
 
-  authoredBooks(
-    after: String
-    first: Int
-    before: String
-    last: Int
-  ): BookConnection
+  authoredBooks(after: String, first: Int, before: String, last: Int): BookConnection
 
   insertedAt: NaiveDateTime!
 
@@ -241,6 +235,12 @@ type Book implements Node {
   updatedAt: NaiveDateTime!
 }
 
+input UpdatePlayerStateInput {
+  mediaId: ID!
+  position: Float
+  playbackRate: Float
+}
+
 type SeriesBookEdge {
   node: SeriesBook
   cursor: String
@@ -254,12 +254,7 @@ type Narrator implements Node {
 
   person: Person!
 
-  narratedMedia(
-    after: String
-    first: Int
-    before: String
-    last: Int
-  ): MediaConnection
+  narratedMedia(after: String, first: Int, before: String, last: Int): MediaConnection
 
   insertedAt: NaiveDateTime!
 
@@ -269,6 +264,7 @@ type Narrator implements Node {
 type RootMutationType {
   createSession(input: CreateSessionInput!): CreateSessionPayload
   deleteSession: DeleteSessionPayload
+  updatePlayerState(input: UpdatePlayerStateInput!): UpdatePlayerStatePayload
 }
 
 type PlayerStateConnection {

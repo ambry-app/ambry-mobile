@@ -1,12 +1,12 @@
 import { GraphQLClient } from 'graphql-request'
 import { RequestInit } from 'graphql-request/dist/types.dom'
 import {
-  useMutation,
   useQuery,
   useInfiniteQuery,
-  UseMutationOptions,
+  useMutation,
   UseQueryOptions,
-  UseInfiniteQueryOptions
+  UseInfiniteQueryOptions,
+  UseMutationOptions
 } from '@tanstack/react-query'
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
@@ -102,8 +102,10 @@ export type BookEdge = {
 
 export type Chapter = {
   __typename?: 'Chapter'
-  time: Scalars['Decimal']
-  title: Scalars['String']
+  endTime?: Maybe<Scalars['Float']>
+  id: Scalars['ID']
+  startTime: Scalars['Float']
+  title?: Maybe<Scalars['String']>
 }
 
 export type CreateSessionInput = {
@@ -127,7 +129,7 @@ export type Media = Node & {
   abridged: Scalars['Boolean']
   book: Book
   chapters: Array<Chapter>
-  duration?: Maybe<Scalars['Decimal']>
+  duration?: Maybe<Scalars['Float']>
   fullCast: Scalars['Boolean']
   hlsPath?: Maybe<Scalars['String']>
   /** The ID of an object */
@@ -205,8 +207,8 @@ export type PlayerState = Node & {
   id: Scalars['ID']
   insertedAt: Scalars['NaiveDateTime']
   media: Media
-  playbackRate: Scalars['Decimal']
-  position: Scalars['Decimal']
+  playbackRate: Scalars['Float']
+  position: Scalars['Float']
   status: PlayerStateStatus
   updatedAt: Scalars['NaiveDateTime']
 }
@@ -233,10 +235,15 @@ export type RootMutationType = {
   __typename?: 'RootMutationType'
   createSession?: Maybe<CreateSessionPayload>
   deleteSession?: Maybe<DeleteSessionPayload>
+  updatePlayerState?: Maybe<UpdatePlayerStatePayload>
 }
 
 export type RootMutationTypeCreateSessionArgs = {
   input: CreateSessionInput
+}
+
+export type RootMutationTypeUpdatePlayerStateArgs = {
+  input: UpdatePlayerStateInput
 }
 
 export type RootQueryType = {
@@ -303,6 +310,17 @@ export type SeriesBookEdge = {
   node?: Maybe<SeriesBook>
 }
 
+export type UpdatePlayerStateInput = {
+  mediaId: Scalars['ID']
+  playbackRate?: InputMaybe<Scalars['Float']>
+  position?: InputMaybe<Scalars['Float']>
+}
+
+export type UpdatePlayerStatePayload = {
+  __typename?: 'UpdatePlayerStatePayload'
+  playerState: PlayerState
+}
+
 export type User = {
   __typename?: 'User'
   admin: Scalars['Boolean']
@@ -311,26 +329,6 @@ export type User = {
   insertedAt: Scalars['NaiveDateTime']
   loadedPlayerState?: Maybe<PlayerState>
   updatedAt: Scalars['NaiveDateTime']
-}
-
-export type LoginMutationVariables = Exact<{
-  input: CreateSessionInput
-}>
-
-export type LoginMutation = {
-  __typename?: 'RootMutationType'
-  login?: {
-    __typename?: 'CreateSessionPayload'
-    token: string
-    user: { __typename?: 'User'; email: string }
-  } | null
-}
-
-export type LogoutMutationVariables = Exact<{ [key: string]: never }>
-
-export type LogoutMutation = {
-  __typename?: 'RootMutationType'
-  logout?: { __typename?: 'DeleteSessionPayload'; deleted: boolean } | null
 }
 
 export type AuthorBasicsFragment = {
@@ -395,15 +393,28 @@ export type MediaBasicsFragment = {
   id: string
   fullCast: boolean
   abridged: boolean
-  duration?: any | null
+  duration?: number | null
+}
+
+export type MediaWithNarratorsFragment = {
+  __typename?: 'Media'
+  id: string
+  fullCast: boolean
+  abridged: boolean
+  duration?: number | null
+  narrators: Array<{
+    __typename?: 'Narrator'
+    id: string
+    name: string
+    person: { __typename?: 'Person'; id: string }
+  }>
 }
 
 export type PlayerStateBasicsFragment = {
   __typename?: 'PlayerState'
-  id: string
   status: PlayerStateStatus
-  position: any
-  playbackRate: any
+  position: number
+  playbackRate: number
 }
 
 export type BooksQueryVariables = Exact<{
@@ -464,7 +475,7 @@ export type BookQuery = {
           id: string
           fullCast: boolean
           abridged: boolean
-          duration?: any | null
+          duration?: number | null
           narrators: Array<{
             __typename?: 'Narrator'
             id: string
@@ -774,13 +785,15 @@ export type PlayerStatesQuery = {
       __typename?: 'PlayerStateEdge'
       node?: {
         __typename?: 'PlayerState'
-        id: string
         status: PlayerStateStatus
-        position: any
-        playbackRate: any
+        position: number
+        playbackRate: number
         media: {
           __typename?: 'Media'
-          duration?: any | null
+          id: string
+          fullCast: boolean
+          abridged: boolean
+          duration?: number | null
           book: {
             __typename?: 'Book'
             id: string
@@ -810,12 +823,106 @@ export type PlayerStatesQuery = {
   } | null
 }
 
-export const NarratorBasicsFragmentDoc = `
-    fragment NarratorBasics on Narrator {
-  id
-  name
+export type MediaWithPlayerStateQueryVariables = Exact<{
+  id: Scalars['ID']
+}>
+
+export type MediaWithPlayerStateQuery = {
+  __typename?: 'RootQueryType'
+  node?:
+    | { __typename?: 'Author' }
+    | { __typename?: 'Book' }
+    | {
+        __typename?: 'Media'
+        hlsPath?: string | null
+        mpdPath?: string | null
+        id: string
+        fullCast: boolean
+        abridged: boolean
+        duration?: number | null
+        chapters: Array<{
+          __typename?: 'Chapter'
+          id: string
+          startTime: number
+          endTime?: number | null
+          title?: string | null
+        }>
+        book: {
+          __typename?: 'Book'
+          id: string
+          title: string
+          imagePath?: string | null
+          authors: Array<{
+            __typename?: 'Author'
+            id: string
+            name: string
+            person: { __typename?: 'Person'; id: string }
+          }>
+          seriesBooks: Array<{
+            __typename?: 'SeriesBook'
+            id: string
+            bookNumber: any
+            series: { __typename?: 'Series'; id: string; name: string }
+          }>
+        }
+        playerState?: {
+          __typename?: 'PlayerState'
+          status: PlayerStateStatus
+          position: number
+          playbackRate: number
+        } | null
+        narrators: Array<{
+          __typename?: 'Narrator'
+          id: string
+          name: string
+          person: { __typename?: 'Person'; id: string }
+        }>
+      }
+    | { __typename?: 'Narrator' }
+    | { __typename?: 'Person' }
+    | { __typename?: 'PlayerState' }
+    | { __typename?: 'Series' }
+    | { __typename?: 'SeriesBook' }
+    | null
 }
-    `
+
+export type LoginMutationVariables = Exact<{
+  input: CreateSessionInput
+}>
+
+export type LoginMutation = {
+  __typename?: 'RootMutationType'
+  login?: {
+    __typename?: 'CreateSessionPayload'
+    token: string
+    user: { __typename?: 'User'; email: string }
+  } | null
+}
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never }>
+
+export type LogoutMutation = {
+  __typename?: 'RootMutationType'
+  logout?: { __typename?: 'DeleteSessionPayload'; deleted: boolean } | null
+}
+
+export type UpdatePlayerStateMutationVariables = Exact<{
+  input: UpdatePlayerStateInput
+}>
+
+export type UpdatePlayerStateMutation = {
+  __typename?: 'RootMutationType'
+  updatePlayerState?: {
+    __typename?: 'UpdatePlayerStatePayload'
+    playerState: {
+      __typename?: 'PlayerState'
+      status: PlayerStateStatus
+      position: number
+      playbackRate: number
+    }
+  } | null
+}
+
 export const PersonBasicsFragmentDoc = `
     fragment PersonBasics on Person {
   id
@@ -876,73 +983,31 @@ export const MediaBasicsFragmentDoc = `
   duration
 }
     `
+export const NarratorBasicsFragmentDoc = `
+    fragment NarratorBasics on Narrator {
+  id
+  name
+}
+    `
+export const MediaWithNarratorsFragmentDoc = `
+    fragment MediaWithNarrators on Media {
+  ...MediaBasics
+  narrators {
+    ...NarratorBasics
+    person {
+      id
+    }
+  }
+}
+    ${MediaBasicsFragmentDoc}
+${NarratorBasicsFragmentDoc}`
 export const PlayerStateBasicsFragmentDoc = `
     fragment PlayerStateBasics on PlayerState {
-  id
   status
   position
   playbackRate
 }
     `
-export const LoginDocument = `
-    mutation login($input: CreateSessionInput!) {
-  login: createSession(input: $input) {
-    token
-    user {
-      email
-    }
-  }
-}
-    `
-export const useLoginMutation = <TError = unknown, TContext = unknown>(
-  client: GraphQLClient,
-  options?: UseMutationOptions<
-    LoginMutation,
-    TError,
-    LoginMutationVariables,
-    TContext
-  >,
-  headers?: RequestInit['headers']
-) =>
-  useMutation<LoginMutation, TError, LoginMutationVariables, TContext>(
-    ['login'],
-    (variables?: LoginMutationVariables) =>
-      fetcher<LoginMutation, LoginMutationVariables>(
-        client,
-        LoginDocument,
-        variables,
-        headers
-      )(),
-    options
-  )
-export const LogoutDocument = `
-    mutation logout {
-  logout: deleteSession {
-    deleted
-  }
-}
-    `
-export const useLogoutMutation = <TError = unknown, TContext = unknown>(
-  client: GraphQLClient,
-  options?: UseMutationOptions<
-    LogoutMutation,
-    TError,
-    LogoutMutationVariables,
-    TContext
-  >,
-  headers?: RequestInit['headers']
-) =>
-  useMutation<LogoutMutation, TError, LogoutMutationVariables, TContext>(
-    ['logout'],
-    (variables?: LogoutMutationVariables) =>
-      fetcher<LogoutMutation, LogoutMutationVariables>(
-        client,
-        LogoutDocument,
-        variables,
-        headers
-      )(),
-    options
-  )
 export const BooksDocument = `
     query books($first: Int, $after: String) {
   books(first: $first, after: $after) {
@@ -1003,20 +1068,13 @@ export const BookDocument = `
       published
       description
       media {
-        ...MediaBasics
-        narrators {
-          ...NarratorBasics
-          person {
-            id
-          }
-        }
+        ...MediaWithNarrators
       }
     }
   }
 }
     ${BookWithAuthorsAndSeriesFragmentDoc}
-${MediaBasicsFragmentDoc}
-${NarratorBasicsFragmentDoc}`
+${MediaWithNarratorsFragmentDoc}`
 export const useBookQuery = <TData = BookQuery, TError = unknown>(
   client: GraphQLClient,
   variables: BookQueryVariables,
@@ -1362,7 +1420,7 @@ export const PlayerStatesDocument = `
       node {
         ...PlayerStateBasics
         media {
-          duration
+          ...MediaBasics
           book {
             ...BookWithAuthorsAndSeries
           }
@@ -1376,6 +1434,7 @@ export const PlayerStatesDocument = `
   }
 }
     ${PlayerStateBasicsFragmentDoc}
+${MediaBasicsFragmentDoc}
 ${BookWithAuthorsAndSeriesFragmentDoc}`
 export const usePlayerStatesQuery = <
   TData = PlayerStatesQuery,
@@ -1415,6 +1474,170 @@ export const useInfinitePlayerStatesQuery = <
         client,
         PlayerStatesDocument,
         { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  )
+
+export const MediaWithPlayerStateDocument = `
+    query mediaWithPlayerState($id: ID!) {
+  node(id: $id) {
+    ... on Media {
+      ...MediaWithNarrators
+      hlsPath
+      mpdPath
+      chapters {
+        id
+        startTime
+        endTime
+        title
+      }
+      book {
+        ...BookWithAuthorsAndSeries
+      }
+      playerState {
+        ...PlayerStateBasics
+      }
+    }
+  }
+}
+    ${MediaWithNarratorsFragmentDoc}
+${BookWithAuthorsAndSeriesFragmentDoc}
+${PlayerStateBasicsFragmentDoc}`
+export const useMediaWithPlayerStateQuery = <
+  TData = MediaWithPlayerStateQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: MediaWithPlayerStateQueryVariables,
+  options?: UseQueryOptions<MediaWithPlayerStateQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<MediaWithPlayerStateQuery, TError, TData>(
+    ['mediaWithPlayerState', variables],
+    fetcher<MediaWithPlayerStateQuery, MediaWithPlayerStateQueryVariables>(
+      client,
+      MediaWithPlayerStateDocument,
+      variables,
+      headers
+    ),
+    options
+  )
+export const useInfiniteMediaWithPlayerStateQuery = <
+  TData = MediaWithPlayerStateQuery,
+  TError = unknown
+>(
+  _pageParamKey: keyof MediaWithPlayerStateQueryVariables,
+  client: GraphQLClient,
+  variables: MediaWithPlayerStateQueryVariables,
+  options?: UseInfiniteQueryOptions<MediaWithPlayerStateQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<MediaWithPlayerStateQuery, TError, TData>(
+    ['mediaWithPlayerState.infinite', variables],
+    metaData =>
+      fetcher<MediaWithPlayerStateQuery, MediaWithPlayerStateQueryVariables>(
+        client,
+        MediaWithPlayerStateDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  )
+
+export const LoginDocument = `
+    mutation login($input: CreateSessionInput!) {
+  login: createSession(input: $input) {
+    token
+    user {
+      email
+    }
+  }
+}
+    `
+export const useLoginMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    LoginMutation,
+    TError,
+    LoginMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<LoginMutation, TError, LoginMutationVariables, TContext>(
+    ['login'],
+    (variables?: LoginMutationVariables) =>
+      fetcher<LoginMutation, LoginMutationVariables>(
+        client,
+        LoginDocument,
+        variables,
+        headers
+      )(),
+    options
+  )
+export const LogoutDocument = `
+    mutation logout {
+  logout: deleteSession {
+    deleted
+  }
+}
+    `
+export const useLogoutMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    LogoutMutation,
+    TError,
+    LogoutMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<LogoutMutation, TError, LogoutMutationVariables, TContext>(
+    ['logout'],
+    (variables?: LogoutMutationVariables) =>
+      fetcher<LogoutMutation, LogoutMutationVariables>(
+        client,
+        LogoutDocument,
+        variables,
+        headers
+      )(),
+    options
+  )
+export const UpdatePlayerStateDocument = `
+    mutation updatePlayerState($input: UpdatePlayerStateInput!) {
+  updatePlayerState(input: $input) {
+    playerState {
+      ...PlayerStateBasics
+    }
+  }
+}
+    ${PlayerStateBasicsFragmentDoc}`
+export const useUpdatePlayerStateMutation = <
+  TError = unknown,
+  TContext = unknown
+>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    UpdatePlayerStateMutation,
+    TError,
+    UpdatePlayerStateMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<
+    UpdatePlayerStateMutation,
+    TError,
+    UpdatePlayerStateMutationVariables,
+    TContext
+  >(
+    ['updatePlayerState'],
+    (variables?: UpdatePlayerStateMutationVariables) =>
+      fetcher<UpdatePlayerStateMutation, UpdatePlayerStateMutationVariables>(
+        client,
+        UpdatePlayerStateDocument,
+        variables,
         headers
       )(),
     options

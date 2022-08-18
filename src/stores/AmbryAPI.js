@@ -3,8 +3,9 @@ import { GraphQLClient } from 'graphql-request'
 import EncryptedStorage from 'react-native-encrypted-storage'
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
-import API from '../api/ambry'
 import {
+  MediaWithPlayerStateDocument,
+  UpdatePlayerStateDocument,
   useBookQuery,
   useInfiniteBooksQuery,
   useInfinitePlayerStatesQuery,
@@ -52,15 +53,17 @@ const useStore = create(
   )
 )
 
+const { getState, setState } = useStore
+
 export default useStore
 
 // Private state mutators:
 
 function setLoggedInState(host, token, email) {
-  const { knownHosts } = useStore.getState()
+  const { knownHosts } = getState()
   const newAuthData = { host, token, email }
 
-  useStore.setState({
+  setState({
     _authData: newAuthData,
     loggedIn: true,
     knownHosts: [...new Set([host, ...knownHosts])]
@@ -68,28 +71,49 @@ function setLoggedInState(host, token, email) {
 }
 
 function setLoggedOutState() {
-  useStore.setState({
+  setState({
     _authData: null,
     loggedIn: false
   })
 }
 
-// Hooks:
+// Utils:
 
-const useClient = fallbackHost => {
-  const _authData = useStore(state => state._authData)
+function makeSource(_authData, path) {
+  const { host, token } = _authData
 
+  return {
+    uri: `${host}/${path}`,
+    headers: {
+      authorization: `Bearer ${token}`
+    }
+  }
+}
+
+function makeClient(_authData, fallbackHost) {
   if (_authData) {
-    const { host, token } = _authData
-    const endpoint = `${host}/gql`
-    const headers = { authorization: `Bearer ${token}` }
+    const { uri, headers } = makeSource(_authData, 'gql')
 
-    return new GraphQLClient(endpoint, { headers })
+    return new GraphQLClient(uri, { headers })
   } else if (fallbackHost) {
     const endpoint = `${fallbackHost}/gql`
 
     return new GraphQLClient(endpoint)
   }
+}
+
+// Hooks:
+
+export const useSource = () => {
+  const _authData = useStore(state => state._authData)
+
+  return path => makeSource(_authData, path)
+}
+
+export const useClient = fallbackHost => {
+  const _authData = useStore(state => state._authData)
+
+  return makeClient(_authData, fallbackHost)
 }
 
 export const useLoginAction = (host, email, password) => {
@@ -187,21 +211,33 @@ export const useSeries = id => {
   return useSeriesQuery(client, { id })
 }
 
-export const doAPICall = async (apiFunc, ...args) => {
-  try {
-    return await apiFunc(useStore.getState()._authData, ...args)
-  } catch (error) {
-    if (error === 401) {
-      // signOut()
-    } else {
-      console.warn('AmbryAPI: Unhandled API call error', error)
-    }
-    throw error
-  }
+// Non-hook calls:
+
+export const source = path => {
+  const { _authData } = getState()
+
+  return makeSource(_authData, path)
 }
 
-export const getPlayerState = mediaId => doAPICall(API.getPlayerState, mediaId)
-export const reportPlayerState = stateReport =>
-  doAPICall(API.reportPlayerState, stateReport)
-export const uriSource = path =>
-  API.uriSource(useStore.getState()._authData, path)
+export const getMediaWithPlayerState = async mediaId => {
+  const { _authData } = getState()
+  const client = makeClient(_authData)
+  const data = await client.request(MediaWithPlayerStateDocument, {
+    id: mediaId
+  })
+
+  return data.node
+}
+
+export const updatePlayerState = async (mediaId, state) => {
+  const { _authData } = getState()
+  const client = makeClient(_authData)
+  const data = await client.request(UpdatePlayerStateDocument, {
+    input: {
+      mediaId: mediaId,
+      ...state
+    }
+  })
+
+  return data.updatePlayerState.playerState
+}

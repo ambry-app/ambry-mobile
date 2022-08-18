@@ -70,7 +70,7 @@ export default function BookDetails({ imageSource, media }) {
             prefix="Narrated by"
             suffix={media.fullCast ? 'and a full cast' : null}
             items={media.narrators}
-            keyExtractor={narrator => narrator.personId}
+            keyExtractor={narrator => narrator.person.id}
             onPressLink={narrator => {
               navigation.push('Person', {
                 personId: narrator.personId
@@ -80,13 +80,15 @@ export default function BookDetails({ imageSource, media }) {
             linkStyle={tw`text-gray-200`}
           />
           <WrappingListOfLinks
-            items={media.book.series}
-            onPressLink={series => {
+            items={media.book.seriesBooks}
+            onPressLink={seriesBook => {
               navigation.push('Series', {
-                seriesId: series.id
+                seriesId: seriesBook.series.id
               })
             }}
-            nameExtractor={series => `${series.name} #${series.bookNumber}`}
+            nameExtractor={seriesBook =>
+              `${seriesBook.series.name} #${seriesBook.bookNumber}`
+            }
             style={tw`text-gray-400`}
             linkStyle={tw`text-gray-400`}
           />

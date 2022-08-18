@@ -1,18 +1,3 @@
-mutation login($input: CreateSessionInput!) {
-  login: createSession(input: $input) {
-    token
-    user {
-      email
-    }
-  }
-}
-
-mutation logout {
-  logout: deleteSession {
-    deleted
-  }
-}
-
 fragment AuthorBasics on Author {
   id
   name
@@ -68,8 +53,17 @@ fragment MediaBasics on Media {
   duration
 }
 
+fragment MediaWithNarrators on Media {
+  ...MediaBasics
+  narrators {
+    ...NarratorBasics
+    person {
+      id
+    }
+  }
+}
+
 fragment PlayerStateBasics on PlayerState {
-  id
   status
   position
   playbackRate
@@ -96,13 +90,7 @@ query book($id: ID!) {
       published
       description
       media {
-        ...MediaBasics
-        narrators {
-          ...NarratorBasics
-          person {
-            id
-          }
-        }
+        ...MediaWithNarrators
       }
     }
   }
@@ -218,7 +206,7 @@ query playerStates($first: Int, $after: String) {
       node {
         ...PlayerStateBasics
         media {
-          duration
+          ...MediaBasics
           book {
             ...BookWithAuthorsAndSeries
           }
@@ -228,6 +216,51 @@ query playerStates($first: Int, $after: String) {
     pageInfo {
       hasNextPage
       endCursor
+    }
+  }
+}
+
+query mediaWithPlayerState($id: ID!) {
+  node(id: $id) {
+    ... on Media {
+      ...MediaWithNarrators
+      hlsPath
+      mpdPath
+      chapters {
+        id
+        startTime
+        endTime
+        title
+      }
+      book {
+        ...BookWithAuthorsAndSeries
+      }
+      playerState {
+        ...PlayerStateBasics
+      }
+    }
+  }
+}
+
+mutation login($input: CreateSessionInput!) {
+  login: createSession(input: $input) {
+    token
+    user {
+      email
+    }
+  }
+}
+
+mutation logout {
+  logout: deleteSession {
+    deleted
+  }
+}
+
+mutation updatePlayerState($input: UpdatePlayerStateInput!) {
+  updatePlayerState(input: $input) {
+    playerState {
+      ...PlayerStateBasics
     }
   }
 }

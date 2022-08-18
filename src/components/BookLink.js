@@ -6,10 +6,11 @@ import {
   TouchableOpacity
 } from 'react-native-gesture-handler'
 import tw from '../lib/tailwind'
-import { uriSource } from '../stores/AmbryAPI'
+import { useSource } from '../stores/AmbryAPI'
 
 export default function BookLink({ book, seriesBook: primarySeriesBook }) {
   const navigation = useNavigation()
+  const source = useSource()
 
   const authorsList = book.authors.map(author => (
     <TouchableOpacity
@@ -57,7 +58,7 @@ export default function BookLink({ book, seriesBook: primarySeriesBook }) {
         >
           <View>
             <Image
-              source={uriSource(book.imagePath)}
+              source={source(book.imagePath)}
               style={tw.style('rounded-lg', 'w-full', {
                 aspectRatio: 10 / 15.5
               })}
