@@ -17,7 +17,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import LeftDrawerContents from '../components/LeftDrawerContents'
 import RightDrawerContents from '../components/RightDrawerContents'
-import { useDrawerDirection } from '../hooks/drawerDirection'
+import { useEnhancedDrawerStatus } from '../hooks/enhancedDrawerStatus'
 import tw from '../lib/tailwind'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
 import PersonDetailsScreen from '../screens/PersonDetailsScreen'
@@ -33,11 +33,11 @@ const PlayerScreenWrapper = ({ navigation }) => {
   const isDrawerOpen = useDrawerStatus() === 'open'
   const setTabBarVisible = usePlayer(state => state.setTabBarVisible)
   const isFocused = useIsFocused()
-  const drawerDirection = useDrawerDirection()
+  const drawerStatus = useEnhancedDrawerStatus()
 
   useEffect(() => {
-    setTabBarVisible(drawerDirection === 1 || !isFocused)
-  }, [isFocused, drawerDirection, setTabBarVisible])
+    setTabBarVisible(['opening', 'open'].includes(drawerStatus) || !isFocused)
+  }, [isFocused, drawerStatus, setTabBarVisible])
 
   useEffect(() => {
     navigation.setOptions({
