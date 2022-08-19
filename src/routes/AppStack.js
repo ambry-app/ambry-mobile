@@ -55,9 +55,9 @@ const PlayerScreenWrapper = ({ navigation }) => {
   return <PlayerScreen />
 }
 
-const LibraryStack = ({ navigation }) => {
+const LibraryStack = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="Recent">
       <Stack.Screen
         name="Recent"
         options={{ title: 'Latest books' }}
@@ -73,7 +73,11 @@ const LibraryStack = ({ navigation }) => {
         options={{ title: 'Person details' }}
         component={PersonDetailsScreen}
       />
-      <Stack.Screen name="Series" component={SeriesScreen} />
+      <Stack.Screen
+        name="Series"
+        options={{ title: 'Series' }}
+        component={SeriesScreen}
+      />
     </Stack.Navigator>
   )
 }

@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { useNavigation } from '@react-navigation/core'
+import { StackActions } from '@react-navigation/native'
 import React from 'react'
 import { Image, Text, View } from 'react-native'
 import {
@@ -25,7 +26,15 @@ export default function BookDetails({ imageSource, media }) {
           <FontAwesomeIcon icon="bars" color={tw.color('gray-100')} size={24} />
         </TouchableNativeFeedback>
         <TouchableOpacity
-          onPress={() => navigation.push('Book', { bookId: media.book.id })}
+          onPress={() => {
+            navigation.navigate('Library', { screen: 'Recent' })
+
+            setImmediate(() => {
+              navigation.dispatch(
+                StackActions.push('Book', { bookId: media.book.id })
+              )
+            })
+          }}
         >
           <Text
             numberOfLines={1}
@@ -39,7 +48,15 @@ export default function BookDetails({ imageSource, media }) {
         <View style={tw`w-1/3`}>
           <View style={tw`w-full rounded-md bg-gray-800`}>
             <TouchableNativeFeedback
-              onPress={() => navigation.push('Book', { bookId: media.book.id })}
+              onPress={() => {
+                navigation.navigate('Library', { screen: 'Recent' })
+
+                setImmediate(() => {
+                  navigation.dispatch(
+                    StackActions.push('Book', { bookId: media.book.id })
+                  )
+                })
+              }}
               background={TouchableNativeFeedback.Ripple(
                 tw.color('gray-400'),
                 true
@@ -59,8 +76,12 @@ export default function BookDetails({ imageSource, media }) {
             prefix="by"
             items={media.book.authors}
             onPressLink={author => {
-              navigation.push('Person', {
-                personId: author.personId
+              navigation.navigate('Library', { screen: 'Recent' })
+
+              setImmediate(() => {
+                navigation.dispatch(
+                  StackActions.push('Person', { personId: author.person.id })
+                )
               })
             }}
             style={tw`leading-none text-lg text-gray-200`}
@@ -72,8 +93,12 @@ export default function BookDetails({ imageSource, media }) {
             items={media.narrators}
             keyExtractor={narrator => narrator.person.id}
             onPressLink={narrator => {
-              navigation.push('Person', {
-                personId: narrator.personId
+              navigation.navigate('Library', { screen: 'Recent' })
+
+              setImmediate(() => {
+                navigation.dispatch(
+                  StackActions.push('Person', { personId: narrator.person.id })
+                )
               })
             }}
             style={tw`text-gray-200`}
@@ -82,8 +107,14 @@ export default function BookDetails({ imageSource, media }) {
           <WrappingListOfLinks
             items={media.book.seriesBooks}
             onPressLink={seriesBook => {
-              navigation.push('Series', {
-                seriesId: seriesBook.series.id
+              navigation.navigate('Library', { screen: 'Recent' })
+
+              setImmediate(() => {
+                navigation.dispatch(
+                  StackActions.push('Series', {
+                    seriesId: seriesBook.series.id
+                  })
+                )
               })
             }}
             nameExtractor={seriesBook =>
