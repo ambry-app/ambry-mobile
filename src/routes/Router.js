@@ -24,7 +24,7 @@ const Theme = {
 const linking = {
   prefixes: ['trackplayer://'],
   config: {
-    screens: { MainStack: { screens: { Player: 'notification.click' } } }
+    screens: { PlayerRightDrawer: 'notification.click' }
   }
 }
 
