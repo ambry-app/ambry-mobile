@@ -1,6 +1,5 @@
 import usePrevious from '@react-hook/previous'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { memo } from 'react'
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { Dimensions, StyleSheet } from 'react-native'
 import { PanGestureHandler } from 'react-native-gesture-handler'
 import Animated, {

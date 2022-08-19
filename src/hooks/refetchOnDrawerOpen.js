@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
 import { useDrawerStatus } from '@react-navigation/drawer'
+import { useEffect, useRef } from 'react'
 
 export function useRefreshOnDrawerOpen(refetch) {
   const firstTimeRef = useRef(true)

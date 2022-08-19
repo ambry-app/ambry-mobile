@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native'
 import React from 'react'
+import RNBootSplash from 'react-native-bootsplash'
 import shallow from 'zustand/shallow'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
@@ -7,7 +8,6 @@ import tw from '../lib/tailwind'
 import useAmbryAPI from '../stores/AmbryAPI'
 import { AppStack } from './AppStack'
 import { AuthStack } from './AuthStack'
-import RNBootSplash from 'react-native-bootsplash'
 
 const Theme = {
   dark: true,

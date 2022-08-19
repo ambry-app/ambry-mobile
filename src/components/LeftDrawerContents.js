@@ -1,10 +1,8 @@
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import React, { useCallback } from 'react'
 import { Button, Image, Text, View } from 'react-native'
 import { FlatList, TouchableNativeFeedback } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import LargeActivityIndicator from './LargeActivityIndicator'
-import ScreenCentered from './ScreenCentered'
+import { useRefreshOnDrawerOpen } from '../hooks/refetchOnDrawerOpen'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
 import { useLogoutAction, usePlayerStates, useSource } from '../stores/AmbryAPI'
@@ -13,17 +11,18 @@ import usePlayer, {
   loadMedia,
   setLoadingImage
 } from '../stores/Player'
+import LargeActivityIndicator from './LargeActivityIndicator'
+import ScreenCentered from './ScreenCentered'
 import WrappingList from './WrappingList'
-import { useRefreshOnDrawerOpen } from '../hooks/refetchOnDrawerOpen'
 
-function Item({ playerState, navigation }) {
+function PlayerStateItem({ playerState, navigation }) {
   const selectedMedia = usePlayer(state => state.selectedMedia)
   const source = useSource()
 
   return (
     <TouchableNativeFeedback
       onPress={() => {
-        navigation.navigate('Player')
+        navigation.closeDrawer()
 
         if (selectedMedia?.id !== playerState.media.id) {
           setLoadingImage(playerState.media.book.imagePath)
@@ -59,7 +58,8 @@ function Item({ playerState, navigation }) {
   )
 }
 
-export default function LeftDrawerContents({ navigation }) {
+const PlayerStateList = ({ navigation }) => {
+  const showDebugOptions = __DEV__
   const {
     data,
     isLoading,
@@ -111,87 +111,38 @@ export default function LeftDrawerContents({ navigation }) {
   )
 
   return (
-    <SafeAreaView>
-      <View style={tw`flex-row h-full`}>
-        <View style={tw`p-4`}>
-          <NavigationIcon
-            onPress={() => {
-              navigation.navigate('Player')
-            }}
-            icon="circle-play"
-            active={true}
-          />
-          <View style={tw`h-4`} />
-          <NavigationIcon
-            onPress={() => {
-              navigation.navigate('Recent')
-            }}
-            icon="book-open"
-          />
-          <View style={tw`h-4`} />
-          <NavigationIcon
-            onPress={() => {
-              navigation.navigate('Search')
-            }}
-            icon="magnifying-glass"
-          />
-          <View style={tw`h-4`} />
-          <NavigationIcon
-            onPress={() => {
-              navigation.navigate('Settings')
-            }}
-            icon="gear"
-          />
-        </View>
-        <FlatList
-          style={tw`mr-2 pb-2 rounded-xl bg-gray-800`}
-          data={playerStates}
-          keyExtractor={item => item.media.id}
-          onEndReached={loadMore}
-          renderItem={({ item }) => (
-            <Item playerState={item} navigation={navigation} />
+    <FlatList
+      style={tw`mr-2 py-2 mb-14 rounded-xl bg-gray-800`}
+      data={playerStates}
+      keyExtractor={item => item.media.id}
+      onEndReached={loadMore}
+      renderItem={({ item }) => (
+        <PlayerStateItem playerState={item} navigation={navigation} />
+      )}
+      ListFooterComponent={
+        <View style={tw`py-2`}>
+          {showDebugOptions && (
+            <>
+              <View style={tw`mb-2`}>
+                <Button
+                  title="Clear Selected Media"
+                  onPress={clearMediaAndNavigate}
+                />
+              </View>
+              <Button title="Sign Out" onPress={clearMediaAndSignOut} />
+            </>
           )}
-          stickyHeaderIndices={[0]}
-          ListHeaderComponent={
-            <View style={tw`px-4 pt-2 rounded-t-xl bg-gray-800 shadow-lg`}>
-              <Text style={tw`mb-1 text-xl font-bold text-gray-100`}>
-                Recent
-              </Text>
-            </View>
-          }
-          ListFooterComponent={
-            <View style={__DEV__ ? tw`h-22` : tw`h-2`}>
-              {__DEV__ && (
-                <>
-                  <View style={tw`mb-2`}>
-                    <Button
-                      title="Clear Selected Media"
-                      onPress={clearMediaAndNavigate}
-                    />
-                  </View>
-                  <Button title="Sign Out" onPress={clearMediaAndSignOut} />
-                </>
-              )}
-              {isFetchingNextPage && <LargeActivityIndicator />}
-            </View>
-          }
-        />
-      </View>
-    </SafeAreaView>
+          {isFetchingNextPage && <LargeActivityIndicator />}
+        </View>
+      }
+    />
   )
 }
 
-function NavigationIcon({ onPress, icon, active = false }) {
+export default function LeftDrawerContents({ navigation }) {
   return (
-    <TouchableNativeFeedback
-      onPress={onPress}
-      background={TouchableNativeFeedback.Ripple(tw.color('gray-400'), true)}
-    >
-      <FontAwesomeIcon
-        icon={icon}
-        size={32}
-        color={active ? tw.color('lime-400') : 'white'}
-      />
-    </TouchableNativeFeedback>
+    <SafeAreaView>
+      <PlayerStateList navigation={navigation} />
+    </SafeAreaView>
   )
 }

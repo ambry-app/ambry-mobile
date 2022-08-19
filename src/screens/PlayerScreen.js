@@ -89,7 +89,7 @@ export default function PlayerScreen() {
           No audiobook selected. Visit the library to choose a book:
         </Text>
         <TouchableNativeFeedback
-          onPress={() => navigation.navigate('Recent')}
+          onPress={() => navigation.navigate('Library', { screen: 'Recent' })}
           background={TouchableNativeFeedback.Ripple(
             tw.color('gray-400'),
             true

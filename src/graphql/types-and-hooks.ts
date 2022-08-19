@@ -1,13 +1,13 @@
+import {
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+  UseQueryOptions
+} from '@tanstack/react-query'
 import { GraphQLClient } from 'graphql-request'
 import { RequestInit } from 'graphql-request/dist/types.dom'
-import {
-  useQuery,
-  useInfiniteQuery,
-  useMutation,
-  UseQueryOptions,
-  UseInfiniteQueryOptions,
-  UseMutationOptions
-} from '@tanstack/react-query'
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = {

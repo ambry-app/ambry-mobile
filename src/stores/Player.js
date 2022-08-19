@@ -18,7 +18,7 @@ import { source } from './AmbryAPI'
 const useStore = create(
   subscribeWithSelector(
     persist(
-      () => ({
+      set => ({
         selectedMedia: undefined,
         mediaLoading: true,
         mediaError: false,
@@ -30,7 +30,9 @@ const useStore = create(
         playbackRate: undefined,
         currentChapter: undefined,
         isSeeking: false,
-        _hasHydrated: false
+        _hasHydrated: false,
+        tabBarVisible: true,
+        setTabBarVisible: visible => set(() => ({ tabBarVisible: visible }))
       }),
       {
         name: '@Ambry_selectedMedia',

@@ -1,13 +1,13 @@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { useDrawerStatus } from '@react-navigation/drawer'
 import React, { useEffect, useRef } from 'react'
 import { Text, View } from 'react-native'
 import { FlatList, TouchableNativeFeedback } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import shallow from 'zustand/shallow'
 import tw from '../lib/tailwind'
 import { secondsDisplay } from '../lib/utils'
 import usePlayer, { seekTo } from '../stores/Player'
-import shallow from 'zustand/shallow'
-import { useDrawerStatus } from '@react-navigation/drawer'
 
 const CHAPTER_HEIGHT = 52
 
@@ -84,7 +84,7 @@ const ChaptersList = ({ navigation }) => {
     <FlatList
       ref={ref}
       data={media?.chapters || []}
-      style={tw`m-2 rounded-xl bg-gray-800`}
+      style={tw`m-2 mb-0 rounded-xl bg-gray-800`}
       keyExtractor={item => item.id}
       renderItem={({ item }) => (
         <ChapterItem
@@ -98,12 +98,6 @@ const ChaptersList = ({ navigation }) => {
         offset: CHAPTER_HEIGHT * index,
         index
       })}
-      stickyHeaderIndices={[0]}
-      ListHeaderComponent={
-        <View style={tw`px-4 pt-2 rounded-t-xl bg-gray-800 shadow-lg`}>
-          <Text style={tw`mb-1 text-xl font-bold text-gray-100`}>Chapters</Text>
-        </View>
-      }
     />
   )
 }
