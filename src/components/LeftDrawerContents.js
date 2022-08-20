@@ -112,7 +112,7 @@ const PlayerStateList = ({ navigation }) => {
 
   return (
     <FlatList
-      style={tw`mr-2 py-2 mb-14 rounded-xl bg-gray-800`}
+      style={tw`mr-2 py-2 rounded-xl bg-gray-800`}
       data={playerStates}
       keyExtractor={item => item.media.id}
       onEndReached={loadMore}
@@ -120,7 +120,7 @@ const PlayerStateList = ({ navigation }) => {
         <PlayerStateItem playerState={item} navigation={navigation} />
       )}
       ListFooterComponent={
-        <View style={tw`py-2`}>
+        <View style={tw`py-2 pb-16`}>
           {showDebugOptions && (
             <>
               <View style={tw`mb-2`}>

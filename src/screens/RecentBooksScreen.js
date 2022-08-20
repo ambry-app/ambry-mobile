@@ -2,6 +2,7 @@ import React from 'react'
 import { Button, Text, View } from 'react-native'
 import BookGrid from '../components/BookGrid'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
+import SafeBottomBorder from '../components/SafeBottomBorder'
 import ScreenCentered from '../components/ScreenCentered'
 import { useRefreshOnFocus } from '../hooks/refetchOnFocus'
 import tw from '../lib/tailwind'
@@ -48,14 +49,16 @@ export default function RecentBooksScreen() {
   )
 
   return (
-    <BookGrid
-      books={books}
-      onEndReached={loadMore}
-      ListFooterComponent={
-        <View style={tw`h-14`}>
-          {isFetchingNextPage && <LargeActivityIndicator />}
-        </View>
-      }
-    />
+    <SafeBottomBorder>
+      <BookGrid
+        books={books}
+        onEndReached={loadMore}
+        ListFooterComponent={
+          <View style={tw`h-14`}>
+            {isFetchingNextPage && <LargeActivityIndicator />}
+          </View>
+        }
+      />
+    </SafeBottomBorder>
   )
 }

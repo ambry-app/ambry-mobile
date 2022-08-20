@@ -7,7 +7,9 @@ export default function SafeBottomBorder({ children }) {
   const { bottom } = useSafeAreaInsets()
 
   return (
-    <View style={[tw`border-gray-900 h-full`, { borderBottomWidth: bottom }]}>
+    <View
+      style={[tw`border-gray-900 h-full pb-12`, { borderBottomWidth: bottom }]}
+    >
       {children}
     </View>
   )

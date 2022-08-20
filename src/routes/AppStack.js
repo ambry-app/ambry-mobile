@@ -17,6 +17,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import LeftDrawerContents from '../components/LeftDrawerContents'
 import RightDrawerContents from '../components/RightDrawerContents'
+import ScreenCentered from '../components/ScreenCentered'
 import { useEnhancedDrawerStatus } from '../hooks/enhancedDrawerStatus'
 import tw from '../lib/tailwind'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
@@ -179,8 +180,9 @@ function TabBar({ state, descriptors, navigation }) {
   return (
     <Animated.View
       style={[
-        tw`bg-gray-800 flex-row absolute bottom-0 left-0 h-16 w-full`,
-        style
+        tw`bg-gray-900 flex-row absolute bottom-0 left-0 h-16 w-full`,
+        style,
+        { paddingBottom: bottom }
       ]}
     >
       {state.routes.map((route, index) => {
@@ -217,12 +219,7 @@ function TabBar({ state, descriptors, navigation }) {
               onPress={onPress}
               onLongPress={onLongPress}
             >
-              <View
-                style={[
-                  tw`h-full items-center justify-center`,
-                  { paddingBottom: bottom }
-                ]}
-              >
+              <View style={tw`h-full items-center justify-center`}>
                 <FontAwesomeIcon
                   icon={iconForRoute(route)}
                   size={24}
@@ -239,20 +236,25 @@ function TabBar({ state, descriptors, navigation }) {
 
 function FakeScreen() {
   return (
-    <View>
-      <Text>Fake</Text>
-    </View>
+    <ScreenCentered>
+      <Text style={tw`text-gray-200`}>Not yet implemented.</Text>
+    </ScreenCentered>
   )
 }
 
 export const AppStack = () => {
   return (
-    <Tab.Navigator
-      screenOptions={{ headerShown: false }}
-      tabBar={props => <TabBar {...props} />}
-    >
-      <Tab.Screen name="PlayerRightDrawer" component={RightDrawerScreen} />
-      <Tab.Screen name="Library" component={LibraryStack} />
+    <Tab.Navigator tabBar={props => <TabBar {...props} />}>
+      <Tab.Screen
+        name="PlayerRightDrawer"
+        options={{ headerShown: false }}
+        component={RightDrawerScreen}
+      />
+      <Tab.Screen
+        name="Library"
+        options={{ headerShown: false }}
+        component={LibraryStack}
+      />
       <Tab.Screen name="Search" component={FakeScreen} />
       <Tab.Screen name="Settings" component={FakeScreen} />
     </Tab.Navigator>
