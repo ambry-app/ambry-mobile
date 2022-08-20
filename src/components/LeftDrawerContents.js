@@ -37,7 +37,7 @@ function PlayerStateItem({ playerState, navigation }) {
           <Image
             source={source(playerState.media.book.imagePath)}
             style={tw.style('rounded-md', 'w-full', {
-              aspectRatio: 10 / 15
+              aspectRatio: 10 / 15.5
             })}
           />
         </View>

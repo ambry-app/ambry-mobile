@@ -65,7 +65,7 @@ export default function BookDetails({ imageSource, media }) {
               <Image
                 source={imageSource}
                 style={tw.style('rounded-md', 'w-full', {
-                  aspectRatio: 10 / 15
+                  aspectRatio: 10 / 15.5
                 })}
               />
             </TouchableNativeFeedback>
