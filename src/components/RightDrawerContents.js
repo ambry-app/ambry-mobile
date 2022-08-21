@@ -3,7 +3,7 @@ import { useDrawerStatus } from '@react-navigation/drawer'
 import React, { useEffect, useRef } from 'react'
 import { Text, View } from 'react-native'
 import { FlatList, TouchableNativeFeedback } from 'react-native-gesture-handler'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import shallow from 'zustand/shallow'
 import tw from '../lib/tailwind'
 import { secondsDisplay } from '../lib/utils'
@@ -21,7 +21,7 @@ const ChapterItem = ({ chapter, active, navigation }) => {
         navigation.closeDrawer()
       }}
     >
-      <View style={tw`flex-row px-4 py-3 items-center`}>
+      <View style={tw`flex-row px-4 py-2 items-center`}>
         <View style={tw`w-7`}>
           {active && (
             <FontAwesomeIcon
@@ -54,6 +54,7 @@ const playerSelector = [state => [state.media, state.currentChapter], shallow]
 const ChaptersList = ({ navigation }) => {
   // console.log('RENDERING: ChaptersList')
 
+  const { bottom } = useSafeAreaInsets()
   const isOpen = useDrawerStatus() === 'open'
   const [media, currentChapter] = usePlayer(...playerSelector)
   const ref = useRef()
@@ -84,7 +85,7 @@ const ChaptersList = ({ navigation }) => {
     <FlatList
       ref={ref}
       data={media?.chapters || []}
-      style={tw`m-2 mb-0 rounded-xl bg-gray-800`}
+      style={tw`mx-2 rounded-t-xl bg-gray-800`}
       keyExtractor={item => item.id}
       renderItem={({ item }) => (
         <ChapterItem
@@ -98,13 +99,14 @@ const ChaptersList = ({ navigation }) => {
         offset: CHAPTER_HEIGHT * index,
         index
       })}
+      ListFooterComponent={<View style={{ paddingBottom: bottom }} />}
     />
   )
 }
 
 export default function RightDrawerContents({ navigation }) {
   return (
-    <SafeAreaView>
+    <SafeAreaView edges={['left', 'top', 'right']}>
       <ChaptersList navigation={navigation} />
     </SafeAreaView>
   )

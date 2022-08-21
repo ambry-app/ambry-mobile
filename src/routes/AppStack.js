@@ -167,9 +167,9 @@ function TabBar({ state, descriptors, navigation }) {
     if (tabBarVisible) {
       position.value = withTiming(0, { duration: 200 })
     } else {
-      position.value = withTiming(64, { duration: 150 })
+      position.value = withTiming(48 + bottom, { duration: 150 })
     }
-  }, [tabBarVisible, position])
+  }, [tabBarVisible, position, bottom])
 
   const style = useAnimatedStyle(() => {
     return {
@@ -180,56 +180,58 @@ function TabBar({ state, descriptors, navigation }) {
   return (
     <Animated.View
       style={[
-        tw`bg-gray-900 flex-row absolute bottom-0 left-0 h-16 w-full`,
+        tw`bg-gray-900 absolute bottom-0 left-0 w-full`,
         style,
-        { paddingBottom: bottom }
+        { height: 48 + bottom }
       ]}
     >
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key]
-        const isFocused = state.index === index
+      <View style={[tw`flex-row`, { marginBottom: bottom }]}>
+        {state.routes.map((route, index) => {
+          const { options } = descriptors[route.key]
+          const isFocused = state.index === index
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true
-          })
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true
+            })
 
-          if (!isFocused && !event.defaultPrevented) {
-            // The `merge: true` option makes sure that the params inside the tab screen are preserved
-            navigation.navigate({ name: route.name, merge: true })
+            if (!isFocused && !event.defaultPrevented) {
+              // The `merge: true` option makes sure that the params inside the tab screen are preserved
+              navigation.navigate({ name: route.name, merge: true })
+            }
           }
-        }
 
-        const onLongPress = () => {
-          navigation.emit({
-            type: 'tabLongPress',
-            target: route.key
-          })
-        }
+          const onLongPress = () => {
+            navigation.emit({
+              type: 'tabLongPress',
+              target: route.key
+            })
+          }
 
-        return (
-          <View key={index} style={tw`flex-grow`}>
-            <TouchableNativeFeedback
-              accessibilityRole="button"
-              accessibilityState={isFocused ? { selected: true } : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
-              testID={options.tabBarTestID}
-              onPress={onPress}
-              onLongPress={onLongPress}
-            >
-              <View style={tw`h-full items-center justify-center`}>
-                <FontAwesomeIcon
-                  icon={iconForRoute(route)}
-                  size={24}
-                  color={isFocused ? tw.color('lime-400') : 'white'}
-                />
-              </View>
-            </TouchableNativeFeedback>
-          </View>
-        )
-      })}
+          return (
+            <View key={index} style={tw`flex-grow`}>
+              <TouchableNativeFeedback
+                accessibilityRole="button"
+                accessibilityState={isFocused ? { selected: true } : {}}
+                accessibilityLabel={options.tabBarAccessibilityLabel}
+                testID={options.tabBarTestID}
+                onPress={onPress}
+                onLongPress={onLongPress}
+              >
+                <View style={tw`h-full items-center justify-center`}>
+                  <FontAwesomeIcon
+                    icon={iconForRoute(route)}
+                    size={24}
+                    color={isFocused ? tw.color('lime-400') : 'white'}
+                  />
+                </View>
+              </TouchableNativeFeedback>
+            </View>
+          )
+        })}
+      </View>
     </Animated.View>
   )
 }

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { Button, Image, Text, View } from 'react-native'
 import { FlatList, TouchableNativeFeedback } from 'react-native-gesture-handler'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRefreshOnDrawerOpen } from '../hooks/refetchOnDrawerOpen'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
@@ -42,7 +42,9 @@ function PlayerStateItem({ playerState, navigation }) {
           />
         </View>
         <View style={tw`pl-2 w-3/4`}>
-          <Text style={tw`text-lg leading-tight font-bold text-gray-100`}>
+          <Text
+            style={tw`mb-1 text-base leading-tight font-bold text-gray-100`}
+          >
             {playerState.media.book.title}
           </Text>
           <WrappingList
@@ -59,6 +61,7 @@ function PlayerStateItem({ playerState, navigation }) {
 }
 
 const PlayerStateList = ({ navigation }) => {
+  const { bottom } = useSafeAreaInsets()
   const showDebugOptions = __DEV__
   const {
     data,
@@ -112,7 +115,7 @@ const PlayerStateList = ({ navigation }) => {
 
   return (
     <FlatList
-      style={tw`mr-2 py-2 rounded-xl bg-gray-800`}
+      style={tw`mx-2 py-2 rounded-t-xl bg-gray-800`}
       data={playerStates}
       keyExtractor={item => item.media.id}
       onEndReached={loadMore}
@@ -120,7 +123,7 @@ const PlayerStateList = ({ navigation }) => {
         <PlayerStateItem playerState={item} navigation={navigation} />
       )}
       ListFooterComponent={
-        <View style={tw`py-2 pb-16`}>
+        <View style={[tw`py-2`, { paddingBottom: 56 + bottom }]}>
           {showDebugOptions && (
             <>
               <View style={tw`mb-2`}>
@@ -141,7 +144,7 @@ const PlayerStateList = ({ navigation }) => {
 
 export default function LeftDrawerContents({ navigation }) {
   return (
-    <SafeAreaView>
+    <SafeAreaView edges={['left', 'top', 'right']}>
       <PlayerStateList navigation={navigation} />
     </SafeAreaView>
   )
