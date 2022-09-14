@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Image, SectionList, Text, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
-import BookGrid from '../components/BookGrid'
+import Grid from '../components/Grid'
 import Description from '../components/Description'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import SafeBottomBorder from '../components/SafeBottomBorder'
@@ -96,7 +96,7 @@ export default function PersonDetailsScreen({ route, navigation }) {
         renderScrollComponent={scrollProps => <ScrollView {...scrollProps} />}
         sections={[...authorSections, ...narratorSections]}
         keyExtractor={({ id }) => id}
-        renderItem={({ item: { books } }) => <BookGrid books={books} />}
+        renderItem={({ item: { books } }) => <Grid books={books} />}
         renderSectionHeader={({ section: { title } }) => (
           <Text style={tw`px-4 pt-8 pb-0 text-xl font-bold text-gray-100`}>
             {title}

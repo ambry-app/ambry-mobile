@@ -9,6 +9,7 @@ import {
   useBookQuery,
   useInfiniteBooksQuery,
   useInfinitePlayerStatesQuery,
+  useInfiniteSearchQuery,
   useInfiniteSeriesBooksQuery,
   useLoginMutation,
   useLogoutMutation,
@@ -209,6 +210,23 @@ export const useSeries = id => {
   const client = useClient()
 
   return useSeriesQuery(client, { id })
+}
+
+export const useSearch = query => {
+  const client = useClient()
+
+  return useInfiniteSearchQuery(
+    'after',
+    client,
+    { first: 50, query },
+    {
+      getNextPageParam: lastPage => {
+        if (lastPage.search.pageInfo.hasNextPage) {
+          return { after: lastPage.search.pageInfo.endCursor }
+        }
+      }
+    }
+  )
 }
 
 // Non-hook calls:

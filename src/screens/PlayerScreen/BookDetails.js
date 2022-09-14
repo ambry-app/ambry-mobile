@@ -27,7 +27,7 @@ export default function BookDetails({ imageSource, media }) {
         </TouchableNativeFeedback>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate('Library', { screen: 'Recent' })
+            navigation.navigate('Library', { screen: 'Main' })
 
             setImmediate(() => {
               navigation.dispatch(
@@ -49,7 +49,7 @@ export default function BookDetails({ imageSource, media }) {
           <View style={tw`w-full rounded-md bg-gray-800`}>
             <TouchableNativeFeedback
               onPress={() => {
-                navigation.navigate('Library', { screen: 'Recent' })
+                navigation.navigate('Library', { screen: 'Main' })
 
                 setImmediate(() => {
                   navigation.dispatch(
@@ -76,7 +76,7 @@ export default function BookDetails({ imageSource, media }) {
             prefix="by"
             items={media.book.authors}
             onPressLink={author => {
-              navigation.navigate('Library', { screen: 'Recent' })
+              navigation.navigate('Library', { screen: 'Main' })
 
               setImmediate(() => {
                 navigation.dispatch(
@@ -93,7 +93,7 @@ export default function BookDetails({ imageSource, media }) {
             items={media.narrators}
             keyExtractor={narrator => narrator.person.id}
             onPressLink={narrator => {
-              navigation.navigate('Library', { screen: 'Recent' })
+              navigation.navigate('Library', { screen: 'Main' })
 
               setImmediate(() => {
                 navigation.dispatch(
@@ -107,7 +107,7 @@ export default function BookDetails({ imageSource, media }) {
           <WrappingListOfLinks
             items={media.book.seriesBooks}
             onPressLink={seriesBook => {
-              navigation.navigate('Library', { screen: 'Recent' })
+              navigation.navigate('Library', { screen: 'Main' })
 
               setImmediate(() => {
                 navigation.dispatch(

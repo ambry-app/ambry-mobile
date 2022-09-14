@@ -23,7 +23,7 @@ import tw from '../lib/tailwind'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
 import PersonDetailsScreen from '../screens/PersonDetailsScreen'
 import PlayerScreen from '../screens/PlayerScreen'
-import RecentBooksScreen from '../screens/RecentBooksScreen'
+import LibraryMainScreen from '../screens/LibraryMainScreen'
 import SeriesScreen from '../screens/SeriesScreen'
 import usePlayer from '../stores/Player'
 
@@ -58,11 +58,11 @@ const PlayerScreenWrapper = ({ navigation }) => {
 
 const LibraryStack = () => {
   return (
-    <Stack.Navigator initialRouteName="Recent">
+    <Stack.Navigator initialRouteName="Main">
       <Stack.Screen
-        name="Recent"
-        options={{ title: 'Latest books' }}
-        component={RecentBooksScreen}
+        name="Main"
+        options={{ title: 'Library' }}
+        component={LibraryMainScreen}
       />
       <Stack.Screen
         name="Book"
@@ -156,6 +156,19 @@ function iconForRoute(route) {
   }
 }
 
+function nameForRoute(route) {
+  switch (route.name) {
+    case 'PlayerRightDrawer':
+      return 'Player'
+    case 'Library':
+      return 'Library'
+    case 'Search':
+      return 'Search'
+    case 'Settings':
+      return 'Settings'
+  }
+}
+
 const Tab = createBottomTabNavigator()
 
 function TabBar({ state, descriptors, navigation }) {
@@ -167,7 +180,7 @@ function TabBar({ state, descriptors, navigation }) {
     if (tabBarVisible) {
       position.value = withTiming(0, { duration: 200 })
     } else {
-      position.value = withTiming(48 + bottom, { duration: 150 })
+      position.value = withTiming(56 + bottom, { duration: 150 })
     }
   }, [tabBarVisible, position, bottom])
 
@@ -182,7 +195,7 @@ function TabBar({ state, descriptors, navigation }) {
       style={[
         tw`bg-gray-900 absolute bottom-0 left-0 w-full`,
         style,
-        { height: 48 + bottom }
+        { height: 56 + bottom }
       ]}
     >
       <View style={[tw`flex-row`, { marginBottom: bottom }]}>
@@ -226,6 +239,14 @@ function TabBar({ state, descriptors, navigation }) {
                     size={24}
                     color={isFocused ? tw.color('lime-400') : 'white'}
                   />
+                  <Text
+                    style={tw.style([
+                      'text-xs',
+                      isFocused ? 'text-lime-400' : 'text-white'
+                    ])}
+                  >
+                    {nameForRoute(route)}
+                  </Text>
                 </View>
               </TouchableNativeFeedback>
             </View>
@@ -246,7 +267,10 @@ function FakeScreen() {
 
 export const AppStack = () => {
   return (
-    <Tab.Navigator tabBar={props => <TabBar {...props} />}>
+    <Tab.Navigator
+      tabBar={props => <TabBar {...props} />}
+      backBehavior="history"
+    >
       <Tab.Screen
         name="PlayerRightDrawer"
         options={{ headerShown: false }}
@@ -257,7 +281,6 @@ export const AppStack = () => {
         options={{ headerShown: false }}
         component={LibraryStack}
       />
-      <Tab.Screen name="Search" component={FakeScreen} />
       <Tab.Screen name="Settings" component={FakeScreen} />
     </Tab.Navigator>
   )

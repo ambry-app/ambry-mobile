@@ -40,6 +40,16 @@ type SeriesBookConnection {
   edges: [SeriesBookEdge]
 }
 
+type SearchResultEdge {
+  node: SearchResult
+  cursor: String
+}
+
+type SearchResultConnection {
+  pageInfo: PageInfo!
+  edges: [SearchResultEdge]
+}
+
 """
 The `Naive DateTime` scalar type represents a naive date and time without
 timezone. The DateTime appears in a JSON response as an ISO8601 formatted
@@ -47,7 +57,7 @@ string.
 """
 scalar NaiveDateTime
 
-type Series implements Node {
+type Series implements SearchResult & Node {
   "The ID of an object"
   id: ID!
 
@@ -135,6 +145,22 @@ type RootQueryType {
   me: User
   books(after: String, first: Int, before: String, last: Int): BookConnection
   playerStates(after: String, first: Int, before: String, last: Int): PlayerStateConnection
+  search(
+    after: String
+
+    first: Int
+
+    before: String
+
+    last: Int
+
+    "Must be at least 3 characters"
+    query: String!
+  ): SearchResultConnection
+}
+
+interface SearchResult {
+  id: ID!
 }
 
 type MediaEdge {
@@ -193,7 +219,7 @@ type Author implements Node {
   updatedAt: NaiveDateTime!
 }
 
-type Person implements Node {
+type Person implements SearchResult & Node {
   "The ID of an object"
   id: ID!
 
@@ -212,7 +238,7 @@ type Person implements Node {
   updatedAt: NaiveDateTime!
 }
 
-type Book implements Node {
+type Book implements SearchResult & Node {
   "The ID of an object"
   id: ID!
 

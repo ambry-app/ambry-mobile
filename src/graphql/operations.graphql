@@ -1,30 +1,46 @@
 fragment AuthorBasics on Author {
+  __typename
   id
   name
 }
 
 fragment NarratorBasics on Narrator {
+  __typename
   id
   name
 }
 
 fragment PersonBasics on Person {
+  __typename
   id
   name
   imagePath
 }
 
+fragment PersonWithAuthorsAndNarrators on Person {
+  ...PersonBasics
+  authors {
+    ...AuthorBasics
+  }
+  narrators {
+    ...NarratorBasics
+  }
+}
+
 fragment SeriesBasics on Series {
+  __typename
   id
   name
 }
 
 fragment SeriesBookBasics on SeriesBook {
+  __typename
   id
   bookNumber
 }
 
 fragment BookBasics on Book {
+  __typename
   id
   title
   imagePath
@@ -47,6 +63,7 @@ fragment BookWithAuthorsAndSeries on Book {
 }
 
 fragment MediaBasics on Media {
+  __typename
   id
   fullCast
   abridged
@@ -64,6 +81,7 @@ fragment MediaWithNarrators on Media {
 }
 
 fragment PlayerStateBasics on PlayerState {
+  __typename
   status
   position
   playbackRate
@@ -238,6 +256,43 @@ query mediaWithPlayerState($id: ID!) {
       playerState {
         ...PlayerStateBasics
       }
+    }
+  }
+}
+
+query search($first: Int, $after: String, $query: String!) {
+  search(first: $first, after: $after, query: $query) {
+    edges {
+      node {
+        ... on Book {
+          ...BookWithAuthorsAndSeries
+        }
+        ... on Person {
+          ...PersonWithAuthorsAndNarrators
+        }
+        ... on Series {
+          ...SeriesBasics
+          seriesSeriesBooks: seriesBooks(first: 3) {
+            edges {
+              node {
+                book {
+                  ...BookBasics
+                  authors {
+                    ...AuthorBasics
+                    person {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
     }
   }
 }

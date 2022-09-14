@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Text, View } from 'react-native'
-import BookGrid from '../components/BookGrid'
+import Grid from '../components/Grid'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import SafeBottomBorder from '../components/SafeBottomBorder'
 import ScreenCentered from '../components/ScreenCentered'
@@ -68,7 +68,7 @@ export default function SeriesScreen({ navigation, route }) {
 
   return (
     <SafeBottomBorder>
-      <BookGrid
+      <Grid
         books={seriesBooks}
         onEndReached={loadMore}
         itemType="seriesBook"

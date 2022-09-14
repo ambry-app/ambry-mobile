@@ -73,20 +73,21 @@ export type AuthorAuthoredBooksArgs = {
   last?: InputMaybe<Scalars['Int']>
 }
 
-export type Book = Node & {
-  __typename?: 'Book'
-  authors: Array<Author>
-  description?: Maybe<Scalars['String']>
-  /** The ID of an object */
-  id: Scalars['ID']
-  imagePath?: Maybe<Scalars['String']>
-  insertedAt: Scalars['NaiveDateTime']
-  media: Array<Media>
-  published: Scalars['Date']
-  seriesBooks: Array<SeriesBook>
-  title: Scalars['String']
-  updatedAt: Scalars['NaiveDateTime']
-}
+export type Book = Node &
+  SearchResult & {
+    __typename?: 'Book'
+    authors: Array<Author>
+    description?: Maybe<Scalars['String']>
+    /** The ID of an object */
+    id: Scalars['ID']
+    imagePath?: Maybe<Scalars['String']>
+    insertedAt: Scalars['NaiveDateTime']
+    media: Array<Media>
+    published: Scalars['Date']
+    seriesBooks: Array<SeriesBook>
+    title: Scalars['String']
+    updatedAt: Scalars['NaiveDateTime']
+  }
 
 export type BookConnection = {
   __typename?: 'BookConnection'
@@ -188,18 +189,19 @@ export type PageInfo = {
   startCursor?: Maybe<Scalars['String']>
 }
 
-export type Person = Node & {
-  __typename?: 'Person'
-  authors: Array<Author>
-  description?: Maybe<Scalars['String']>
-  /** The ID of an object */
-  id: Scalars['ID']
-  imagePath?: Maybe<Scalars['String']>
-  insertedAt: Scalars['NaiveDateTime']
-  name: Scalars['String']
-  narrators: Array<Narrator>
-  updatedAt: Scalars['NaiveDateTime']
-}
+export type Person = Node &
+  SearchResult & {
+    __typename?: 'Person'
+    authors: Array<Author>
+    description?: Maybe<Scalars['String']>
+    /** The ID of an object */
+    id: Scalars['ID']
+    imagePath?: Maybe<Scalars['String']>
+    insertedAt: Scalars['NaiveDateTime']
+    name: Scalars['String']
+    narrators: Array<Narrator>
+    updatedAt: Scalars['NaiveDateTime']
+  }
 
 export type PlayerState = Node & {
   __typename?: 'PlayerState'
@@ -252,6 +254,7 @@ export type RootQueryType = {
   me?: Maybe<User>
   node?: Maybe<Node>
   playerStates?: Maybe<PlayerStateConnection>
+  search?: Maybe<SearchResultConnection>
 }
 
 export type RootQueryTypeBooksArgs = {
@@ -272,15 +275,40 @@ export type RootQueryTypePlayerStatesArgs = {
   last?: InputMaybe<Scalars['Int']>
 }
 
-export type Series = Node & {
-  __typename?: 'Series'
-  /** The ID of an object */
-  id: Scalars['ID']
-  insertedAt: Scalars['NaiveDateTime']
-  name: Scalars['String']
-  seriesBooks?: Maybe<SeriesBookConnection>
-  updatedAt: Scalars['NaiveDateTime']
+export type RootQueryTypeSearchArgs = {
+  after?: InputMaybe<Scalars['String']>
+  before?: InputMaybe<Scalars['String']>
+  first?: InputMaybe<Scalars['Int']>
+  last?: InputMaybe<Scalars['Int']>
+  query: Scalars['String']
 }
+
+export type SearchResult = {
+  id: Scalars['ID']
+}
+
+export type SearchResultConnection = {
+  __typename?: 'SearchResultConnection'
+  edges?: Maybe<Array<Maybe<SearchResultEdge>>>
+  pageInfo: PageInfo
+}
+
+export type SearchResultEdge = {
+  __typename?: 'SearchResultEdge'
+  cursor?: Maybe<Scalars['String']>
+  node?: Maybe<SearchResult>
+}
+
+export type Series = Node &
+  SearchResult & {
+    __typename?: 'Series'
+    /** The ID of an object */
+    id: Scalars['ID']
+    insertedAt: Scalars['NaiveDateTime']
+    name: Scalars['String']
+    seriesBooks?: Maybe<SeriesBookConnection>
+    updatedAt: Scalars['NaiveDateTime']
+  }
 
 export type SeriesSeriesBooksArgs = {
   after?: InputMaybe<Scalars['String']>
@@ -332,64 +360,73 @@ export type User = {
 }
 
 export type AuthorBasicsFragment = {
-  __typename?: 'Author'
+  __typename: 'Author'
   id: string
   name: string
 }
 
 export type NarratorBasicsFragment = {
-  __typename?: 'Narrator'
+  __typename: 'Narrator'
   id: string
   name: string
 }
 
 export type PersonBasicsFragment = {
-  __typename?: 'Person'
+  __typename: 'Person'
   id: string
   name: string
   imagePath?: string | null
 }
 
+export type PersonWithAuthorsAndNarratorsFragment = {
+  __typename: 'Person'
+  id: string
+  name: string
+  imagePath?: string | null
+  authors: Array<{ __typename: 'Author'; id: string; name: string }>
+  narrators: Array<{ __typename: 'Narrator'; id: string; name: string }>
+}
+
 export type SeriesBasicsFragment = {
-  __typename?: 'Series'
+  __typename: 'Series'
   id: string
   name: string
 }
 
 export type SeriesBookBasicsFragment = {
-  __typename?: 'SeriesBook'
+  __typename: 'SeriesBook'
   id: string
   bookNumber: any
 }
 
 export type BookBasicsFragment = {
-  __typename?: 'Book'
+  __typename: 'Book'
   id: string
   title: string
   imagePath?: string | null
 }
 
 export type BookWithAuthorsAndSeriesFragment = {
-  __typename?: 'Book'
+  __typename: 'Book'
   id: string
   title: string
   imagePath?: string | null
   authors: Array<{
-    __typename?: 'Author'
+    __typename: 'Author'
     id: string
     name: string
     person: { __typename?: 'Person'; id: string }
   }>
   seriesBooks: Array<{
-    __typename?: 'SeriesBook'
+    __typename: 'SeriesBook'
     id: string
     bookNumber: any
-    series: { __typename?: 'Series'; id: string; name: string }
+    series: { __typename: 'Series'; id: string; name: string }
   }>
 }
 
 export type MediaBasicsFragment = {
-  __typename?: 'Media'
+  __typename: 'Media'
   id: string
   fullCast: boolean
   abridged: boolean
@@ -397,13 +434,13 @@ export type MediaBasicsFragment = {
 }
 
 export type MediaWithNarratorsFragment = {
-  __typename?: 'Media'
+  __typename: 'Media'
   id: string
   fullCast: boolean
   abridged: boolean
   duration?: number | null
   narrators: Array<{
-    __typename?: 'Narrator'
+    __typename: 'Narrator'
     id: string
     name: string
     person: { __typename?: 'Person'; id: string }
@@ -411,7 +448,7 @@ export type MediaWithNarratorsFragment = {
 }
 
 export type PlayerStateBasicsFragment = {
-  __typename?: 'PlayerState'
+  __typename: 'PlayerState'
   status: PlayerStateStatus
   position: number
   playbackRate: number
@@ -429,21 +466,21 @@ export type BooksQuery = {
     edges?: Array<{
       __typename?: 'BookEdge'
       node?: {
-        __typename?: 'Book'
+        __typename: 'Book'
         id: string
         title: string
         imagePath?: string | null
         authors: Array<{
-          __typename?: 'Author'
+          __typename: 'Author'
           id: string
           name: string
           person: { __typename?: 'Person'; id: string }
         }>
         seriesBooks: Array<{
-          __typename?: 'SeriesBook'
+          __typename: 'SeriesBook'
           id: string
           bookNumber: any
-          series: { __typename?: 'Series'; id: string; name: string }
+          series: { __typename: 'Series'; id: string; name: string }
         }>
       } | null
     } | null> | null
@@ -464,36 +501,36 @@ export type BookQuery = {
   node?:
     | { __typename?: 'Author' }
     | {
-        __typename?: 'Book'
+        __typename: 'Book'
         published: any
         description?: string | null
         id: string
         title: string
         imagePath?: string | null
         media: Array<{
-          __typename?: 'Media'
+          __typename: 'Media'
           id: string
           fullCast: boolean
           abridged: boolean
           duration?: number | null
           narrators: Array<{
-            __typename?: 'Narrator'
+            __typename: 'Narrator'
             id: string
             name: string
             person: { __typename?: 'Person'; id: string }
           }>
         }>
         authors: Array<{
-          __typename?: 'Author'
+          __typename: 'Author'
           id: string
           name: string
           person: { __typename?: 'Person'; id: string }
         }>
         seriesBooks: Array<{
-          __typename?: 'SeriesBook'
+          __typename: 'SeriesBook'
           id: string
           bookNumber: any
-          series: { __typename?: 'Series'; id: string; name: string }
+          series: { __typename: 'Series'; id: string; name: string }
         }>
       }
     | { __typename?: 'Media' }
@@ -518,7 +555,7 @@ export type SeriesQuery = {
     | { __typename?: 'Narrator' }
     | { __typename?: 'Person' }
     | { __typename?: 'PlayerState' }
-    | { __typename?: 'Series'; id: string; name: string }
+    | { __typename: 'Series'; id: string; name: string }
     | { __typename?: 'SeriesBook' }
     | null
 }
@@ -536,13 +573,13 @@ export type PersonQuery = {
     | { __typename?: 'Media' }
     | { __typename?: 'Narrator' }
     | {
-        __typename?: 'Person'
+        __typename: 'Person'
         description?: string | null
         id: string
         name: string
         imagePath?: string | null
         authors: Array<{
-          __typename?: 'Author'
+          __typename: 'Author'
           id: string
           name: string
           authoredBooks?: {
@@ -550,21 +587,21 @@ export type PersonQuery = {
             edges?: Array<{
               __typename?: 'BookEdge'
               node?: {
-                __typename?: 'Book'
+                __typename: 'Book'
                 id: string
                 title: string
                 imagePath?: string | null
                 authors: Array<{
-                  __typename?: 'Author'
+                  __typename: 'Author'
                   id: string
                   name: string
                   person: { __typename?: 'Person'; id: string }
                 }>
                 seriesBooks: Array<{
-                  __typename?: 'SeriesBook'
+                  __typename: 'SeriesBook'
                   id: string
                   bookNumber: any
-                  series: { __typename?: 'Series'; id: string; name: string }
+                  series: { __typename: 'Series'; id: string; name: string }
                 }>
               } | null
             } | null> | null
@@ -572,7 +609,7 @@ export type PersonQuery = {
           } | null
         }>
         narrators: Array<{
-          __typename?: 'Narrator'
+          __typename: 'Narrator'
           id: string
           name: string
           narratedMedia?: {
@@ -582,21 +619,21 @@ export type PersonQuery = {
               node?: {
                 __typename?: 'Media'
                 book: {
-                  __typename?: 'Book'
+                  __typename: 'Book'
                   id: string
                   title: string
                   imagePath?: string | null
                   authors: Array<{
-                    __typename?: 'Author'
+                    __typename: 'Author'
                     id: string
                     name: string
                     person: { __typename?: 'Person'; id: string }
                   }>
                   seriesBooks: Array<{
-                    __typename?: 'SeriesBook'
+                    __typename: 'SeriesBook'
                     id: string
                     bookNumber: any
-                    series: { __typename?: 'Series'; id: string; name: string }
+                    series: { __typename: 'Series'; id: string; name: string }
                   }>
                 }
               } | null
@@ -627,21 +664,21 @@ export type AuthoredBooksQuery = {
           edges?: Array<{
             __typename?: 'BookEdge'
             node?: {
-              __typename?: 'Book'
+              __typename: 'Book'
               id: string
               title: string
               imagePath?: string | null
               authors: Array<{
-                __typename?: 'Author'
+                __typename: 'Author'
                 id: string
                 name: string
                 person: { __typename?: 'Person'; id: string }
               }>
               seriesBooks: Array<{
-                __typename?: 'SeriesBook'
+                __typename: 'SeriesBook'
                 id: string
                 bookNumber: any
-                series: { __typename?: 'Series'; id: string; name: string }
+                series: { __typename: 'Series'; id: string; name: string }
               }>
             } | null
           } | null> | null
@@ -683,21 +720,21 @@ export type NarratedMediaQuery = {
             node?: {
               __typename?: 'Media'
               book: {
-                __typename?: 'Book'
+                __typename: 'Book'
                 id: string
                 title: string
                 imagePath?: string | null
                 authors: Array<{
-                  __typename?: 'Author'
+                  __typename: 'Author'
                   id: string
                   name: string
                   person: { __typename?: 'Person'; id: string }
                 }>
                 seriesBooks: Array<{
-                  __typename?: 'SeriesBook'
+                  __typename: 'SeriesBook'
                   id: string
                   bookNumber: any
-                  series: { __typename?: 'Series'; id: string; name: string }
+                  series: { __typename: 'Series'; id: string; name: string }
                 }>
               }
             } | null
@@ -738,25 +775,25 @@ export type SeriesBooksQuery = {
           edges?: Array<{
             __typename?: 'SeriesBookEdge'
             node?: {
-              __typename?: 'SeriesBook'
+              __typename: 'SeriesBook'
               id: string
               bookNumber: any
               book: {
-                __typename?: 'Book'
+                __typename: 'Book'
                 id: string
                 title: string
                 imagePath?: string | null
                 authors: Array<{
-                  __typename?: 'Author'
+                  __typename: 'Author'
                   id: string
                   name: string
                   person: { __typename?: 'Person'; id: string }
                 }>
                 seriesBooks: Array<{
-                  __typename?: 'SeriesBook'
+                  __typename: 'SeriesBook'
                   id: string
                   bookNumber: any
-                  series: { __typename?: 'Series'; id: string; name: string }
+                  series: { __typename: 'Series'; id: string; name: string }
                 }>
               }
             } | null
@@ -784,32 +821,32 @@ export type PlayerStatesQuery = {
     edges?: Array<{
       __typename?: 'PlayerStateEdge'
       node?: {
-        __typename?: 'PlayerState'
+        __typename: 'PlayerState'
         status: PlayerStateStatus
         position: number
         playbackRate: number
         media: {
-          __typename?: 'Media'
+          __typename: 'Media'
           id: string
           fullCast: boolean
           abridged: boolean
           duration?: number | null
           book: {
-            __typename?: 'Book'
+            __typename: 'Book'
             id: string
             title: string
             imagePath?: string | null
             authors: Array<{
-              __typename?: 'Author'
+              __typename: 'Author'
               id: string
               name: string
               person: { __typename?: 'Person'; id: string }
             }>
             seriesBooks: Array<{
-              __typename?: 'SeriesBook'
+              __typename: 'SeriesBook'
               id: string
               bookNumber: any
-              series: { __typename?: 'Series'; id: string; name: string }
+              series: { __typename: 'Series'; id: string; name: string }
             }>
           }
         }
@@ -833,7 +870,7 @@ export type MediaWithPlayerStateQuery = {
     | { __typename?: 'Author' }
     | { __typename?: 'Book' }
     | {
-        __typename?: 'Media'
+        __typename: 'Media'
         hlsPath?: string | null
         mpdPath?: string | null
         id: string
@@ -848,31 +885,31 @@ export type MediaWithPlayerStateQuery = {
           title?: string | null
         }>
         book: {
-          __typename?: 'Book'
+          __typename: 'Book'
           id: string
           title: string
           imagePath?: string | null
           authors: Array<{
-            __typename?: 'Author'
+            __typename: 'Author'
             id: string
             name: string
             person: { __typename?: 'Person'; id: string }
           }>
           seriesBooks: Array<{
-            __typename?: 'SeriesBook'
+            __typename: 'SeriesBook'
             id: string
             bookNumber: any
-            series: { __typename?: 'Series'; id: string; name: string }
+            series: { __typename: 'Series'; id: string; name: string }
           }>
         }
         playerState?: {
-          __typename?: 'PlayerState'
+          __typename: 'PlayerState'
           status: PlayerStateStatus
           position: number
           playbackRate: number
         } | null
         narrators: Array<{
-          __typename?: 'Narrator'
+          __typename: 'Narrator'
           id: string
           name: string
           person: { __typename?: 'Person'; id: string }
@@ -884,6 +921,85 @@ export type MediaWithPlayerStateQuery = {
     | { __typename?: 'Series' }
     | { __typename?: 'SeriesBook' }
     | null
+}
+
+export type SearchQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']>
+  after?: InputMaybe<Scalars['String']>
+  query: Scalars['String']
+}>
+
+export type SearchQuery = {
+  __typename?: 'RootQueryType'
+  search?: {
+    __typename?: 'SearchResultConnection'
+    edges?: Array<{
+      __typename?: 'SearchResultEdge'
+      node?:
+        | {
+            __typename: 'Book'
+            id: string
+            title: string
+            imagePath?: string | null
+            authors: Array<{
+              __typename: 'Author'
+              id: string
+              name: string
+              person: { __typename?: 'Person'; id: string }
+            }>
+            seriesBooks: Array<{
+              __typename: 'SeriesBook'
+              id: string
+              bookNumber: any
+              series: { __typename: 'Series'; id: string; name: string }
+            }>
+          }
+        | {
+            __typename: 'Person'
+            id: string
+            name: string
+            imagePath?: string | null
+            authors: Array<{ __typename: 'Author'; id: string; name: string }>
+            narrators: Array<{
+              __typename: 'Narrator'
+              id: string
+              name: string
+            }>
+          }
+        | {
+            __typename: 'Series'
+            id: string
+            name: string
+            seriesSeriesBooks?: {
+              __typename?: 'SeriesBookConnection'
+              edges?: Array<{
+                __typename?: 'SeriesBookEdge'
+                node?: {
+                  __typename?: 'SeriesBook'
+                  book: {
+                    __typename: 'Book'
+                    id: string
+                    title: string
+                    imagePath?: string | null
+                    authors: Array<{
+                      __typename: 'Author'
+                      id: string
+                      name: string
+                      person: { __typename?: 'Person'; id: string }
+                    }>
+                  }
+                } | null
+              } | null> | null
+            } | null
+          }
+        | null
+    } | null> | null
+    pageInfo: {
+      __typename?: 'PageInfo'
+      hasNextPage: boolean
+      endCursor?: string | null
+    }
+  } | null
 }
 
 export type LoginMutationVariables = Exact<{
@@ -915,7 +1031,7 @@ export type UpdatePlayerStateMutation = {
   updatePlayerState?: {
     __typename?: 'UpdatePlayerStatePayload'
     playerState: {
-      __typename?: 'PlayerState'
+      __typename: 'PlayerState'
       status: PlayerStateStatus
       position: number
       playbackRate: number
@@ -925,32 +1041,57 @@ export type UpdatePlayerStateMutation = {
 
 export const PersonBasicsFragmentDoc = `
     fragment PersonBasics on Person {
+  __typename
   id
   name
-  imagePath
-}
-    `
-export const BookBasicsFragmentDoc = `
-    fragment BookBasics on Book {
-  id
-  title
   imagePath
 }
     `
 export const AuthorBasicsFragmentDoc = `
     fragment AuthorBasics on Author {
+  __typename
   id
   name
 }
     `
+export const NarratorBasicsFragmentDoc = `
+    fragment NarratorBasics on Narrator {
+  __typename
+  id
+  name
+}
+    `
+export const PersonWithAuthorsAndNarratorsFragmentDoc = `
+    fragment PersonWithAuthorsAndNarrators on Person {
+  ...PersonBasics
+  authors {
+    ...AuthorBasics
+  }
+  narrators {
+    ...NarratorBasics
+  }
+}
+    ${PersonBasicsFragmentDoc}
+${AuthorBasicsFragmentDoc}
+${NarratorBasicsFragmentDoc}`
+export const BookBasicsFragmentDoc = `
+    fragment BookBasics on Book {
+  __typename
+  id
+  title
+  imagePath
+}
+    `
 export const SeriesBookBasicsFragmentDoc = `
     fragment SeriesBookBasics on SeriesBook {
+  __typename
   id
   bookNumber
 }
     `
 export const SeriesBasicsFragmentDoc = `
     fragment SeriesBasics on Series {
+  __typename
   id
   name
 }
@@ -977,16 +1118,11 @@ ${SeriesBookBasicsFragmentDoc}
 ${SeriesBasicsFragmentDoc}`
 export const MediaBasicsFragmentDoc = `
     fragment MediaBasics on Media {
+  __typename
   id
   fullCast
   abridged
   duration
-}
-    `
-export const NarratorBasicsFragmentDoc = `
-    fragment NarratorBasics on Narrator {
-  id
-  name
 }
     `
 export const MediaWithNarratorsFragmentDoc = `
@@ -1003,6 +1139,7 @@ export const MediaWithNarratorsFragmentDoc = `
 ${NarratorBasicsFragmentDoc}`
 export const PlayerStateBasicsFragmentDoc = `
     fragment PlayerStateBasics on PlayerState {
+  __typename
   status
   position
   playbackRate
@@ -1539,6 +1676,83 @@ export const useInfiniteMediaWithPlayerStateQuery = <
       fetcher<MediaWithPlayerStateQuery, MediaWithPlayerStateQueryVariables>(
         client,
         MediaWithPlayerStateDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  )
+
+export const SearchDocument = `
+    query search($first: Int, $after: String, $query: String!) {
+  search(first: $first, after: $after, query: $query) {
+    edges {
+      node {
+        ... on Book {
+          ...BookWithAuthorsAndSeries
+        }
+        ... on Person {
+          ...PersonWithAuthorsAndNarrators
+        }
+        ... on Series {
+          ...SeriesBasics
+          seriesSeriesBooks: seriesBooks(first: 3) {
+            edges {
+              node {
+                book {
+                  ...BookBasics
+                  authors {
+                    ...AuthorBasics
+                    person {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    ${BookWithAuthorsAndSeriesFragmentDoc}
+${PersonWithAuthorsAndNarratorsFragmentDoc}
+${SeriesBasicsFragmentDoc}
+${BookBasicsFragmentDoc}
+${AuthorBasicsFragmentDoc}`
+export const useSearchQuery = <TData = SearchQuery, TError = unknown>(
+  client: GraphQLClient,
+  variables: SearchQueryVariables,
+  options?: UseQueryOptions<SearchQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<SearchQuery, TError, TData>(
+    ['search', variables],
+    fetcher<SearchQuery, SearchQueryVariables>(
+      client,
+      SearchDocument,
+      variables,
+      headers
+    ),
+    options
+  )
+export const useInfiniteSearchQuery = <TData = SearchQuery, TError = unknown>(
+  _pageParamKey: keyof SearchQueryVariables,
+  client: GraphQLClient,
+  variables: SearchQueryVariables,
+  options?: UseInfiniteQueryOptions<SearchQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<SearchQuery, TError, TData>(
+    ['search.infinite', variables],
+    metaData =>
+      fetcher<SearchQuery, SearchQueryVariables>(
+        client,
+        SearchDocument,
         { ...variables, ...(metaData.pageParam ?? {}) },
         headers
       )(),

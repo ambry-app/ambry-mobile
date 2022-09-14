@@ -5,8 +5,8 @@ import {
   TouchableNativeFeedback,
   TouchableOpacity
 } from 'react-native-gesture-handler'
-import tw from '../lib/tailwind'
-import { useSource } from '../stores/AmbryAPI'
+import tw from '../../lib/tailwind'
+import { useSource } from '../../stores/AmbryAPI'
 
 export default function BookLink({ book, seriesBook: primarySeriesBook }) {
   const navigation = useNavigation()
@@ -43,7 +43,7 @@ export default function BookLink({ book, seriesBook: primarySeriesBook }) {
           Book {primarySeriesBook.bookNumber}
         </Text>
       )}
-      <View style={tw`rounded-lg bg-gray-800 shadow-lg mb-1 overflow-hidden`}>
+      <View style={tw`rounded-lg bg-gray-800 mb-1 overflow-hidden`}>
         <TouchableNativeFeedback
           onPress={() => navigation.push('Book', { bookId: book.id })}
           useForeground={true}
@@ -55,9 +55,10 @@ export default function BookLink({ book, seriesBook: primarySeriesBook }) {
           <View>
             <Image
               source={source(book.imagePath)}
-              style={tw.style('rounded-lg', 'w-full', {
-                aspectRatio: 10 / 15.5
-              })}
+              style={[
+                tw`rounded-lg w-full border border-gray-800`,
+                { aspectRatio: 10 / 15.5 }
+              ]}
             />
           </View>
         </TouchableNativeFeedback>

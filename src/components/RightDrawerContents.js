@@ -81,6 +81,17 @@ const ChaptersList = ({ navigation }) => {
     )
   }
 
+  if (media.chapters.length === 0) {
+    return (
+      <View style={tw`m-4`}>
+        <Text style={tw`text-gray-200 mb-4`}>
+          This is the chapter list. This drawer will display the book's
+          chapters. Unfortunately, this book has no chapters defined.
+        </Text>
+      </View>
+    )
+  }
+
   return (
     <FlatList
       ref={ref}

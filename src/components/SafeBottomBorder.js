@@ -8,7 +8,7 @@ export default function SafeBottomBorder({ children }) {
 
   return (
     <View
-      style={[tw`border-gray-900 h-full pb-12`, { borderBottomWidth: bottom }]}
+      style={[tw`border-gray-900 h-full pb-14`, { borderBottomWidth: bottom }]}
     >
       {children}
     </View>
