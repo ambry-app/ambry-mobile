@@ -1,16 +1,12 @@
-import React, { useCallback } from 'react'
-import { Button, Image, Text, View } from 'react-native'
+import React from 'react'
+import { Image, Text, View } from 'react-native'
 import { FlatList, TouchableNativeFeedback } from 'react-native-gesture-handler'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRefreshOnDrawerOpen } from '../hooks/refetchOnDrawerOpen'
 import tw from '../lib/tailwind'
 import { progressPercent } from '../lib/utils'
-import { useLogoutAction, usePlayerStates, useSource } from '../stores/AmbryAPI'
-import usePlayer, {
-  destroy,
-  loadMedia,
-  setLoadingImage
-} from '../stores/Player'
+import { usePlayerStates, useSource } from '../stores/AmbryAPI'
+import usePlayer, { loadMedia, setLoadingImage } from '../stores/Player'
 import LargeActivityIndicator from './LargeActivityIndicator'
 import ScreenCentered from './ScreenCentered'
 import WrappingList from './WrappingList'
@@ -62,7 +58,6 @@ function PlayerStateItem({ playerState, navigation }) {
 
 const PlayerStateList = ({ navigation }) => {
   const { bottom } = useSafeAreaInsets()
-  const showDebugOptions = __DEV__
   const {
     data,
     isLoading,
@@ -72,18 +67,6 @@ const PlayerStateList = ({ navigation }) => {
     fetchNextPage,
     refetch
   } = usePlayerStates()
-
-  const { logout } = useLogoutAction()
-
-  const clearMediaAndNavigate = useCallback(() => {
-    destroy()
-    navigation.navigate('Player')
-  }, [navigation])
-
-  const clearMediaAndSignOut = useCallback(() => {
-    destroy()
-    logout()
-  }, [logout])
 
   const loadMore = () => {
     if (hasNextPage) {
@@ -123,18 +106,7 @@ const PlayerStateList = ({ navigation }) => {
         <PlayerStateItem playerState={item} navigation={navigation} />
       )}
       ListFooterComponent={
-        <View style={[tw`py-2`, { paddingBottom: 56 + bottom }]}>
-          {showDebugOptions && (
-            <>
-              <View style={tw`mb-2`}>
-                <Button
-                  title="Clear Selected Media"
-                  onPress={clearMediaAndNavigate}
-                />
-              </View>
-              <Button title="Sign Out" onPress={clearMediaAndSignOut} />
-            </>
-          )}
+        <View style={[tw`py-2`, { paddingBottom: 64 + bottom }]}>
           {isFetchingNextPage && <LargeActivityIndicator />}
         </View>
       }

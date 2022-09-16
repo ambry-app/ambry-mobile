@@ -17,7 +17,6 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import LeftDrawerContents from '../components/LeftDrawerContents'
 import RightDrawerContents from '../components/RightDrawerContents'
-import ScreenCentered from '../components/ScreenCentered'
 import { useEnhancedDrawerStatus } from '../hooks/enhancedDrawerStatus'
 import tw from '../lib/tailwind'
 import BookDetailsScreen from '../screens/BookDetailsScreen'
@@ -26,6 +25,7 @@ import PlayerScreen from '../screens/PlayerScreen'
 import LibraryMainScreen from '../screens/LibraryMainScreen'
 import SeriesScreen from '../screens/SeriesScreen'
 import usePlayer from '../stores/Player'
+import SettingsScreen from '../screens/SettingsScreen'
 
 const Stack = createNativeStackNavigator()
 
@@ -257,14 +257,6 @@ function TabBar({ state, descriptors, navigation }) {
   )
 }
 
-function FakeScreen() {
-  return (
-    <ScreenCentered>
-      <Text style={tw`text-gray-200`}>Not yet implemented.</Text>
-    </ScreenCentered>
-  )
-}
-
 export const AppStack = () => {
   return (
     <Tab.Navigator
@@ -281,7 +273,7 @@ export const AppStack = () => {
         options={{ headerShown: false }}
         component={LibraryStack}
       />
-      <Tab.Screen name="Settings" component={FakeScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   )
 }
