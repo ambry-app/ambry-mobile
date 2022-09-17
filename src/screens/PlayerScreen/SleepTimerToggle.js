@@ -1,3 +1,4 @@
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import React, { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, Text } from 'react-native'
 import {
@@ -11,7 +12,6 @@ import Animated, {
   useSharedValue,
   withTiming
 } from 'react-native-reanimated'
-import Svg, { Path } from 'react-native-svg'
 import { State, usePlaybackState } from 'react-native-track-player'
 import tw from '../../lib/tailwind'
 import { secondsDisplayMinutesOnly } from '../../lib/utils'
@@ -94,7 +94,10 @@ export default function SleepTimerToggle() {
         onNewValue={onNewCountdownSeconds}
         onRequestClose={onRequestModalClose}
       />
-      <TouchableNativeFeedback onPress={toggleSleepTimer}>
+      <TouchableNativeFeedback
+        onPress={toggleSleepTimer}
+        background={TouchableNativeFeedback.Ripple(tw.color('gray-400'), true)}
+      >
         <LongPressGestureHandler
           onActivated={onLongPress}
           minDurationMs={300}
@@ -107,25 +110,16 @@ export default function SleepTimerToggle() {
               animatedViewStyle
             ]}
           >
-            <Svg
-              style={tw`-mb-1`}
-              height="30"
-              width="30"
-              viewBox="0 0 24 24"
-              stroke={enabled ? tw.color('lime-400') : tw.color('gray-400')}
-            >
-              <Path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1"
-                d="M 10.5 10 H 13.5 L 10.5 14 H 13.5 M 10 1.5 H 14 M 18.5 2.5 L 20.5 4.5 M 17 6 L 19.5 3.5 M 19.5 12 A 7.5 7.5 90 0 1 12 19.5 A 7.5 7.5 90 0 1 4.5 12 A 7.5 7.5 90 0 1 12 4.5 A 7.5 7.5 90 0 1 19.5 12 Z"
-              />
-            </Svg>
+            <FontAwesomeIcon
+              icon="stopwatch"
+              color={enabled ? tw.color('gray-100') : tw.color('gray-500')}
+              size={24}
+            />
             <Animated.View style={animatedTextStyle}>
               <Text
                 style={[
                   tw`text-xs`,
-                  enabled ? tw`text-lime-400` : tw`text-gray-400`,
+                  enabled ? tw`text-gray-100` : tw`text-gray-500`,
                   styles.textSize
                 ]}
               >

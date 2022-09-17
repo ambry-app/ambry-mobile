@@ -1,6 +1,5 @@
 import { NavigationContainer } from '@react-navigation/native'
 import React from 'react'
-import { useColorScheme } from 'react-native'
 import RNBootSplash from 'react-native-bootsplash'
 import shallow from 'zustand/shallow'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
@@ -10,25 +9,13 @@ import useAmbryAPI from '../stores/AmbryAPI'
 import { AppStack } from './AppStack'
 import { AuthStack } from './AuthStack'
 
-const LightTheme = {
-  dark: false,
-  colors: {
-    primary: tw.color('lime-500'),
-    background: tw.color('gray-100'),
-    card: tw.color('white'),
-    text: tw.color('gray-700'),
-    border: tw.color('gray-200'),
-    notification: tw.color('red-500')
-  }
-}
-
-const DarkTheme = {
+const Theme = {
   dark: true,
   colors: {
     primary: tw.color('lime-400'),
-    background: tw.color('gray-900'),
-    card: tw.color('gray-800'),
-    text: tw.color('gray-50'),
+    background: tw.color('black'),
+    card: tw.color('gray-900'),
+    text: tw.color('gray-100'),
     border: tw.color('gray-600'),
     notification: tw.color('red-400')
   }
@@ -36,14 +23,15 @@ const DarkTheme = {
 
 const linking = {
   prefixes: ['trackplayer://'],
-  config: { screens: { PlayerDrawer: 'notification.click' } }
+  config: {
+    screens: { PlayerRightDrawer: 'notification.click' }
+  }
 }
 
 const apiSelector = [state => [state.loggedIn, state._hasHydrated], shallow]
 
 export const Router = () => {
   const [loggedIn, ready] = useAmbryAPI(...apiSelector)
-  const scheme = useColorScheme()
 
   if (!ready) {
     return (
@@ -56,7 +44,7 @@ export const Router = () => {
   return (
     <NavigationContainer
       linking={linking}
-      theme={scheme === 'dark' ? DarkTheme : LightTheme}
+      theme={Theme}
       onReady={() => RNBootSplash.hide()}
     >
       {loggedIn ? <AppStack /> : <AuthStack />}

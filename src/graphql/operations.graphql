@@ -1,0 +1,321 @@
+fragment AuthorBasics on Author {
+  __typename
+  id
+  name
+}
+
+fragment NarratorBasics on Narrator {
+  __typename
+  id
+  name
+}
+
+fragment PersonBasics on Person {
+  __typename
+  id
+  name
+  imagePath
+}
+
+fragment PersonWithAuthorsAndNarrators on Person {
+  ...PersonBasics
+  authors {
+    ...AuthorBasics
+  }
+  narrators {
+    ...NarratorBasics
+  }
+}
+
+fragment SeriesBasics on Series {
+  __typename
+  id
+  name
+}
+
+fragment SeriesBookBasics on SeriesBook {
+  __typename
+  id
+  bookNumber
+}
+
+fragment BookBasics on Book {
+  __typename
+  id
+  title
+  imagePath
+}
+
+fragment BookWithAuthorsAndSeries on Book {
+  ...BookBasics
+  authors {
+    ...AuthorBasics
+    person {
+      id
+    }
+  }
+  seriesBooks {
+    ...SeriesBookBasics
+    series {
+      ...SeriesBasics
+    }
+  }
+}
+
+fragment MediaBasics on Media {
+  __typename
+  id
+  fullCast
+  abridged
+  duration
+}
+
+fragment MediaWithNarrators on Media {
+  ...MediaBasics
+  narrators {
+    ...NarratorBasics
+    person {
+      id
+    }
+  }
+}
+
+fragment PlayerStateBasics on PlayerState {
+  __typename
+  status
+  position
+  playbackRate
+}
+
+query books($first: Int, $after: String) {
+  books(first: $first, after: $after) {
+    edges {
+      node {
+        ...BookWithAuthorsAndSeries
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+query book($id: ID!) {
+  node(id: $id) {
+    ... on Book {
+      ...BookWithAuthorsAndSeries
+      published
+      description
+      media {
+        ...MediaWithNarrators
+      }
+    }
+  }
+}
+
+query series($id: ID!) {
+  node(id: $id) {
+    ... on Series {
+      ...SeriesBasics
+    }
+  }
+}
+
+query person($id: ID!, $previewBooks: Int!) {
+  node(id: $id) {
+    ... on Person {
+      ...PersonBasics
+      description
+      authors {
+        ...AuthorBasics
+        authoredBooks(first: $previewBooks) {
+          edges {
+            node {
+              ...BookWithAuthorsAndSeries
+            }
+          }
+          pageInfo {
+            hasNextPage
+          }
+        }
+      }
+      narrators {
+        ...NarratorBasics
+        narratedMedia(first: $previewBooks) {
+          edges {
+            node {
+              book {
+                ...BookWithAuthorsAndSeries
+              }
+            }
+          }
+          pageInfo {
+            hasNextPage
+          }
+        }
+      }
+    }
+  }
+}
+
+query authoredBooks($id: ID!, $first: Int, $after: String) {
+  node(id: $id) {
+    ... on Author {
+      authoredBooks(first: $first, after: $after) {
+        edges {
+          node {
+            ...BookWithAuthorsAndSeries
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  }
+}
+
+query narratedMedia($id: ID!, $first: Int, $after: String) {
+  node(id: $id) {
+    ... on Narrator {
+      narratedMedia(first: $first, after: $after) {
+        edges {
+          node {
+            book {
+              ...BookWithAuthorsAndSeries
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  }
+}
+
+query seriesBooks($id: ID!, $first: Int, $after: String) {
+  node(id: $id) {
+    ... on Series {
+      seriesBooks(first: $first, after: $after) {
+        edges {
+          node {
+            ...SeriesBookBasics
+            book {
+              ...BookWithAuthorsAndSeries
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  }
+}
+
+query playerStates($first: Int, $after: String) {
+  playerStates(first: $first, after: $after) {
+    edges {
+      node {
+        ...PlayerStateBasics
+        media {
+          ...MediaBasics
+          book {
+            ...BookWithAuthorsAndSeries
+          }
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+query mediaWithPlayerState($id: ID!) {
+  node(id: $id) {
+    ... on Media {
+      ...MediaWithNarrators
+      hlsPath
+      mpdPath
+      chapters {
+        id
+        startTime
+        endTime
+        title
+      }
+      book {
+        ...BookWithAuthorsAndSeries
+      }
+      playerState {
+        ...PlayerStateBasics
+      }
+    }
+  }
+}
+
+query search($first: Int, $after: String, $query: String!) {
+  search(first: $first, after: $after, query: $query) {
+    edges {
+      node {
+        ... on Book {
+          ...BookWithAuthorsAndSeries
+        }
+        ... on Person {
+          ...PersonWithAuthorsAndNarrators
+        }
+        ... on Series {
+          ...SeriesBasics
+          seriesSeriesBooks: seriesBooks(first: 3) {
+            edges {
+              node {
+                book {
+                  ...BookBasics
+                  authors {
+                    ...AuthorBasics
+                    person {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+mutation login($input: CreateSessionInput!) {
+  login: createSession(input: $input) {
+    token
+    user {
+      email
+    }
+  }
+}
+
+mutation logout {
+  logout: deleteSession {
+    deleted
+  }
+}
+
+mutation updatePlayerState($input: UpdatePlayerStateInput!) {
+  updatePlayerState(input: $input) {
+    playerState {
+      ...PlayerStateBasics
+    }
+  }
+}

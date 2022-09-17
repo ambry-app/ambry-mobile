@@ -1,5 +1,6 @@
 import React from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { Text, View } from 'react-native'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 import tw from '../lib/tailwind'
 
 export default function WrappingListOfLinks({
@@ -12,22 +13,18 @@ export default function WrappingListOfLinks({
   style,
   linkStyle
 }) {
-  const links = items
-    .map(item => (
-      <TouchableOpacity
-        key={keyExtractor(item)}
-        onPress={() => onPressLink(item)}
-      >
-        <Text style={linkStyle}>{nameExtractor(item)}</Text>
-      </TouchableOpacity>
-    ))
-    .flatMap((e, i) => [
-      <Text key={'comma-' + i} style={style}>
-        ,{' '}
-      </Text>,
-      e
-    ])
-    .slice(1)
+  const lastIndex = items.length - 1
+  const links = items.map((item, index) => (
+    <TouchableOpacity
+      key={keyExtractor(item)}
+      onPress={() => onPressLink(item)}
+    >
+      <Text style={linkStyle}>
+        {nameExtractor(item)}
+        {index !== lastIndex ? ', ' : null}
+      </Text>
+    </TouchableOpacity>
+  ))
 
   const prefixElement = prefix ? (
     <Text key="prefix" style={style}>

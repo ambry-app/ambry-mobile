@@ -9,15 +9,16 @@ import create from 'zustand'
 import { persist, subscribeWithSelector } from 'zustand/middleware'
 import shallow from 'zustand/shallow'
 import { isPlaying } from '../lib/utils'
+import { getMediaWithPlayerState, updatePlayerState } from '../stores/AmbryAPI'
 import SleepTimer from '../stores/SleepTimer'
-import { getPlayerState, reportPlayerState, uriSource } from './AmbryAPI'
+import { source } from './AmbryAPI'
 
 // Store:
 
 const useStore = create(
   subscribeWithSelector(
     persist(
-      () => ({
+      set => ({
         selectedMedia: undefined,
         mediaLoading: true,
         mediaError: false,
@@ -29,7 +30,9 @@ const useStore = create(
         playbackRate: undefined,
         currentChapter: undefined,
         isSeeking: false,
-        _hasHydrated: false
+        _hasHydrated: false,
+        tabBarVisible: true,
+        setTabBarVisible: visible => set(() => ({ tabBarVisible: visible }))
       }),
       {
         name: '@Ambry_selectedMedia',
@@ -239,17 +242,19 @@ const loadPlayerStateFromServer = async selectedMedia => {
     useStore.setState({
       mediaLoading: true,
       media: undefined,
-      imageSource: uriSource(selectedMedia.imagePath),
+      imageSource: source(selectedMedia.imagePath),
       playbackRate: null
     })
 
-    console.debug(`Player: loading playerState ${selectedMedia.id} from server`)
-    const serverPlayerState = await getPlayerState(selectedMedia.id)
+    console.debug(
+      `Player: loading playerState for media ${selectedMedia.id} from server`
+    )
+    const media = await getMediaWithPlayerState(selectedMedia.id)
 
-    console.debug('Player: playerState loaded', serverPlayerState)
-    loadTrackIntoPlayer(serverPlayerState)
+    console.debug('Player: media with playerState loaded', media)
+    loadTrackIntoPlayer(media)
   } catch (err) {
-    console.error('Player: failed to load playerState', err)
+    console.error('Player: failed to load media with playerState', err)
     useStore.setState({
       mediaLoading: false,
       mediaError: true
@@ -257,17 +262,15 @@ const loadPlayerStateFromServer = async selectedMedia => {
   }
 }
 
-const loadTrackIntoPlayer = async playerState => {
+const loadTrackIntoPlayer = async media => {
   await setupTrackPlayer()
 
-  const mediaTrack = mediaTrackForPlatform(playerState.media)
-  const { uri: artworkUrl, headers } = uriSource(
-    playerState.media.book.imagePath
-  )
+  const mediaTrack = mediaTrackForPlatform(media)
+  const { uri: artworkUrl, headers } = source(media.book.imagePath)
 
   const currentTrack = await TrackPlayer.getTrack(0)
 
-  if (currentTrack && currentTrack.description === playerState.id) {
+  if (currentTrack && currentTrack.description === media.id) {
     // the current track is already loaded; nothing to do
     console.debug('Player: track already loaded')
 
@@ -276,11 +279,11 @@ const loadTrackIntoPlayer = async playerState => {
       TrackPlayer.getRate()
     ])
 
-    const chapter = findChapter(currentPosition, playerState.media.chapters)
+    const chapter = findChapter(currentPosition, media.chapters)
 
     useStore.setState({
       mediaLoading: false,
-      media: playerState.media,
+      media: media,
       position: currentPosition,
       buffered: 0,
       currentChapter: chapter,
@@ -295,31 +298,26 @@ const loadTrackIntoPlayer = async playerState => {
       url: mediaTrack.url,
       type: mediaTrack.type,
       pitchAlgorithm: PitchAlgorithm.Voice,
-      duration: playerState.media.duration,
-      title: playerState.media.book.title,
-      artist: playerState.media.book.authors
-        .map(author => author.name)
-        .join(', '),
+      duration: media.duration,
+      title: media.book.title,
+      artist: media.book.authors.map(author => author.name).join(', '),
       artwork: artworkUrl,
-      description: playerState.id,
+      description: media.id,
       headers
     })
 
-    await TrackPlayer.seekTo(playerState.position)
-    await TrackPlayer.setRate(playerState.playbackRate)
+    await TrackPlayer.seekTo(media.playerState.position)
+    await TrackPlayer.setRate(media.playerState.playbackRate)
 
-    const chapter = findChapter(
-      playerState.position,
-      playerState.media.chapters
-    )
+    const chapter = findChapter(media.playerState.position, media.chapters)
 
     useStore.setState({
       mediaLoading: false,
-      media: playerState.media,
-      position: playerState.position,
+      media: media,
+      position: media.playerState.position,
       buffered: 0,
       currentChapter: chapter,
-      playbackRate: playerState.playbackRate
+      playbackRate: media.playerState.playbackRate
     })
   }
 }
@@ -327,7 +325,7 @@ const loadTrackIntoPlayer = async playerState => {
 const mediaTrackForPlatform = media => {
   const path = Platform.OS === 'ios' ? media.hlsPath : media.mpdPath
   const type = Platform.OS === 'ios' ? TrackType.HLS : TrackType.Dash
-  const { uri: url } = uriSource(path)
+  const { uri: url } = source(path)
 
   return { url, type }
 }
@@ -342,25 +340,19 @@ const findChapter = (position, chapters) => {
 }
 
 const updateServerPosition = async () => {
-  const [position, track] = await Promise.all([
-    TrackPlayer.getPosition(),
-    TrackPlayer.getTrack(0)
-  ])
+  try {
+    const [position, track] = await Promise.all([
+      TrackPlayer.getPosition(),
+      TrackPlayer.getTrack(0)
+    ])
 
-  if (!track) {
+    const mediaId = track.description
+
+    console.debug('Player: updating server position', { mediaId, position })
+    return updatePlayerState(mediaId, { position })
+  } catch {
     console.debug('Player: updateServerPosition called while no track loaded')
-    return
   }
-
-  const playerStateID = track.description
-
-  const playerStateReport = {
-    id: playerStateID,
-    position: position.toString()
-  }
-
-  console.debug('Player: updating server position', playerStateReport)
-  return reportPlayerState(playerStateReport)
 }
 
 // Actions:
@@ -377,14 +369,23 @@ export const loadMedia = async (id, imagePath) => {
   })
 }
 
-export const setPlaybackRate = async newPlaybackRate => {
-  console.debug('Player: setting playback rate', newPlaybackRate)
+export const setLoadingImage = async imagePath => {
+  useStore.setState({
+    mediaLoading: true,
+    media: undefined,
+    imageSource: source(imagePath),
+    playbackRate: null
+  })
+}
+
+export const setPlaybackRate = async playbackRate => {
+  console.debug('Player: setting playback rate', playbackRate)
 
   // set rate on player async
-  TrackPlayer.setRate(newPlaybackRate)
+  TrackPlayer.setRate(playbackRate)
 
   // set rate state
-  useStore.setState({ playbackRate: newPlaybackRate })
+  useStore.setState({ playbackRate })
 
   const track = await TrackPlayer.getTrack(0)
 
@@ -393,15 +394,13 @@ export const setPlaybackRate = async newPlaybackRate => {
     return
   }
 
-  const playerStateID = track.description
+  const mediaId = track.description
 
-  const playerStateReport = {
-    id: playerStateID,
-    playbackRate: newPlaybackRate.toFixed(2)
-  }
-
-  console.debug('Player: updating server playback rate', playerStateReport)
-  return reportPlayerState(playerStateReport)
+  console.debug('Player: updating server playback rate', {
+    mediaId,
+    playbackRate
+  })
+  return updatePlayerState(mediaId, { playbackRate })
 }
 
 export const togglePlayback = async () => {
@@ -483,4 +482,30 @@ export const destroy = () => {
     trackPlayerReady: false
   })
   return TrackPlayer.destroy()
+}
+
+export const seekNextChapter = async () => {
+  const { media, currentChapter } = useStore.getState()
+  const chapters = media.chapters
+  const index = chapters.indexOf(currentChapter)
+  const nextChapter = chapters[index + 1]
+
+  if (nextChapter) {
+    return seekTo(nextChapter.startTime)
+  } else {
+    return seekTo(media.duration)
+  }
+}
+
+export const seekPreviousChapter = async () => {
+  const { media, currentChapter } = useStore.getState()
+  const chapters = media.chapters
+  const index = chapters.indexOf(currentChapter)
+  const previousChapter = chapters[index - 1]
+
+  if (previousChapter) {
+    return seekTo(previousChapter.startTime)
+  } else {
+    return seekTo(0)
+  }
 }

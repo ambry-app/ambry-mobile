@@ -33,9 +33,12 @@ export function durationDisplay(input) {
   }
 }
 
-export function progressPercent(durationSeconds, positionSeconds) {
-  return durationSeconds && durationSeconds > 0
-    ? ((positionSeconds / durationSeconds) * 100).toFixed(1) + '%'
+export function progressPercent(durationInput, positionInput) {
+  const duration = Number(durationInput)
+  const position = Number(positionInput)
+
+  return duration && duration > 0
+    ? ((position / duration) * 100).toFixed(1) + '%'
     : '0.0%'
 }
 
@@ -56,8 +59,4 @@ export function isPlaying(trackPlayerState) {
   return (
     trackPlayerState === State.Playing || trackPlayerState === State.Buffering
   )
-}
-
-export function isPaused(trackPlayerState) {
-  return !isPlaying(trackPlayerState)
 }

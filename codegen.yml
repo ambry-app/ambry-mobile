@@ -1,0 +1,12 @@
+schema: ./src/graphql/schema.graphql
+documents: ./src/graphql/operations.graphql
+generates:
+  ./src/graphql/types-and-hooks.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-query
+    config:
+      fetcher: graphql-request
+      addInfiniteQuery: true
+      legacyMode: false

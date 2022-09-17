@@ -1,24 +1,22 @@
 import { useNavigation } from '@react-navigation/core'
 import Moment from 'moment'
-import React, { useCallback, useEffect, useReducer } from 'react'
+import React, { useEffect } from 'react'
+import { Image, Text, View } from 'react-native'
 import {
-  Image,
   ScrollView,
-  Text,
-  TouchableNativeFeedback,
-  View
-} from 'react-native'
+  TouchableNativeFeedback
+} from 'react-native-gesture-handler'
 import Description from '../components/Description'
-import { Header1 } from '../components/Headers'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import PlayButton from '../components/PlayButton'
+import SafeBottomBorder from '../components/SafeBottomBorder'
 import ScreenCentered from '../components/ScreenCentered'
 import WrappingListOfLinks from '../components/WrappingListOfLinks'
+import { useRefreshOnFocus } from '../hooks/refetchOnFocus'
 import tw from '../lib/tailwind'
 import { durationDisplay } from '../lib/utils'
-import { actionCreators, initialState, reducer } from '../reducers/book'
-import { getBook, uriSource } from '../stores/AmbryAPI'
-import usePlayer, { loadMedia } from '../stores/Player'
+import { useBook, useSource } from '../stores/AmbryAPI'
+import usePlayer, { loadMedia, setLoadingImage } from '../stores/Player'
 
 function MediaList({ book, media: mediaList }) {
   const navigation = useNavigation()
@@ -27,34 +25,30 @@ function MediaList({ book, media: mediaList }) {
 
   if (mediaLength === 0) {
     return (
-      <Text style={tw`text-gray-700 dark:text-gray-200 my-4 font-bold`}>
+      <Text style={tw`text-gray-200 my-4 font-bold`}>
         Sorry, there are no recordings uploaded yet for this book.
       </Text>
     )
   } else {
     return (
-      <View
-        style={tw`rounded-lg bg-white dark:border-0 dark:bg-gray-800 shadow-lg my-4`}
-      >
+      <View style={tw`rounded-lg border-0 bg-gray-900 shadow-lg my-4`}>
         {mediaList.map((media, i) => (
           <View key={media.id}>
-            <View
-              style={tw`overflow-hidden rounded-lg bg-white dark:bg-gray-800`}
-            >
+            <View style={tw`overflow-hidden rounded-lg bg-gray-900`}>
               <TouchableNativeFeedback
                 background={TouchableNativeFeedback.Ripple(
                   tw.color('gray-400'),
                   true
                 )}
                 onPress={() => {
+                  navigation.navigate('Player')
+
                   if (selectedMedia?.id !== media.id) {
-                    loadMedia(media.id, book.imagePath)
+                    setLoadingImage(book.imagePath)
+                    setTimeout(() => {
+                      loadMedia(media.id, book.imagePath)
+                    }, 500)
                   }
-                  setImmediate(() => {
-                    navigation.navigate('PlayerDrawer', {
-                      screen: 'PlayerScreen'
-                    })
-                  })
                 }}
               >
                 <View
@@ -65,35 +59,28 @@ function MediaList({ book, media: mediaList }) {
                       prefix="Narrated by"
                       suffix={media.fullCast ? 'and a full cast' : null}
                       items={media.narrators}
-                      keyExtractor={narrator => narrator.personId}
+                      keyExtractor={narrator => narrator.person.id}
                       onPressLink={narrator =>
-                        navigation.navigate('Library', {
-                          screen: 'Person',
-                          params: { personId: narrator.personId }
+                        navigation.push('Person', {
+                          personId: narrator.person.id
                         })
                       }
-                      style={tw`text-lg text-gray-700 dark:text-gray-200`}
-                      linkStyle={tw`text-lg text-lime-500 dark:text-lime-400`}
+                      style={tw`leading-none text-lg text-gray-200`}
+                      linkStyle={tw`leading-none text-lg text-gray-200`}
                     />
                     {media.abridged && (
-                      <Text
-                        style={tw`text-lg text-gray-500 dark:text-gray-400`}
-                      >
-                        (Abridged)
-                      </Text>
+                      <Text style={tw`text-lg text-gray-400`}>(Abridged)</Text>
                     )}
-                    <Text style={tw`text-gray-500 dark:text-gray-400`}>
+                    <Text style={tw`text-gray-400`}>
                       {durationDisplay(media.duration)}
                     </Text>
                   </View>
-                  <PlayButton width={50} height={50} />
+                  <PlayButton size={48} />
                 </View>
               </TouchableNativeFeedback>
             </View>
             {i !== mediaLength - 1 && (
-              <View
-                style={tw`mx-3 border-t border-gray-200 dark:border-gray-700`}
-              />
+              <View style={tw`mx-3 border-t border-gray-700`} />
             )}
           </View>
         ))}
@@ -103,91 +90,75 @@ function MediaList({ book, media: mediaList }) {
 }
 
 export default function BookDetailsScreen({ route, navigation }) {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const source = useSource()
+  const { data, isLoading, isError, refetch } = useBook(route.params.bookId)
+  const book = data?.node
 
-  const { book, loading, error } = state
-
-  const fetchBook = useCallback(async () => {
-    dispatch(actionCreators.loading())
-
-    try {
-      const loadedBook = await getBook(route.params.bookId)
-      dispatch(actionCreators.success(loadedBook))
-    } catch {
-      dispatch(actionCreators.failure())
-    }
-  }, [route.params.bookId])
+  useRefreshOnFocus(refetch)
 
   useEffect(() => {
-    fetchBook()
-  }, [fetchBook, route.params.bookId])
-
-  useEffect(() => {
-    if (book) {
+    if (book?.title) {
       navigation.setOptions({ title: book.title })
     }
   }, [navigation, book])
 
-  if (!book) {
-    if (loading) {
-      return (
-        <ScreenCentered>
-          <LargeActivityIndicator />
-        </ScreenCentered>
-      )
-    }
-
-    if (error) {
-      return (
-        <ScreenCentered>
-          <Text style={tw`text-gray-700 dark:text-gray-200`}>
-            Failed to load book!
-          </Text>
-        </ScreenCentered>
-      )
-    }
-  } else {
+  if (isLoading) {
     return (
+      <ScreenCentered>
+        <LargeActivityIndicator />
+      </ScreenCentered>
+    )
+  }
+
+  if (isError) {
+    return (
+      <ScreenCentered>
+        <Text style={tw`text-gray-200`}>Failed to load book!</Text>
+      </ScreenCentered>
+    )
+  }
+
+  return (
+    <SafeBottomBorder>
       <ScrollView>
         <View style={tw`p-4`}>
-          <Header1>{book.title}</Header1>
           <WrappingListOfLinks
             prefix="by"
             items={book.authors}
-            onPressLink={author =>
-              navigation.push('Person', { personId: author.personId })
-            }
-            style={tw`text-xl text-gray-500 dark:text-gray-400`}
-            linkStyle={tw`text-xl text-lime-500 dark:text-lime-400`}
+            onPressLink={author => {
+              navigation.push('Person', {
+                personId: author.person.id
+              })
+            }}
+            style={tw`leading-none text-lg text-gray-200`}
+            linkStyle={tw`leading-none text-lg text-gray-200`}
           />
           <WrappingListOfLinks
-            items={book.series}
-            onPressLink={series =>
-              navigation.push('Series', { seriesId: series.id })
+            items={book.seriesBooks}
+            onPressLink={seriesBook =>
+              navigation.push('Series', { seriesId: seriesBook.series.id })
             }
-            nameExtractor={series => `${series.name} #${series.bookNumber}`}
-            style={tw`text-lg text-gray-400 dark:text-gray-500`}
-            linkStyle={tw`text-lg text-gray-400 dark:text-gray-500`}
+            nameExtractor={seriesBook =>
+              `${seriesBook.series.name} #${seriesBook.bookNumber}`
+            }
+            style={tw`text-gray-400`}
+            linkStyle={tw`text-gray-400`}
           />
           <MediaList book={book} media={book.media} />
-          <View
-            style={tw`mt-4 rounded-2xl border-gray-200 bg-gray-200 shadow-lg`}
-          >
+          <View style={tw`mt-4 rounded-2xl bg-gray-800 shadow-lg`}>
             <Image
-              source={uriSource(book.imagePath)}
+              source={source(book.imagePath)}
               style={tw.style('rounded-2xl', 'w-full', {
                 aspectRatio: 10 / 15.5
               })}
             />
           </View>
-          <Text style={tw`text-gray-400 dark:text-gray-500 text-sm mt-1 mb-4`}>
+          <Text style={tw`text-gray-500 text-sm mt-1 mb-4`}>
             Published {Moment(book.published).format('MMMM Do, YYYY')}
           </Text>
           <Description description={book.description} />
         </View>
       </ScrollView>
-    )
-  }
-
-  return null
+    </SafeBottomBorder>
+  )
 }

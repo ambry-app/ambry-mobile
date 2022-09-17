@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { memo } from 'react'
+import usePrevious from '@react-hook/previous'
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { Dimensions, StyleSheet } from 'react-native'
 import { PanGestureHandler } from 'react-native-gesture-handler'
 import Animated, {
@@ -12,8 +12,8 @@ import Animated, {
   withDecay,
   withTiming
 } from 'react-native-reanimated'
-import { clamp, ReText } from 'react-native-redash'
 import Svg, { Line, Path, Rect } from 'react-native-svg'
+import AnimatedText from '../../../components/AnimatedText'
 
 const SPACING = 10 // pixels between ticks
 const FACTOR = SPACING / 5 // 5 seconds per tick
@@ -22,6 +22,11 @@ const WIDTH = Dimensions.get('window').width
 const HEIGHT = 60
 const HALF_WIDTH = WIDTH / 2
 const NUM_TICKS = Math.ceil(WIDTH / SPACING)
+
+const clamp = (value, lowerBound, upperBound) => {
+  'worklet'
+  return Math.min(Math.max(lowerBound, value), upperBound)
+}
 
 function friction(value) {
   'worklet'
@@ -126,6 +131,7 @@ const Markers = memo(({ markers, duration, theme }) => {
 export default function Scrubber({
   position: positionInput,
   duration,
+  playbackRate,
   onChange,
   markers,
   theme
@@ -134,6 +140,7 @@ export default function Scrubber({
   const translateX = useSharedValue(timeToTranslateX(Math.round(positionInput)))
   const [isScrubbing, setIsScrubbing] = useIsScrubbing()
   const maxTranslateX = timeToTranslateX(duration)
+  const previousPosition = usePrevious(positionInput)
 
   const onGestureEventHandler = useAnimatedGestureHandler({
     onStart: (_event, ctx) => {
@@ -253,14 +260,23 @@ export default function Scrubber({
 
   useEffect(() => {
     if (!isScrubbing) {
-      translateX.value = timeToTranslateX(Math.round(positionInput))
+      if (Math.abs(positionInput - previousPosition) > 5) {
+        translateX.value = withTiming(timeToTranslateX(positionInput), {
+          easing: Easing.out(Easing.exp)
+        })
+      } else {
+        translateX.value = withTiming(timeToTranslateX(positionInput), {
+          duration: 1000 / playbackRate,
+          easing: Easing.linear
+        })
+      }
     }
-  }, [translateX, isScrubbing, positionInput])
+  }, [translateX, isScrubbing, positionInput, previousPosition, playbackRate])
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEventHandler}>
       <Animated.View>
-        <ReText
+        <AnimatedText
           text={timecode}
           style={[styles.timecode, { color: theme.strong }]}
         />

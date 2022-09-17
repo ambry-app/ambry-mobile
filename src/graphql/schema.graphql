@@ -1,0 +1,312 @@
+"Represents a schema"
+schema {
+  query: RootQueryType
+  mutation: RootMutationType
+}
+
+type DeleteSessionPayload {
+  deleted: Boolean!
+}
+
+type Media implements Node {
+  "The ID of an object"
+  id: ID!
+
+  fullCast: Boolean!
+
+  abridged: Boolean!
+
+  duration: Float
+
+  mpdPath: String
+
+  hlsPath: String
+
+  chapters: [Chapter!]!
+
+  book: Book!
+
+  narrators: [Narrator!]!
+
+  playerState: PlayerState
+
+  insertedAt: NaiveDateTime!
+
+  updatedAt: NaiveDateTime!
+}
+
+type SeriesBookConnection {
+  pageInfo: PageInfo!
+  edges: [SeriesBookEdge]
+}
+
+type SearchResultEdge {
+  node: SearchResult
+  cursor: String
+}
+
+type SearchResultConnection {
+  pageInfo: PageInfo!
+  edges: [SearchResultEdge]
+}
+
+"""
+The `Naive DateTime` scalar type represents a naive date and time without
+timezone. The DateTime appears in a JSON response as an ISO8601 formatted
+string.
+"""
+scalar NaiveDateTime
+
+type Series implements SearchResult & Node {
+  "The ID of an object"
+  id: ID!
+
+  name: String!
+
+  seriesBooks(after: String, first: Int, before: String, last: Int): SeriesBookConnection
+
+  insertedAt: NaiveDateTime!
+
+  updatedAt: NaiveDateTime!
+}
+
+type User {
+  email: String!
+  admin: Boolean!
+  confirmedAt: NaiveDateTime
+  loadedPlayerState: PlayerState
+  insertedAt: NaiveDateTime!
+  updatedAt: NaiveDateTime!
+}
+
+type PageInfo {
+  "When paginating backwards, are there more items?"
+  hasPreviousPage: Boolean!
+
+  "When paginating forwards, are there more items?"
+  hasNextPage: Boolean!
+
+  "When paginating backwards, the cursor to continue."
+  startCursor: String
+
+  "When paginating forwards, the cursor to continue."
+  endCursor: String
+}
+
+type BookEdge {
+  node: Book
+  cursor: String
+}
+
+type MediaConnection {
+  pageInfo: PageInfo!
+  edges: [MediaEdge]
+}
+
+type SeriesBook implements Node {
+  "The ID of an object"
+  id: ID!
+
+  bookNumber: Decimal!
+
+  book: Book!
+
+  series: Series!
+}
+
+interface Node {
+  "The ID of the object."
+  id: ID!
+}
+
+"""
+The `Date` scalar type represents a date. The Date appears in a JSON
+response as an ISO8601 formatted string, without a time component.
+"""
+scalar Date
+
+type PlayerStateEdge {
+  node: PlayerState
+  cursor: String
+}
+
+type Chapter {
+  id: ID!
+  title: String
+  startTime: Float!
+  endTime: Float
+}
+
+type RootQueryType {
+  node(
+    "The ID of an object."
+    id: ID!
+  ): Node
+  me: User
+  books(after: String, first: Int, before: String, last: Int): BookConnection
+  playerStates(after: String, first: Int, before: String, last: Int): PlayerStateConnection
+  search(
+    after: String
+
+    first: Int
+
+    before: String
+
+    last: Int
+
+    "Must be at least 3 characters"
+    query: String!
+  ): SearchResultConnection
+}
+
+interface SearchResult {
+  id: ID!
+}
+
+type MediaEdge {
+  node: Media
+  cursor: String
+}
+
+type BookConnection {
+  pageInfo: PageInfo!
+  edges: [BookEdge]
+}
+
+type PlayerState implements Node {
+  "The ID of an object"
+  id: ID!
+
+  playbackRate: Float!
+
+  position: Float!
+
+  status: PlayerStateStatus!
+
+  media: Media!
+
+  insertedAt: NaiveDateTime!
+
+  updatedAt: NaiveDateTime!
+}
+
+input CreateSessionInput {
+  email: String!
+  password: String!
+}
+
+type CreateSessionPayload {
+  token: String!
+  user: User!
+}
+
+type UpdatePlayerStatePayload {
+  playerState: PlayerState!
+}
+
+type Author implements Node {
+  "The ID of an object"
+  id: ID!
+
+  name: String!
+
+  person: Person!
+
+  authoredBooks(after: String, first: Int, before: String, last: Int): BookConnection
+
+  insertedAt: NaiveDateTime!
+
+  updatedAt: NaiveDateTime!
+}
+
+type Person implements SearchResult & Node {
+  "The ID of an object"
+  id: ID!
+
+  name: String!
+
+  description: String
+
+  imagePath: String
+
+  authors: [Author!]!
+
+  narrators: [Narrator!]!
+
+  insertedAt: NaiveDateTime!
+
+  updatedAt: NaiveDateTime!
+}
+
+type Book implements SearchResult & Node {
+  "The ID of an object"
+  id: ID!
+
+  title: String!
+
+  description: String
+
+  published: Date!
+
+  imagePath: String
+
+  authors: [Author!]!
+
+  seriesBooks: [SeriesBook!]!
+
+  media: [Media!]!
+
+  insertedAt: NaiveDateTime!
+
+  updatedAt: NaiveDateTime!
+}
+
+input UpdatePlayerStateInput {
+  mediaId: ID!
+  position: Float
+  playbackRate: Float
+}
+
+type SeriesBookEdge {
+  node: SeriesBook
+  cursor: String
+}
+
+type Narrator implements Node {
+  "The ID of an object"
+  id: ID!
+
+  name: String!
+
+  person: Person!
+
+  narratedMedia(after: String, first: Int, before: String, last: Int): MediaConnection
+
+  insertedAt: NaiveDateTime!
+
+  updatedAt: NaiveDateTime!
+}
+
+type RootMutationType {
+  createSession(input: CreateSessionInput!): CreateSessionPayload
+  deleteSession: DeleteSessionPayload
+  updatePlayerState(input: UpdatePlayerStateInput!): UpdatePlayerStatePayload
+}
+
+type PlayerStateConnection {
+  pageInfo: PageInfo!
+  edges: [PlayerStateEdge]
+}
+
+"""
+The `Decimal` scalar type represents signed double-precision fractional
+values parsed by the `Decimal` library.  The Decimal appears in a JSON
+response as a string to preserve precision.
+"""
+scalar Decimal
+
+enum PlayerStateStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  FINISHED
+}

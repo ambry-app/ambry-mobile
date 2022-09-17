@@ -4,7 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -30,17 +30,17 @@ public class SleepTimerModule extends ReactContextBaseJavaModule {
     public void setSleepTimer(Integer seconds) {
         Log.d("SleepTimerModule", "Set sleep timer called with seconds: " + seconds);
 
-        long targetTime = SystemClock.elapsedRealtime() + (seconds * 1000);
+        long targetTime = SystemClock.elapsedRealtime() + (seconds * 1000L);
+
+        Bundle bundle = new Bundle();
+        bundle.putLong("targetTime", targetTime);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, SleepTimerService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent intent = new Intent(context, SleepTimerBroadcastReceiver.class);
+        intent.putExtras(bundle);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, targetTime, pendingIntent);
-        } else {
-            alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, targetTime, pendingIntent);
-        }
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, targetTime, pendingIntent);
     }
 
     @ReactMethod
@@ -48,10 +48,9 @@ public class SleepTimerModule extends ReactContextBaseJavaModule {
         Log.d("SleepTimerModule", "Cancel sleep timer called");
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, SleepTimerService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent intent = new Intent(context, SleepTimerBroadcastReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         alarmManager.cancel(pendingIntent);
     }
-
 }

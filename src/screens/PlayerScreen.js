@@ -1,6 +1,8 @@
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
-import React, { useEffect, useRef } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { useNavigation } from '@react-navigation/native'
+import React, { useEffect } from 'react'
 import { Platform, Text, View } from 'react-native'
+import { TouchableNativeFeedback } from 'react-native-gesture-handler'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -15,10 +17,6 @@ import Background from './PlayerScreen/Background'
 import BookDetails from './PlayerScreen/BookDetails'
 import PlaybackRate from './PlayerScreen/PlaybackRate'
 import PlayerControls from './PlayerScreen/PlayerControls'
-import {
-  Chapters,
-  useChapters
-} from './PlayerScreen/PlayerControls/ChapterControls'
 import PlayerHeader from './PlayerScreen/PlayerHeader'
 import ProgressDisplay from './PlayerScreen/ProgressDisplay'
 import SleepTimerToggle from './PlayerScreen/SleepTimerToggle'
@@ -36,6 +34,7 @@ const playerSelector = [
 
 export default function PlayerScreen() {
   // console.log('RENDERING: PlayerScreen')
+  const navigation = useNavigation()
   const [error, loading, media, imageSource, hydrated] = usePlayer(
     ...playerSelector
   )
@@ -49,22 +48,14 @@ export default function PlayerScreen() {
     }
   }, [opacity, loading])
 
-  const animatedStyle = useAnimatedStyle(() => {
+  const animatedOpacity = useAnimatedStyle(() => {
     return { opacity: opacity.value }
   })
-
-  const chaptersRef = useRef()
-  const { chaptersOpen, onChaptersChange, toggleChapters } = useChapters(
-    chaptersRef,
-    loading
-  )
 
   if (error) {
     return (
       <ScreenCentered>
-        <Text style={tw`text-gray-700 dark:text-gray-200`}>
-          Failed to load player!
-        </Text>
+        <Text style={tw`text-gray-200`}>Failed to load player!</Text>
       </ScreenCentered>
     )
   }
@@ -74,7 +65,7 @@ export default function PlayerScreen() {
       <Background loading={loading} imageSource={imageSource} blur={0}>
         <ScreenCentered>
           <View
-            style={tw`flex items-center justify-center w-14 h-14 rounded-full bg-gray-200 dark:bg-gray-800`}
+            style={tw`flex items-center justify-center w-14 h-14 rounded-full bg-gray-800`}
           >
             <LargeActivityIndicator />
           </View>
@@ -94,39 +85,45 @@ export default function PlayerScreen() {
   if (!media) {
     return (
       <ScreenCentered>
-        <Text style={tw`text-gray-700 dark:text-gray-200`}>
-          No audiobook selected. Visit the Library to choose a book.
+        <Text style={tw`text-gray-200 mb-4`}>
+          No audiobook selected. Visit the library to choose a book:
         </Text>
+        <TouchableNativeFeedback
+          onPress={() => navigation.navigate('Library', { screen: 'Main' })}
+          background={TouchableNativeFeedback.Ripple(
+            tw.color('gray-400'),
+            true
+          )}
+        >
+          <FontAwesomeIcon
+            icon="book-open"
+            size={48}
+            color={tw.color('lime-400')}
+          />
+        </TouchableNativeFeedback>
       </ScreenCentered>
     )
   }
 
   return (
-    <BottomSheetModalProvider>
-      <Background
-        imageSource={imageSource}
-        blur={Platform.OS === 'ios' ? 25 : 10}
-      >
-        <Animated.View style={animatedStyle}>
-          <View style={tw`h-full`}>
-            <PlayerHeader>
-              <BookDetails imageSource={imageSource} media={media} />
-              <ProgressDisplay />
-              <View style={tw`flex-row items-center`}>
-                <SleepTimerToggle />
-                <View style={tw`flex-grow`} />
-                <PlaybackRate />
-              </View>
-            </PlayerHeader>
-            <PlayerControls toggleChapters={toggleChapters} />
-          </View>
-        </Animated.View>
-      </Background>
-      <Chapters
-        sheetRef={chaptersRef}
-        onChange={onChaptersChange}
-        isOpen={chaptersOpen}
-      />
-    </BottomSheetModalProvider>
+    <Background
+      imageSource={imageSource}
+      blur={Platform.OS === 'ios' ? 25 : 10}
+    >
+      <Animated.View style={animatedOpacity}>
+        <View style={tw`h-full`}>
+          <PlayerHeader>
+            <BookDetails imageSource={imageSource} media={media} />
+            <ProgressDisplay />
+            <View style={tw`flex-row items-center -ml-2`}>
+              <SleepTimerToggle />
+              <View style={tw`flex-grow`} />
+              <PlaybackRate />
+            </View>
+          </PlayerHeader>
+          <PlayerControls />
+        </View>
+      </Animated.View>
+    </Background>
   )
 }
