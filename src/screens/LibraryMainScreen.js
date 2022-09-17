@@ -16,7 +16,6 @@ export default function LibraryMainScreen({ navigation }) {
     navigation.setOptions({
       headerSearchBarOptions: {
         onChangeText: event => {
-          console.log(event)
           setSearch(event.nativeEvent.text)
         },
         placeholder: 'search library',
