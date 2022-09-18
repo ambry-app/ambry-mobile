@@ -4,7 +4,7 @@ import EncryptedStorage from 'react-native-encrypted-storage'
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 import {
-  MediaWithPlayerStateDocument,
+  LoadPlayerStateDocument,
   UpdatePlayerStateDocument,
   useBookQuery,
   useInfiniteBooksQuery,
@@ -237,14 +237,14 @@ export const source = path => {
   return makeSource(_authData, path)
 }
 
-export const getMediaWithPlayerState = async mediaId => {
+export const loadPlayerState = async mediaId => {
   const { _authData } = getState()
   const client = makeClient(_authData)
-  const data = await client.request(MediaWithPlayerStateDocument, {
-    id: mediaId
+  const data = await client.request(LoadPlayerStateDocument, {
+    input: { mediaId: mediaId }
   })
 
-  return data.node
+  return data.loadPlayerState.playerState
 }
 
 export const updatePlayerState = async (mediaId, state) => {

@@ -9,7 +9,7 @@ import create from 'zustand'
 import { persist, subscribeWithSelector } from 'zustand/middleware'
 import shallow from 'zustand/shallow'
 import { isPlaying } from '../lib/utils'
-import { getMediaWithPlayerState, updatePlayerState } from '../stores/AmbryAPI'
+import { loadPlayerState, updatePlayerState } from '../stores/AmbryAPI'
 import SleepTimer from '../stores/SleepTimer'
 import { source } from './AmbryAPI'
 
@@ -249,10 +249,10 @@ const loadPlayerStateFromServer = async selectedMedia => {
     console.debug(
       `Player: loading playerState for media ${selectedMedia.id} from server`
     )
-    const media = await getMediaWithPlayerState(selectedMedia.id)
+    const playerState = await loadPlayerState(selectedMedia.id)
 
-    console.debug('Player: media with playerState loaded', media)
-    loadTrackIntoPlayer(media)
+    console.debug('Player: playerState with media loaded', playerState)
+    loadTrackIntoPlayer(playerState)
   } catch (err) {
     console.error('Player: failed to load media with playerState', err)
     useStore.setState({
@@ -262,8 +262,9 @@ const loadPlayerStateFromServer = async selectedMedia => {
   }
 }
 
-const loadTrackIntoPlayer = async media => {
+const loadTrackIntoPlayer = async playerState => {
   await setupTrackPlayer()
+  const { media } = playerState
 
   const mediaTrack = mediaTrackForPlatform(media)
   const { uri: artworkUrl, headers } = source(media.book.imagePath)
@@ -306,18 +307,18 @@ const loadTrackIntoPlayer = async media => {
       headers
     })
 
-    await TrackPlayer.seekTo(media.playerState.position)
-    await TrackPlayer.setRate(media.playerState.playbackRate)
+    await TrackPlayer.seekTo(playerState.position)
+    await TrackPlayer.setRate(playerState.playbackRate)
 
-    const chapter = findChapter(media.playerState.position, media.chapters)
+    const chapter = findChapter(playerState.position, media.chapters)
 
     useStore.setState({
       mediaLoading: false,
       media: media,
-      position: media.playerState.position,
+      position: playerState.position,
       buffered: 0,
       currentChapter: chapter,
-      playbackRate: media.playerState.playbackRate
+      playbackRate: playerState.playbackRate
     })
   }
 }
