@@ -274,7 +274,7 @@ function sanitizeMediaId(id) {
   }
 }
 
-const loadTrackIntoPlayer = async media => {
+const loadTrackIntoPlayer = async playerState => {
   await setupTrackPlayer()
   const { media } = playerState
 
