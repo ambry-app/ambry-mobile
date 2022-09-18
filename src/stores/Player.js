@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { encode } from 'base-64'
 import { Platform } from 'react-native'
 import TrackPlayer, {
   Capability,
@@ -246,10 +247,12 @@ const loadPlayerStateFromServer = async selectedMedia => {
       playbackRate: null
     })
 
+    const mediaId = sanitizeMediaId(selectedMedia.id)
+
     console.debug(
-      `Player: loading playerState for media ${selectedMedia.id} from server`
+      `Player: loading playerState for media ${mediaId} from server`
     )
-    const playerState = await loadPlayerState(selectedMedia.id)
+    const playerState = await loadPlayerState(mediaId)
 
     console.debug('Player: playerState with media loaded', playerState)
     loadTrackIntoPlayer(playerState)
@@ -262,7 +265,16 @@ const loadPlayerStateFromServer = async selectedMedia => {
   }
 }
 
-const loadTrackIntoPlayer = async playerState => {
+// Required for upgrading from v1.x to v2.x
+function sanitizeMediaId(id) {
+  if (Number.isInteger(id)) {
+    return encode(`Media:${id}`)
+  } else {
+    return id
+  }
+}
+
+const loadTrackIntoPlayer = async media => {
   await setupTrackPlayer()
   const { media } = playerState
 
