@@ -125,6 +125,15 @@ export type DeleteSessionPayload = {
   deleted: Scalars['Boolean']
 }
 
+export type LoadPlayerStateInput = {
+  mediaId: Scalars['ID']
+}
+
+export type LoadPlayerStatePayload = {
+  __typename?: 'LoadPlayerStatePayload'
+  playerState: PlayerState
+}
+
 export type Media = Node & {
   __typename?: 'Media'
   abridged: Scalars['Boolean']
@@ -237,11 +246,17 @@ export type RootMutationType = {
   __typename?: 'RootMutationType'
   createSession?: Maybe<CreateSessionPayload>
   deleteSession?: Maybe<DeleteSessionPayload>
+  /** Initializes a new player state or returns an existing player state for a given Media. */
+  loadPlayerState?: Maybe<LoadPlayerStatePayload>
   updatePlayerState?: Maybe<UpdatePlayerStatePayload>
 }
 
 export type RootMutationTypeCreateSessionArgs = {
   input: CreateSessionInput
+}
+
+export type RootMutationTypeLoadPlayerStateArgs = {
+  input: LoadPlayerStateInput
 }
 
 export type RootMutationTypeUpdatePlayerStateArgs = {
@@ -860,69 +875,6 @@ export type PlayerStatesQuery = {
   } | null
 }
 
-export type MediaWithPlayerStateQueryVariables = Exact<{
-  id: Scalars['ID']
-}>
-
-export type MediaWithPlayerStateQuery = {
-  __typename?: 'RootQueryType'
-  node?:
-    | { __typename?: 'Author' }
-    | { __typename?: 'Book' }
-    | {
-        __typename: 'Media'
-        hlsPath?: string | null
-        mpdPath?: string | null
-        id: string
-        fullCast: boolean
-        abridged: boolean
-        duration?: number | null
-        chapters: Array<{
-          __typename?: 'Chapter'
-          id: string
-          startTime: number
-          endTime?: number | null
-          title?: string | null
-        }>
-        book: {
-          __typename: 'Book'
-          id: string
-          title: string
-          imagePath?: string | null
-          authors: Array<{
-            __typename: 'Author'
-            id: string
-            name: string
-            person: { __typename?: 'Person'; id: string }
-          }>
-          seriesBooks: Array<{
-            __typename: 'SeriesBook'
-            id: string
-            bookNumber: any
-            series: { __typename: 'Series'; id: string; name: string }
-          }>
-        }
-        playerState?: {
-          __typename: 'PlayerState'
-          status: PlayerStateStatus
-          position: number
-          playbackRate: number
-        } | null
-        narrators: Array<{
-          __typename: 'Narrator'
-          id: string
-          name: string
-          person: { __typename?: 'Person'; id: string }
-        }>
-      }
-    | { __typename?: 'Narrator' }
-    | { __typename?: 'Person' }
-    | { __typename?: 'PlayerState' }
-    | { __typename?: 'Series' }
-    | { __typename?: 'SeriesBook' }
-    | null
-}
-
 export type SearchQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']>
   after?: InputMaybe<Scalars['String']>
@@ -1020,6 +972,63 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never }>
 export type LogoutMutation = {
   __typename?: 'RootMutationType'
   logout?: { __typename?: 'DeleteSessionPayload'; deleted: boolean } | null
+}
+
+export type LoadPlayerStateMutationVariables = Exact<{
+  input: LoadPlayerStateInput
+}>
+
+export type LoadPlayerStateMutation = {
+  __typename?: 'RootMutationType'
+  loadPlayerState?: {
+    __typename?: 'LoadPlayerStatePayload'
+    playerState: {
+      __typename: 'PlayerState'
+      status: PlayerStateStatus
+      position: number
+      playbackRate: number
+      media: {
+        __typename: 'Media'
+        hlsPath?: string | null
+        mpdPath?: string | null
+        id: string
+        fullCast: boolean
+        abridged: boolean
+        duration?: number | null
+        chapters: Array<{
+          __typename?: 'Chapter'
+          id: string
+          startTime: number
+          endTime?: number | null
+          title?: string | null
+        }>
+        book: {
+          __typename: 'Book'
+          id: string
+          title: string
+          imagePath?: string | null
+          authors: Array<{
+            __typename: 'Author'
+            id: string
+            name: string
+            person: { __typename?: 'Person'; id: string }
+          }>
+          seriesBooks: Array<{
+            __typename: 'SeriesBook'
+            id: string
+            bookNumber: any
+            series: { __typename: 'Series'; id: string; name: string }
+          }>
+        }
+        narrators: Array<{
+          __typename: 'Narrator'
+          id: string
+          name: string
+          person: { __typename?: 'Person'; id: string }
+        }>
+      }
+    }
+  } | null
 }
 
 export type UpdatePlayerStateMutationVariables = Exact<{
@@ -1616,72 +1625,6 @@ export const useInfinitePlayerStatesQuery = <
     options
   )
 
-export const MediaWithPlayerStateDocument = `
-    query mediaWithPlayerState($id: ID!) {
-  node(id: $id) {
-    ... on Media {
-      ...MediaWithNarrators
-      hlsPath
-      mpdPath
-      chapters {
-        id
-        startTime
-        endTime
-        title
-      }
-      book {
-        ...BookWithAuthorsAndSeries
-      }
-      playerState {
-        ...PlayerStateBasics
-      }
-    }
-  }
-}
-    ${MediaWithNarratorsFragmentDoc}
-${BookWithAuthorsAndSeriesFragmentDoc}
-${PlayerStateBasicsFragmentDoc}`
-export const useMediaWithPlayerStateQuery = <
-  TData = MediaWithPlayerStateQuery,
-  TError = unknown
->(
-  client: GraphQLClient,
-  variables: MediaWithPlayerStateQueryVariables,
-  options?: UseQueryOptions<MediaWithPlayerStateQuery, TError, TData>,
-  headers?: RequestInit['headers']
-) =>
-  useQuery<MediaWithPlayerStateQuery, TError, TData>(
-    ['mediaWithPlayerState', variables],
-    fetcher<MediaWithPlayerStateQuery, MediaWithPlayerStateQueryVariables>(
-      client,
-      MediaWithPlayerStateDocument,
-      variables,
-      headers
-    ),
-    options
-  )
-export const useInfiniteMediaWithPlayerStateQuery = <
-  TData = MediaWithPlayerStateQuery,
-  TError = unknown
->(
-  _pageParamKey: keyof MediaWithPlayerStateQueryVariables,
-  client: GraphQLClient,
-  variables: MediaWithPlayerStateQueryVariables,
-  options?: UseInfiniteQueryOptions<MediaWithPlayerStateQuery, TError, TData>,
-  headers?: RequestInit['headers']
-) =>
-  useInfiniteQuery<MediaWithPlayerStateQuery, TError, TData>(
-    ['mediaWithPlayerState.infinite', variables],
-    metaData =>
-      fetcher<MediaWithPlayerStateQuery, MediaWithPlayerStateQueryVariables>(
-        client,
-        MediaWithPlayerStateDocument,
-        { ...variables, ...(metaData.pageParam ?? {}) },
-        headers
-      )(),
-    options
-  )
-
 export const SearchDocument = `
     query search($first: Int, $after: String, $query: String!) {
   search(first: $first, after: $after, query: $query) {
@@ -1813,6 +1756,60 @@ export const useLogoutMutation = <TError = unknown, TContext = unknown>(
       fetcher<LogoutMutation, LogoutMutationVariables>(
         client,
         LogoutDocument,
+        variables,
+        headers
+      )(),
+    options
+  )
+export const LoadPlayerStateDocument = `
+    mutation loadPlayerState($input: LoadPlayerStateInput!) {
+  loadPlayerState(input: $input) {
+    playerState {
+      ...PlayerStateBasics
+      media {
+        ...MediaWithNarrators
+        hlsPath
+        mpdPath
+        chapters {
+          id
+          startTime
+          endTime
+          title
+        }
+        book {
+          ...BookWithAuthorsAndSeries
+        }
+      }
+    }
+  }
+}
+    ${PlayerStateBasicsFragmentDoc}
+${MediaWithNarratorsFragmentDoc}
+${BookWithAuthorsAndSeriesFragmentDoc}`
+export const useLoadPlayerStateMutation = <
+  TError = unknown,
+  TContext = unknown
+>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    LoadPlayerStateMutation,
+    TError,
+    LoadPlayerStateMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<
+    LoadPlayerStateMutation,
+    TError,
+    LoadPlayerStateMutationVariables,
+    TContext
+  >(
+    ['loadPlayerState'],
+    (variables?: LoadPlayerStateMutationVariables) =>
+      fetcher<LoadPlayerStateMutation, LoadPlayerStateMutationVariables>(
+        client,
+        LoadPlayerStateDocument,
         variables,
         headers
       )(),

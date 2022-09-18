@@ -261,6 +261,10 @@ type Book implements SearchResult & Node {
   updatedAt: NaiveDateTime!
 }
 
+type LoadPlayerStatePayload {
+  playerState: PlayerState!
+}
+
 input UpdatePlayerStateInput {
   mediaId: ID!
   position: Float
@@ -289,7 +293,12 @@ type Narrator implements Node {
 
 type RootMutationType {
   createSession(input: CreateSessionInput!): CreateSessionPayload
+
   deleteSession: DeleteSessionPayload
+
+  "Initializes a new player state or returns an existing player state for a given Media."
+  loadPlayerState(input: LoadPlayerStateInput!): LoadPlayerStatePayload
+
   updatePlayerState(input: UpdatePlayerStateInput!): UpdatePlayerStatePayload
 }
 
@@ -304,6 +313,10 @@ values parsed by the `Decimal` library.  The Decimal appears in a JSON
 response as a string to preserve precision.
 """
 scalar Decimal
+
+input LoadPlayerStateInput {
+  mediaId: ID!
+}
 
 enum PlayerStateStatus {
   NOT_STARTED

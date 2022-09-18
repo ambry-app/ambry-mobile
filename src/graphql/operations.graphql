@@ -238,28 +238,6 @@ query playerStates($first: Int, $after: String) {
   }
 }
 
-query mediaWithPlayerState($id: ID!) {
-  node(id: $id) {
-    ... on Media {
-      ...MediaWithNarrators
-      hlsPath
-      mpdPath
-      chapters {
-        id
-        startTime
-        endTime
-        title
-      }
-      book {
-        ...BookWithAuthorsAndSeries
-      }
-      playerState {
-        ...PlayerStateBasics
-      }
-    }
-  }
-}
-
 query search($first: Int, $after: String, $query: String!) {
   search(first: $first, after: $after, query: $query) {
     edges {
@@ -309,6 +287,28 @@ mutation login($input: CreateSessionInput!) {
 mutation logout {
   logout: deleteSession {
     deleted
+  }
+}
+
+mutation loadPlayerState($input: LoadPlayerStateInput!) {
+  loadPlayerState(input: $input) {
+    playerState {
+      ...PlayerStateBasics
+      media {
+        ...MediaWithNarrators
+        hlsPath
+        mpdPath
+        chapters {
+          id
+          startTime
+          endTime
+          title
+        }
+        book {
+          ...BookWithAuthorsAndSeries
+        }
+      }
+    }
   }
 }
 

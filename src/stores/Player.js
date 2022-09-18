@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { encode } from 'base-64'
 import { Platform } from 'react-native'
 import TrackPlayer, {
   Capability,
@@ -9,7 +10,7 @@ import create from 'zustand'
 import { persist, subscribeWithSelector } from 'zustand/middleware'
 import shallow from 'zustand/shallow'
 import { isPlaying } from '../lib/utils'
-import { getMediaWithPlayerState, updatePlayerState } from '../stores/AmbryAPI'
+import { loadPlayerState, updatePlayerState } from '../stores/AmbryAPI'
 import SleepTimer from '../stores/SleepTimer'
 import { source } from './AmbryAPI'
 
@@ -246,13 +247,15 @@ const loadPlayerStateFromServer = async selectedMedia => {
       playbackRate: null
     })
 
-    console.debug(
-      `Player: loading playerState for media ${selectedMedia.id} from server`
-    )
-    const media = await getMediaWithPlayerState(selectedMedia.id)
+    const mediaId = sanitizeMediaId(selectedMedia.id)
 
-    console.debug('Player: media with playerState loaded', media)
-    loadTrackIntoPlayer(media)
+    console.debug(
+      `Player: loading playerState for media ${mediaId} from server`
+    )
+    const playerState = await loadPlayerState(mediaId)
+
+    console.debug('Player: playerState with media loaded', playerState)
+    loadTrackIntoPlayer(playerState)
   } catch (err) {
     console.error('Player: failed to load media with playerState', err)
     useStore.setState({
@@ -262,8 +265,18 @@ const loadPlayerStateFromServer = async selectedMedia => {
   }
 }
 
+// Required for upgrading from v1.x to v2.x
+function sanitizeMediaId(id) {
+  if (Number.isInteger(id)) {
+    return encode(`Media:${id}`)
+  } else {
+    return id
+  }
+}
+
 const loadTrackIntoPlayer = async media => {
   await setupTrackPlayer()
+  const { media } = playerState
 
   const mediaTrack = mediaTrackForPlatform(media)
   const { uri: artworkUrl, headers } = source(media.book.imagePath)
@@ -306,18 +319,18 @@ const loadTrackIntoPlayer = async media => {
       headers
     })
 
-    await TrackPlayer.seekTo(media.playerState.position)
-    await TrackPlayer.setRate(media.playerState.playbackRate)
+    await TrackPlayer.seekTo(playerState.position)
+    await TrackPlayer.setRate(playerState.playbackRate)
 
-    const chapter = findChapter(media.playerState.position, media.chapters)
+    const chapter = findChapter(playerState.position, media.chapters)
 
     useStore.setState({
       mediaLoading: false,
       media: media,
-      position: media.playerState.position,
+      position: playerState.position,
       buffered: 0,
       currentChapter: chapter,
-      playbackRate: media.playerState.playbackRate
+      playbackRate: playerState.playbackRate
     })
   }
 }
