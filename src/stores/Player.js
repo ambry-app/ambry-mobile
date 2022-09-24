@@ -14,6 +14,8 @@ import { loadPlayerState, updatePlayerState } from '../stores/AmbryAPI'
 import SleepTimer from '../stores/SleepTimer'
 import { source } from './AmbryAPI'
 
+const PLAYER_STORAGE_KEY = '@Ambry_selectedMedia'
+
 // Store:
 
 const useStore = create(
@@ -36,7 +38,7 @@ const useStore = create(
         setTabBarVisible: visible => set(() => ({ tabBarVisible: visible }))
       }),
       {
-        name: '@Ambry_selectedMedia',
+        name: PLAYER_STORAGE_KEY,
         getStorage: () => AsyncStorage,
         // only persist these values:
         partialize: state => ({

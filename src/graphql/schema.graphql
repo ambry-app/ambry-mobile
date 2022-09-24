@@ -22,6 +22,8 @@ type Media implements Node {
 
   hlsPath: String
 
+  mp4Path: String
+
   chapters: [Chapter!]!
 
   book: Book!

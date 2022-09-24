@@ -26,6 +26,7 @@ import LibraryMainScreen from '../screens/LibraryMainScreen'
 import SeriesScreen from '../screens/SeriesScreen'
 import usePlayer from '../stores/Player'
 import SettingsScreen from '../screens/SettingsScreen'
+import DownloadsScreen from '../screens/DownloadsScreen'
 
 const Stack = createNativeStackNavigator()
 
@@ -151,6 +152,8 @@ function iconForRoute(route) {
       return 'book-open'
     case 'Search':
       return 'magnifying-glass'
+    case 'Downloads':
+      return 'download'
     case 'Settings':
       return 'gear'
   }
@@ -164,6 +167,8 @@ function nameForRoute(route) {
       return 'Library'
     case 'Search':
       return 'Search'
+    case 'Downloads':
+      return 'Downloads'
     case 'Settings':
       return 'Settings'
   }
@@ -273,6 +278,7 @@ export const AppStack = () => {
         options={{ headerShown: false }}
         component={LibraryStack}
       />
+      <Tab.Screen name="Downloads" component={DownloadsScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   )

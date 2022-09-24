@@ -8162,6 +8162,11 @@ react-native-bars@^1.1.4:
   resolved "https://registry.yarnpkg.com/react-native-bars/-/react-native-bars-1.2.2.tgz#b1d7cbd7066da3e4aba4e15cd63f2d757c87d719"
   integrity sha512-4xSdhRcGdY3TMM0XFYf31VpjZ6pM/E4mN9DTpQdDH02RS0QB/V1zK+rllLEO/tVp9tgb0D4e3X0rhEED9FwpCQ==
 
+react-native-blob-courier@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-blob-courier/-/react-native-blob-courier-3.1.0.tgz#0579d5e899717b874a586e96ce61a8a5bed2ef99"
+  integrity sha512-qvYwZfJJTOZIcka6SC0o5wKkbJ3c2aO7q1soLMHoXAfUPCl4jKJbHuRWyQgGYDCXFkpMTNzwZ3dirKYxVfqNUQ==
+
 react-native-bootsplash@^4.1.5:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/react-native-bootsplash/-/react-native-bootsplash-4.3.2.tgz#347b024975dc344310ee4d95cb3be56b0b39e381"
@@ -8195,6 +8200,11 @@ react-native-encrypted-storage@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/react-native-encrypted-storage/-/react-native-encrypted-storage-4.0.2.tgz#c7d59b1d3ff2f80d572be3e85aaab3fdee16744a"
   integrity sha512-vneDkHGDuTvLQjUBztqb2YI8QoH1zxdJonPGTS+g57lfJZff9fAjoLSSb6NgMBebpXFcK3I3sEresGyL+3AArw==
+
+react-native-file-access@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-file-access/-/react-native-file-access-2.5.0.tgz#df6916e5edacaaed73a1ea20bea79d4be13b3faf"
+  integrity sha512-12Dq2NJ4pcTi+nATwT6ZwotpFn1iHZt/W5fOYNcCOuxIg2JnV4KlyDHEBI2WwwEXn6BvEkg9SZDYFk4rkQFttA==
 
 react-native-fit-image@^1.5.5:
   version "1.5.5"

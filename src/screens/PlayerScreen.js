@@ -1,7 +1,8 @@
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { useNavigation } from '@react-navigation/native'
-import React, { useEffect } from 'react'
-import { Platform, Text, View } from 'react-native'
+import React, { useCallback, useEffect } from 'react'
+import { Button, Platform, Text, View } from 'react-native'
+import BlobCourier from 'react-native-blob-courier'
 import { TouchableNativeFeedback } from 'react-native-gesture-handler'
 import Animated, {
   useAnimatedStyle,
@@ -12,6 +13,7 @@ import shallow from 'zustand/shallow'
 import LargeActivityIndicator from '../components/LargeActivityIndicator'
 import ScreenCentered from '../components/ScreenCentered'
 import tw from '../lib/tailwind'
+import useAmbryAPI from '../stores/AmbryAPI'
 import usePlayer from '../stores/Player'
 import Background from './PlayerScreen/Background'
 import BookDetails from './PlayerScreen/BookDetails'
@@ -39,6 +41,7 @@ export default function PlayerScreen() {
     ...playerSelector
   )
   const opacity = useSharedValue(0)
+  const _authData = useAmbryAPI(state => state._authData)
 
   useEffect(() => {
     if (loading) {
@@ -47,6 +50,29 @@ export default function PlayerScreen() {
       opacity.value = withTiming(1, { duration: 200 })
     }
   }, [opacity, loading])
+
+  const download = useCallback(async () => {
+    const mp4Path = media.mpdPath.replace('.mpd', '.mp4')
+    const url = `${_authData.host}${mp4Path}`
+
+    const request = {
+      android: {
+        useDownloadManager: true,
+        target: 'data'
+      },
+      filename: `downloads/${media.id}.m4a`,
+      method: 'GET',
+      mimeType: 'audio/mp4',
+      url: url,
+      headers: {
+        Authorization: `Bearer ${_authData.token}`
+      }
+    }
+
+    const fetchedResult = await BlobCourier.fetchBlob(request)
+
+    console.log(fetchedResult)
+  }, [media, _authData])
 
   const animatedOpacity = useAnimatedStyle(() => {
     return { opacity: opacity.value }
@@ -121,6 +147,11 @@ export default function PlayerScreen() {
               <PlaybackRate />
             </View>
           </PlayerHeader>
+          <Button
+            title="Download"
+            color={tw.color('lime-500')}
+            onPress={download}
+          />
           <PlayerControls />
         </View>
       </Animated.View>

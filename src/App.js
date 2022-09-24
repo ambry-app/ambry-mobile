@@ -12,6 +12,7 @@ import { faBackwardStep } from '@fortawesome/free-solid-svg-icons/faBackwardStep
 import { faBars } from '@fortawesome/free-solid-svg-icons/faBars'
 import { faBookOpen } from '@fortawesome/free-solid-svg-icons/faBookOpen'
 import { faCirclePlay } from '@fortawesome/free-solid-svg-icons/faCirclePlay'
+import { faDownload } from '@fortawesome/free-solid-svg-icons/faDownload'
 import { faForward } from '@fortawesome/free-solid-svg-icons/faForward'
 import { faForwardStep } from '@fortawesome/free-solid-svg-icons/faForwardStep'
 import { faGaugeHigh } from '@fortawesome/free-solid-svg-icons/faGaugeHigh'
@@ -48,7 +49,8 @@ library.add(
   faGaugeHigh,
   faVolumeHigh,
   faForwardStep,
-  faBackwardStep
+  faBackwardStep,
+  faDownload
 )
 
 onlineManager.setEventListener(setOnline => {

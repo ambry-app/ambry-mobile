@@ -145,6 +145,7 @@ export type Media = Node & {
   /** The ID of an object */
   id: Scalars['ID']
   insertedAt: Scalars['NaiveDateTime']
+  mp4Path?: Maybe<Scalars['String']>
   mpdPath?: Maybe<Scalars['String']>
   narrators: Array<Narrator>
   playerState?: Maybe<PlayerState>
