@@ -78,6 +78,12 @@ function setLoggedOutState() {
   })
 }
 
+function logoutIfUnauthorized(error) {
+  if (error.message.startsWith('unauthorized')) {
+    setLoggedOutState()
+  }
+}
+
 // Utils:
 
 function makeSource(_authData, path) {
@@ -155,7 +161,8 @@ export const useBooks = () => {
         if (lastPage.books.pageInfo.hasNextPage) {
           return { after: lastPage.books.pageInfo.endCursor }
         }
-      }
+      },
+      onError: logoutIfUnauthorized
     }
   )
 }
@@ -172,7 +179,8 @@ export const useSeriesBooks = id => {
         if (lastPage.node.seriesBooks.pageInfo.hasNextPage) {
           return { after: lastPage.node.seriesBooks.pageInfo.endCursor }
         }
-      }
+      },
+      onError: logoutIfUnauthorized
     }
   )
 }
@@ -189,7 +197,8 @@ export const usePlayerStates = () => {
         if (lastPage.playerStates.pageInfo.hasNextPage) {
           return { after: lastPage.playerStates.pageInfo.endCursor }
         }
-      }
+      },
+      onError: logoutIfUnauthorized
     }
   )
 }
@@ -197,19 +206,23 @@ export const usePlayerStates = () => {
 export const useBook = id => {
   const client = useClient()
 
-  return useBookQuery(client, { id })
+  return useBookQuery(client, { id }, { onError: logoutIfUnauthorized })
 }
 
 export const usePerson = id => {
   const client = useClient()
 
-  return usePersonQuery(client, { id, previewBooks: 25 })
+  return usePersonQuery(
+    client,
+    { id, previewBooks: 25 },
+    { onError: logoutIfUnauthorized }
+  )
 }
 
 export const useSeries = id => {
   const client = useClient()
 
-  return useSeriesQuery(client, { id })
+  return useSeriesQuery(client, { id }, { onError: logoutIfUnauthorized })
 }
 
 export const useSearch = query => {
@@ -224,7 +237,8 @@ export const useSearch = query => {
         if (lastPage.search.pageInfo.hasNextPage) {
           return { after: lastPage.search.pageInfo.endCursor }
         }
-      }
+      },
+      onError: logoutIfUnauthorized
     }
   )
 }
@@ -240,22 +254,32 @@ export const source = path => {
 export const loadPlayerState = async mediaId => {
   const { _authData } = getState()
   const client = makeClient(_authData)
-  const data = await client.request(LoadPlayerStateDocument, {
-    input: { mediaId: mediaId }
-  })
 
-  return data.loadPlayerState.playerState
+  try {
+    const data = await client.request(LoadPlayerStateDocument, {
+      input: { mediaId: mediaId }
+    })
+
+    return data.loadPlayerState.playerState
+  } catch (error) {
+    logoutIfUnauthorized(error)
+  }
 }
 
 export const updatePlayerState = async (mediaId, state) => {
   const { _authData } = getState()
   const client = makeClient(_authData)
-  const data = await client.request(UpdatePlayerStateDocument, {
-    input: {
-      mediaId: mediaId,
-      ...state
-    }
-  })
 
-  return data.updatePlayerState.playerState
+  try {
+    const data = await client.request(UpdatePlayerStateDocument, {
+      input: {
+        mediaId: mediaId,
+        ...state
+      }
+    })
+
+    return data.updatePlayerState.playerState
+  } catch (error) {
+    logoutIfUnauthorized(error)
+  }
 }
