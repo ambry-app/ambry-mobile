@@ -1,10 +1,10 @@
 import {
-  useInfiniteQuery,
   UseInfiniteQueryOptions,
-  useMutation,
   UseMutationOptions,
-  useQuery,
-  UseQueryOptions
+  UseQueryOptions,
+  useInfiniteQuery,
+  useMutation,
+  useQuery
 } from '@tanstack/react-query'
 import { GraphQLClient } from 'graphql-request'
 import { RequestInit } from 'graphql-request/dist/types.dom'
