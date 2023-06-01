@@ -28,16 +28,16 @@ function PlayerStateItem({ playerState, navigation }) {
         }
       }}
     >
-      <View style={tw`p-4 py-2 flex-row`}>
-        <View style={tw`w-1/4 bg-gray-800`}>
+      <View style={tw`p-4 py-2 flex-row items-center`}>
+        <View style={tw`w-1/3 bg-gray-800`}>
           <Image
             source={source(playerState.media.book.imagePath)}
             style={tw.style('rounded-md', 'w-full', {
-              aspectRatio: 10 / 15.5
+              aspectRatio: 1 / 1
             })}
           />
         </View>
-        <View style={tw`pl-2 w-3/4`}>
+        <View style={tw`pl-2 w-2/3`}>
           <Text
             style={tw`mb-1 text-base leading-tight font-bold text-gray-100`}
           >

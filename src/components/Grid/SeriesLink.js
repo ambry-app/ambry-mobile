@@ -42,7 +42,7 @@ export default function SeriesLink({ series }) {
           <View
             style={[
               tw`flex items-center justify-center`,
-              { aspectRatio: 10 / 15.5 }
+              { aspectRatio: 1 / 1 }
             ]}
           >
             <BookCovers seriesBooks={seriesBooks} />
@@ -82,21 +82,21 @@ function ThreeBooks({ firstBook, secondBook, thirdBook }) {
         source={source(thirdBook.imagePath)}
         style={[
           tw`rounded-lg w-10/12 absolute bottom-1 right-1 border border-gray-800`,
-          { aspectRatio: 10 / 15.5, transform: [{ rotate: '2deg' }] }
+          { aspectRatio: 1 / 1, transform: [{ rotate: '2deg' }] }
         ]}
       />
       <Image
         source={source(secondBook.imagePath)}
         style={[
           tw`rounded-lg w-10/12 border border-gray-800`,
-          { aspectRatio: 10 / 15.5 }
+          { aspectRatio: 1 / 1 }
         ]}
       />
       <Image
         source={source(firstBook.imagePath)}
         style={[
           tw`rounded-lg w-10/12 absolute top-1 left-1 border border-gray-800`,
-          { aspectRatio: 10 / 15.5, transform: [{ rotate: '-2deg' }] }
+          { aspectRatio: 1 / 1, transform: [{ rotate: '-2deg' }] }
         ]}
       />
     </>
@@ -112,14 +112,14 @@ function TwoBooks({ firstBook, secondBook }) {
         source={source(secondBook.imagePath)}
         style={[
           tw`rounded-lg w-10/12 absolute bottom-2 right-2 border border-gray-800`,
-          { aspectRatio: 10 / 15.5, transform: [{ rotate: '1deg' }] }
+          { aspectRatio: 1 / 1, transform: [{ rotate: '1deg' }] }
         ]}
       />
       <Image
         source={source(firstBook.imagePath)}
         style={[
           tw`rounded-lg w-10/12 absolute top-2 left-2 border border-gray-800`,
-          { aspectRatio: 10 / 15.5, transform: [{ rotate: '-1deg' }] }
+          { aspectRatio: 1 / 1, transform: [{ rotate: '-1deg' }] }
         ]}
       />
     </>
@@ -134,7 +134,7 @@ function OneBook({ firstBook }) {
       source={source(firstBook.imagePath)}
       style={[
         tw`rounded-lg w-10/12 border border-gray-800`,
-        { aspectRatio: 10 / 15.5 }
+        { aspectRatio: 1 / 1 }
       ]}
     />
   )

@@ -45,7 +45,7 @@ export default function BookDetails({ imageSource, media }) {
         </TouchableOpacity>
       </View>
       <View style={tw`mt-3 flex-row`}>
-        <View style={tw`w-1/3`}>
+        <View style={tw`w-2/5`}>
           <View style={tw`w-full rounded-md bg-gray-800`}>
             <TouchableNativeFeedback
               onPress={() => {
@@ -65,13 +65,13 @@ export default function BookDetails({ imageSource, media }) {
               <Image
                 source={imageSource}
                 style={tw.style('rounded-md', 'w-full', {
-                  aspectRatio: 10 / 15.5
+                  aspectRatio: 1 / 1
                 })}
               />
             </TouchableNativeFeedback>
           </View>
         </View>
-        <View style={tw`w-2/3 pl-3`}>
+        <View style={tw`w-3/5 pl-3`}>
           <WrappingListOfLinks
             prefix="by"
             items={media.book.authors}

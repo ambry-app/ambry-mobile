@@ -57,7 +57,7 @@ export default function BookLink({ book, seriesBook: primarySeriesBook }) {
               source={source(book.imagePath)}
               style={[
                 tw`rounded-lg w-full border border-gray-800`,
-                { aspectRatio: 10 / 15.5 }
+                { aspectRatio: 1 / 1 }
               ]}
             />
           </View>
